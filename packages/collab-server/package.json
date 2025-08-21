@@ -1,0 +1,12 @@
+{
+  "name": "@pitter-patter/collab-server",
+  "version": "0.0.1",
+  "type": "module",
+  "packageManager": "yarn@4.9.1",
+  "dependencies": {
+    "@stepwisehq/prosemirror-collab-commit": "^1.0.3"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.5"
+  }
+}

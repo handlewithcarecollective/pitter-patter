@@ -1,0 +1,14 @@
+{
+  "name": "@pitter-patter/collab-client",
+  "version": "0.0.1",
+  "type": "module",
+  "packageManager": "yarn@4.9.1",
+  "dependencies": {
+    "@stepwisehq/prosemirror-collab-commit": "^1.0.0"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.5",
+    "prosemirror-state": "^1.4.3",
+    "typescript": "^5.9.2"
+  }
+}
