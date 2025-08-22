@@ -2,7 +2,11 @@
 
 {
   # https://devenv.sh/packages/
-  packages = [ pkgs.git pkgs.git-lfs ];
+  packages = [
+    pkgs.git
+    pkgs.git-lfs
+    pkgs.nil
+  ];
 
   # https://devenv.sh/languages/
   languages.javascript = {
