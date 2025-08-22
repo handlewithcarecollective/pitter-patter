@@ -10,5 +10,8 @@
     "@tsconfig/strictest": "^2.0.5",
     "prosemirror-state": "^1.4.3",
     "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "prosemirror-state": "^1.0.0"
   }
 }
