@@ -6,6 +6,9 @@
     },
     {
       "path": "packages/collab-server"
+    },
+    {
+      "path": "packages/demo"
     }
   ]
 }

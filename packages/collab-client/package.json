@@ -9,7 +9,9 @@
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5",
+    "prosemirror-model": "^1.0.0",
     "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.0.0",
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
