@@ -13,12 +13,19 @@ import {
   receiveCommitTransaction,
   collab,
 } from "@pitter-patter/collab-client";
+import { DB } from "../database/schema";
+import { Node } from "prosemirror-model";
 
-const docId = "doc1";
+interface Props {
+  doc: DB["doc"];
+}
 
-export function Editor() {
+export function Editor({ doc }: Props) {
   const [state, setState] = useState(() =>
-    EditorState.create({ schema, plugins: [collab()] }),
+    EditorState.create({
+      doc: Node.fromJSON(schema, doc.content),
+      plugins: [collab({ version: doc.version })],
+    }),
   );
 
   const [initialState] = useState(state);
@@ -27,7 +34,7 @@ export function Editor() {
     typeof window === "undefined"
       ? null
       : new LongPollListener(
-          new URL(`/api/docs/${docId}/commits`, window.location.href),
+          new URL(`/api/docs/${doc.id}/commits`, window.location.href),
         ),
   );
 
@@ -35,8 +42,7 @@ export function Editor() {
     () =>
       listener && {
         sendCommit: async (commit) => {
-          console.log("commit", commit);
-          await fetch(`/api/docs/${docId}/commits`, {
+          await fetch(`/api/docs/${doc.id}/commits`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(commit.toJSON()),
@@ -44,7 +50,6 @@ export function Editor() {
         },
         getCommits: listener.getCommits,
         receiveCommits: (commits) => {
-          console.log("Receiving commits", commits);
           setState((prev) =>
             commits.reduce(
               (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),

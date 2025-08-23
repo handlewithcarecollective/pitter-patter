@@ -6,6 +6,7 @@
     pkgs.git
     pkgs.git-lfs
     pkgs.nil
+    pkgs.sqlite-interactive
   ];
 
   # https://devenv.sh/languages/
@@ -15,7 +16,10 @@
   };
 
   services = {
-    redis.enable = true;
+    redis = {
+      enable = true;
+      extraConfig = "save \"\"";
+    };
   };
 
   process.manager.implementation = "process-compose";

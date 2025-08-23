@@ -395,6 +395,14 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/codeframe", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-codeframe-npm-2.13.3-031ed52505-8181eb5328.zip/node_modules/@parcel/codeframe/",\
+        "packageDependencies": [\
+          ["@parcel/codeframe", "npm:2.13.3"],\
+          ["chalk", "npm:4.1.2"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-codeframe-npm-2.15.4-3293dc9909-a8e17327a7.zip/node_modules/@parcel/codeframe/",\
         "packageDependencies": [\
@@ -503,6 +511,15 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/diagnostic", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-diagnostic-npm-2.13.3-014ad4474c-6cf774f88b.zip/node_modules/@parcel/diagnostic/",\
+        "packageDependencies": [\
+          ["@mischnic/json-sourcemap", "npm:0.1.1"],\
+          ["@parcel/diagnostic", "npm:2.13.3"],\
+          ["nullthrows", "npm:1.1.1"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-diagnostic-npm-2.15.4-9d96b3f3d7-e088e1d98b.zip/node_modules/@parcel/diagnostic/",\
         "packageDependencies": [\
@@ -523,6 +540,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/events", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-events-npm-2.13.3-146f983142-f7233113db.zip/node_modules/@parcel/events/",\
+        "packageDependencies": [\
+          ["@parcel/events", "npm:2.13.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-events-npm-2.15.4-7d196e4d57-757afe5bf2.zip/node_modules/@parcel/events/",\
         "packageDependencies": [\
@@ -532,6 +556,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/feature-flags", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-feature-flags-npm-2.13.3-b7311841d7-0fb2588052.zip/node_modules/@parcel/feature-flags/",\
+        "packageDependencies": [\
+          ["@parcel/feature-flags", "npm:2.13.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-feature-flags-npm-2.15.4-97cf479791-5b4bb4bc99.zip/node_modules/@parcel/feature-flags/",\
         "packageDependencies": [\
@@ -580,6 +611,15 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/logger", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-logger-npm-2.13.3-7e623a6f24-b093f0718c.zip/node_modules/@parcel/logger/",\
+        "packageDependencies": [\
+          ["@parcel/diagnostic", "npm:2.13.3"],\
+          ["@parcel/events", "npm:2.13.3"],\
+          ["@parcel/logger", "npm:2.13.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-logger-npm-2.15.4-574b695a54-fac8451bfe.zip/node_modules/@parcel/logger/",\
         "packageDependencies": [\
@@ -591,6 +631,14 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/markdown-ansi", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-markdown-ansi-npm-2.13.3-75ec860315-7c995c1339.zip/node_modules/@parcel/markdown-ansi/",\
+        "packageDependencies": [\
+          ["@parcel/markdown-ansi", "npm:2.13.3"],\
+          ["chalk", "npm:4.1.2"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-markdown-ansi-npm-2.15.4-c7f60e1557-4980739e68.zip/node_modules/@parcel/markdown-ansi/",\
         "packageDependencies": [\
@@ -821,6 +869,14 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/plugin", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-plugin-npm-2.13.3-04df687f87-1b45f73a7e.zip/node_modules/@parcel/plugin/",\
+        "packageDependencies": [\
+          ["@parcel/plugin", "npm:2.13.3"],\
+          ["@parcel/types", "npm:2.13.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-plugin-npm-2.15.4-b50836a673-880bfbd1b6.zip/node_modules/@parcel/plugin/",\
         "packageDependencies": [\
@@ -831,6 +887,17 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/profiler", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-profiler-npm-2.13.3-970e2c27b2-f72e34a98a.zip/node_modules/@parcel/profiler/",\
+        "packageDependencies": [\
+          ["@parcel/diagnostic", "npm:2.13.3"],\
+          ["@parcel/events", "npm:2.13.3"],\
+          ["@parcel/profiler", "npm:2.13.3"],\
+          ["@parcel/types-internal", "npm:2.13.3"],\
+          ["chrome-trace-event", "npm:1.0.4"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-profiler-npm-2.15.4-45f95d4995-ccb44c8fa8.zip/node_modules/@parcel/profiler/",\
         "packageDependencies": [\
@@ -946,6 +1013,19 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@parcel/runtime-react-refresh", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-runtime-react-refresh-npm-2.13.3-6f7e813429-4ac6daaae0.zip/node_modules/@parcel/runtime-react-refresh/",\
+        "packageDependencies": [\
+          ["@parcel/plugin", "npm:2.13.3"],\
+          ["@parcel/runtime-react-refresh", "npm:2.13.3"],\
+          ["@parcel/utils", "npm:2.13.3"],\
+          ["react-error-overlay", "npm:6.0.9"],\
+          ["react-refresh", "npm:0.14.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@parcel/runtime-rsc", [\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-runtime-rsc-npm-2.15.4-9f470090ed-65d70ee48a.zip/node_modules/@parcel/runtime-rsc/",\
@@ -1002,6 +1082,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/rust", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/unplugged/@parcel-rust-npm-2.13.3-a6eff8339b/node_modules/@parcel/rust/",\
+        "packageDependencies": [\
+          ["@parcel/rust", "npm:2.13.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-rust-npm-2.15.4-04577b44ad-375ba783d6.zip/node_modules/@parcel/rust/",\
         "packageDependencies": [\
@@ -1302,6 +1389,15 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/types", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-types-npm-2.13.3-b4cc46a8a8-6cb4c15575.zip/node_modules/@parcel/types/",\
+        "packageDependencies": [\
+          ["@parcel/types", "npm:2.13.3"],\
+          ["@parcel/types-internal", "npm:2.13.3"],\
+          ["@parcel/workers", "virtual:b4cc46a8a8f4d0f0835574c9ef860055c06819ac9c881128c6e19a3eedafee3afac571ecf0343a713347a68eae489e60d6895780e3e17ca24ffc543a1508f754#npm:2.13.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-types-npm-2.15.4-bdbe78c28b-aa12a6b56f.zip/node_modules/@parcel/types/",\
         "packageDependencies": [\
@@ -1313,6 +1409,17 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/types-internal", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-types-internal-npm-2.13.3-a19211e96a-8edbdbe3a1.zip/node_modules/@parcel/types-internal/",\
+        "packageDependencies": [\
+          ["@parcel/diagnostic", "npm:2.13.3"],\
+          ["@parcel/feature-flags", "npm:2.13.3"],\
+          ["@parcel/source-map", "npm:2.1.1"],\
+          ["@parcel/types-internal", "npm:2.13.3"],\
+          ["utility-types", "npm:3.11.0"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-types-internal-npm-2.15.4-38a7f50d7f-ab2d739324.zip/node_modules/@parcel/types-internal/",\
         "packageDependencies": [\
@@ -1326,6 +1433,21 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/utils", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-utils-npm-2.13.3-e68f4549ae-cbd8be0cfb.zip/node_modules/@parcel/utils/",\
+        "packageDependencies": [\
+          ["@parcel/codeframe", "npm:2.13.3"],\
+          ["@parcel/diagnostic", "npm:2.13.3"],\
+          ["@parcel/logger", "npm:2.13.3"],\
+          ["@parcel/markdown-ansi", "npm:2.13.3"],\
+          ["@parcel/rust", "npm:2.13.3"],\
+          ["@parcel/source-map", "npm:2.1.1"],\
+          ["@parcel/utils", "npm:2.13.3"],\
+          ["chalk", "npm:4.1.2"],\
+          ["nullthrows", "npm:1.1.1"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-utils-npm-2.15.4-6150dff7aa-8dc6d64367.zip/node_modules/@parcel/utils/",\
         "packageDependencies": [\
@@ -1487,6 +1609,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@parcel/workers", [\
+      ["npm:2.13.3", {\
+        "packageLocation": "./.yarn/cache/@parcel-workers-npm-2.13.3-b9b072daef-0aec766158.zip/node_modules/@parcel/workers/",\
+        "packageDependencies": [\
+          ["@parcel/workers", "npm:2.13.3"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
       ["npm:2.15.4", {\
         "packageLocation": "./.yarn/cache/@parcel-workers-npm-2.15.4-78451c8fdc-f191fbb414.zip/node_modules/@parcel/workers/",\
         "packageDependencies": [\
@@ -1504,6 +1633,25 @@ const RAW_RUNTIME_STATE =
           ["@parcel/types-internal", "npm:2.15.4"],\
           ["@parcel/utils", "npm:2.15.4"],\
           ["@parcel/workers", "virtual:1847039c823861d115456547892b46a60f6888d5653b7e6762084601ef0eb3d74c1f29664398546a49779d7a093de7157dc009de4cc38bd5c683fc81db4150fe#npm:2.15.4"],\
+          ["@types/parcel__core", null],\
+          ["nullthrows", "npm:1.1.1"]\
+        ],\
+        "packagePeers": [\
+          "@parcel/core",\
+          "@types/parcel__core"\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["virtual:b4cc46a8a8f4d0f0835574c9ef860055c06819ac9c881128c6e19a3eedafee3afac571ecf0343a713347a68eae489e60d6895780e3e17ca24ffc543a1508f754#npm:2.13.3", {\
+        "packageLocation": "./.yarn/__virtual__/@parcel-workers-virtual-df66c5c34e/0/cache/@parcel-workers-npm-2.13.3-b9b072daef-0aec766158.zip/node_modules/@parcel/workers/",\
+        "packageDependencies": [\
+          ["@parcel/core", null],\
+          ["@parcel/diagnostic", "npm:2.13.3"],\
+          ["@parcel/logger", "npm:2.13.3"],\
+          ["@parcel/profiler", "npm:2.13.3"],\
+          ["@parcel/types-internal", "npm:2.13.3"],\
+          ["@parcel/utils", "npm:2.13.3"],\
+          ["@parcel/workers", "virtual:b4cc46a8a8f4d0f0835574c9ef860055c06819ac9c881128c6e19a3eedafee3afac571ecf0343a713347a68eae489e60d6895780e3e17ca24ffc543a1508f754#npm:2.13.3"],\
           ["@types/parcel__core", null],\
           ["nullthrows", "npm:1.1.1"]\
         ],\
@@ -1617,6 +1765,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@handlewithcare/react-prosemirror", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.4.12"],\
           ["@parcel/rsc", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.15.4"],\
+          ["@parcel/runtime-react-refresh", "npm:2.13.3"],\
           ["@parcel/runtime-rsc", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.15.4"],\
           ["@pitter-patter/collab-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/collab-client"],\
           ["@pitter-patter/collab-server", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/collab-server"],\
@@ -1644,7 +1793,8 @@ const RAW_RUNTIME_STATE =
           ["react", "npm:19.1.1"],\
           ["react-dom", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.1.1"],\
           ["react-reconciler", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.32.0"],\
-          ["react-server-dom-parcel", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.1.1"]\
+          ["react-server-dom-parcel", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.1.1"],\
+          ["uuid", "npm:11.1.0"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -4204,7 +4354,7 @@ const RAW_RUNTIME_STATE =
           ["pathe", "npm:2.0.3"],\
           ["pkg-types", "npm:2.3.0"],\
           ["std-env", "npm:3.9.0"],\
-          ["tsconfck", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#npm:3.1.6"]\
+          ["tsconfck", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"]\
         ],\
         "packagePeers": [\
           "@types/kysely-postgres-js",\
@@ -5389,6 +5539,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["react-error-overlay", [\
+      ["npm:6.0.9", {\
+        "packageLocation": "./.yarn/cache/react-error-overlay-npm-6.0.9-96e7e1e53a-02f51337f3.zip/node_modules/react-error-overlay/",\
+        "packageDependencies": [\
+          ["react-error-overlay", "npm:6.0.9"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["react-reconciler", [\
       ["npm:0.32.0", {\
         "packageLocation": "./.yarn/cache/react-reconciler-npm-0.32.0-9d60959fd4-ace0562d2a.zip/node_modules/react-reconciler/",\
@@ -5413,6 +5572,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["react-refresh", [\
+      ["npm:0.14.2", {\
+        "packageLocation": "./.yarn/cache/react-refresh-npm-0.14.2-95df341b4d-875b72ef56.zip/node_modules/react-refresh/",\
+        "packageDependencies": [\
+          ["react-refresh", "npm:0.14.2"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:0.16.0", {\
         "packageLocation": "./.yarn/cache/react-refresh-npm-0.16.0-b640d0f460-122525dbd7.zip/node_modules/react-refresh/",\
         "packageDependencies": [\
@@ -6085,18 +6251,18 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["tsconfck", [\
-      ["npm:3.1.6", {\
-        "packageLocation": "./.yarn/cache/tsconfck-npm-3.1.6-2dccdb1bd5-269c3c5135.zip/node_modules/tsconfck/",\
+      ["patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d", {\
+        "packageLocation": "./.yarn/cache/tsconfck-patch-1609f909d9-6faf065dd6.zip/node_modules/tsconfck/",\
         "packageDependencies": [\
-          ["tsconfck", "npm:3.1.6"]\
+          ["tsconfck", "patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"]\
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#npm:3.1.6", {\
-        "packageLocation": "./.yarn/__virtual__/tsconfck-virtual-c47ad620c6/0/cache/tsconfck-npm-3.1.6-2dccdb1bd5-269c3c5135.zip/node_modules/tsconfck/",\
+      ["virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d", {\
+        "packageLocation": "./.yarn/__virtual__/tsconfck-virtual-159dc5b09c/0/cache/tsconfck-patch-1609f909d9-6faf065dd6.zip/node_modules/tsconfck/",\
         "packageDependencies": [\
           ["@types/typescript", null],\
-          ["tsconfck", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#npm:3.1.6"],\
+          ["tsconfck", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"],\
           ["typescript", null]\
         ],\
         "packagePeers": [\
@@ -6249,6 +6415,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/utility-types-npm-3.11.0-5b9c56f39f-2f1580137b.zip/node_modules/utility-types/",\
         "packageDependencies": [\
           ["utility-types", "npm:3.11.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["uuid", [\
+      ["npm:11.1.0", {\
+        "packageLocation": "./.yarn/cache/uuid-npm-11.1.0-61d0d08928-34aa51b987.zip/node_modules/uuid/",\
+        "packageDependencies": [\
+          ["uuid", "npm:11.1.0"]\
         ],\
         "linkType": "HARD"\
       }]\

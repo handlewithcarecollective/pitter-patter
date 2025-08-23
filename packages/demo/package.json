@@ -19,6 +19,7 @@
     "@parcel/runtime-rsc": "^2.15.4",
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/collab-server": "workspace:^",
+    "better-sqlite3": "^12.2.0",
     "express": "^5.1.0",
     "kysely": "^0.28.5",
     "prosemirror-commands": "^1.7.1",
@@ -31,9 +32,11 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-reconciler": "^0.32.0",
-    "react-server-dom-parcel": "^19.1.1"
+    "react-server-dom-parcel": "^19.1.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@parcel/runtime-react-refresh": "^2.13.3",
     "@tsconfig/strictest": "^2.0.5",
     "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5",
@@ -41,7 +44,6 @@
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "@types/react-reconciler": "^0",
-    "better-sqlite3": "^12.2.0",
     "kysely-codegen": "^0.18.5",
     "kysely-ctl": "^0.17.0",
     "parcel": "^2.15.4"

@@ -6,6 +6,16 @@ import { applyCommitJSON } from "@stepwisehq/prosemirror-collab-commit/apply-com
 import { Schema } from "prosemirror-model";
 import { createClient, RedisClientType } from "redis";
 
+function PromiseWithResolvers<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: any) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
 interface CollabAuthorityConfig {
   schema: Schema;
   getDoc: (docId: string) => Promise<{ docJSON: NodeJSON; version: number }>;
@@ -116,7 +126,7 @@ export class RedisBroadcastManager {
   }
 
   async listenForCommit(docId: string, version: number) {
-    const { promise, resolve } = Promise.withResolvers<CommitJSON[]>();
+    const { promise, resolve } = PromiseWithResolvers<CommitJSON[]>();
     this.streamManager.listenForCommit(docId, version, resolve);
 
     return await Promise.race([
@@ -139,25 +149,25 @@ class RedisStreamManager {
   private streamCancellations = new Map<string, number>();
 
   constructor(
-    private restartStreams: (streams: { key: string; id: string }[]) => void,
+    private restartStreams: (
+      streams: { key: string; id: string }[],
+    ) => Promise<void>,
   ) {
     this.processMessages = this.processMessages.bind(this);
   }
 
   async restart() {
-    const streams = this.map
-      .entries()
+    const streams = Array.from(this.map.entries())
       .map(
         ([stream, versionMap]) =>
           [
             stream,
-            versionMap
-              .keys()
-              .reduce((acc, version) => (acc < version ? acc : version)),
+            Array.from(versionMap.keys()).reduce((acc, version) =>
+              acc < version ? acc : version,
+            ),
           ] as const,
       )
-      .map(([stream, id]) => ({ key: stream, id: id.toString() + "-1" }))
-      .toArray();
+      .map(([stream, id]) => ({ key: stream, id: id.toString() + "-1" }));
 
     await this.restartStreams(streams);
   }
@@ -173,7 +183,9 @@ class RedisStreamManager {
 
       await this.restart();
     } else {
-      const alreadyListening = existing.keys().some((v) => v <= version);
+      const alreadyListening = Array.from(existing.keys()).some(
+        (v) => v <= version,
+      );
       const existingResolvers = existing.get(version);
 
       if (existingResolvers) {

@@ -5,12 +5,17 @@ import {
   CommitJSON,
   getVersion,
   sendableCommit,
+  NodeJSON,
 } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { EditorState } from "prosemirror-state";
 
-export { collab, receiveCommitTransaction };
-
-export { Commit, type CommitJSON };
+export {
+  collab,
+  receiveCommitTransaction,
+  Commit,
+  type CommitJSON,
+  type NodeJSON,
+};
 
 export interface CollabClientConfig {
   sendCommit: (commit: Commit) => Promise<void>;
