@@ -9,7 +9,7 @@ import { createClient, RedisClientType } from "redis";
 interface CollabAuthorityConfig {
   schema: Schema;
   getDoc: (docId: string) => Promise<{ docJSON: NodeJSON; version: number }>;
-  getCommit: (docId: string, commitRef: string) => Promise<CommitJSON>;
+  getCommit: (docId: string, commitRef: string) => Promise<CommitJSON | null>;
   getCommits: (docId: string, version: number) => Promise<CommitJSON[]>;
   saveDoc: (docId: string, docJSON: NodeJSON, version: number) => Promise<void>;
   saveCommit: (docId: string, commitJSON: CommitJSON) => Promise<void>;
@@ -48,7 +48,7 @@ export class CollabAuthority {
 
     await this.saveCommit(docId, appliedCommitJSON);
     await this.saveDoc(docId, appliedDocJSON, appliedCommitJSON.version);
-    await this.broadcastCommit(docId, commitJSON);
+    await this.broadcastCommit(docId, appliedCommitJSON);
   }
 }
 
@@ -63,6 +63,7 @@ export class RedisBroadcastManager {
   private readClientId: number | null = null;
   private writeClient: RedisClientType;
   private streamManager: RedisStreamManager;
+  // private blocked = false;
   private timeout: number;
 
   constructor(config: RedisBroadcastManagerConfig) {
@@ -77,23 +78,25 @@ export class RedisBroadcastManager {
     });
     this.timeout = config.timeout ?? 5_000;
 
-    this.streamManager = new RedisStreamManager(
-      async () => {
-        if (this.readClientId === null) {
-          throw new Error(`Failed to unblock redis read client: not connected`);
-        }
-        await this.unblockClient.sendCommand([
-          "CLIENT",
-          "UNBLOCK",
-          this.readClientId.toString(),
-        ]);
-      },
-      (streams) => {
+    this.streamManager = new RedisStreamManager(async (streams) => {
+      if (this.readClientId === null) {
+        throw new Error(`Failed to unblock redis read client: not connected`);
+      }
+
+      await this.unblockClient.sendCommand([
+        "CLIENT",
+        "UNBLOCK",
+        this.readClientId.toString(),
+      ]);
+
+      if (streams.length) {
         this.readClient
           .xRead(streams, { BLOCK: this.timeout })
           .then(this.streamManager.processMessages);
-      },
-    );
+      }
+    });
+
+    this.broadcastCommit = this.broadcastCommit.bind(this);
   }
 
   async connect() {
@@ -107,7 +110,7 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.writeClient.xAdd(docId, commitJSON.version.toString(), {
+    await this.writeClient.xAdd(docId, commitJSON.version.toString() + "-1", {
       commitJSON: JSON.stringify(commitJSON),
     });
   }
@@ -120,9 +123,9 @@ export class RedisBroadcastManager {
       promise,
       new Promise((resolve) => {
         setTimeout(resolve, this.timeout);
-      }).then(() => {
-        this.streamManager.clearListener(docId, version, resolve);
-        return [];
+      }).then(async () => {
+        await this.streamManager.clearListener(docId, version, resolve);
+        return [] as CommitJSON[];
       }),
     ]);
   }
@@ -136,7 +139,6 @@ class RedisStreamManager {
   private streamCancellations = new Map<string, number>();
 
   constructor(
-    private unblock: () => Promise<void>,
     private restartStreams: (streams: { key: string; id: string }[]) => void,
   ) {
     this.processMessages = this.processMessages.bind(this);
@@ -154,10 +156,10 @@ class RedisStreamManager {
               .reduce((acc, version) => (acc < version ? acc : version)),
           ] as const,
       )
-      .map(([stream, id]) => ({ key: stream, id: id.toString() }))
+      .map(([stream, id]) => ({ key: stream, id: id.toString() + "-1" }))
       .toArray();
 
-    this.restartStreams(streams);
+    await this.restartStreams(streams);
   }
 
   async listenForCommit(
@@ -169,9 +171,7 @@ class RedisStreamManager {
     if (!existing) {
       this.map.set(streamKey, new Map([[version, [callback]]]));
 
-      await this.unblock();
-
-      this.restart();
+      await this.restart();
     } else {
       const alreadyListening = existing.keys().some((v) => v <= version);
       const existingResolvers = existing.get(version);
@@ -190,27 +190,29 @@ class RedisStreamManager {
       }
 
       if (!alreadyListening) {
-        await this.unblock();
-
-        this.restart();
+        await this.restart();
       }
     }
   }
 
   async processMessages(events: Awaited<ReturnType<RedisClientType["xRead"]>>) {
     if (!events) {
-      this.restart();
+      await this.restart();
       return;
     }
     for (const { name: stream, messages } of events as {
       name: string;
-      messages: { id: string; message: any }[];
+      messages: { id: string; message: { commitJSON: string } }[];
     }[]) {
-      const messageMap = new Map<(messages: any) => void, string[]>();
+      const messageMap = new Map<
+        (commitJSON: CommitJSON[]) => void,
+        CommitJSON[]
+      >();
       const versionMap = this.map.get(stream);
       if (!versionMap) continue;
       const versionsToDelete = new Set<number>();
       for (const { id, message } of messages) {
+        const commitJSON = JSON.parse(message.commitJSON) as CommitJSON;
         for (const [version, resolvers] of versionMap.entries()) {
           const idVersion = id.split("-")[0]!;
           if (version >= parseInt(idVersion, 10)) {
@@ -220,9 +222,9 @@ class RedisStreamManager {
           for (const resolve of resolvers) {
             const foundMessages = messageMap.get(resolve);
             if (foundMessages) {
-              foundMessages.push(message);
+              foundMessages.push(commitJSON);
             } else {
-              messageMap.set(resolve, [message]);
+              messageMap.set(resolve, [commitJSON]);
             }
           }
           versionsToDelete.add(version);
@@ -240,10 +242,10 @@ class RedisStreamManager {
         resolve(foundMessages);
       }
     }
-    this.restart();
+    await this.restart();
   }
 
-  clearListener(
+  async clearListener(
     streamKey: string,
     version: number,
     callback: (commits: CommitJSON[]) => void,
@@ -255,6 +257,7 @@ class RedisStreamManager {
       if (versionMap.size === 0) {
         this.map.delete(streamKey);
       }
+      await this.restart();
     } else {
       versionMap.set(
         version,

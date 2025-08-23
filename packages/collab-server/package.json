@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "packageManager": "yarn@4.9.1",
+  "exports": "./dist/index.js",
   "dependencies": {
     "@stepwisehq/prosemirror-collab-commit": "^1.0.3",
     "redis": "^5.8.2"
@@ -12,6 +13,8 @@
     "prosemirror-model": "^1.25.3"
   },
   "peerDependencies": {
-    "prosemirror-model": "^1.0.0"
+    "prosemirror-model": "^1.0.0",
+    "prosemirror-state": "^1.0.0",
+    "prosemirror-transform": "^1.0.0"
   }
 }

@@ -20,3 +20,6 @@ devenv.local.nix
 # Typescript
 dist/
 *.tsbuildinfo
+
+# Parcel
+.parcel-cache

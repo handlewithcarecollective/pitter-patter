@@ -10,6 +10,8 @@ import { EditorState } from "prosemirror-state";
 
 export { collab, receiveCommitTransaction };
 
+export { Commit, type CommitJSON };
+
 export interface CollabClientConfig {
   sendCommit: (commit: Commit) => Promise<void>;
   getCommits: (version: number) => Promise<CommitJSON[]>;
@@ -79,6 +81,9 @@ export class CollabClient {
       } catch (e) {
         // TODO: Implement a backoff strategy
         console.error(e);
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 3_000);
+        });
       }
     }
   }
@@ -93,15 +98,15 @@ export interface LongPollListenerOptions {
 export class LongPollListener {
   private headers: HeadersInit;
   private fetch: typeof globalThis.fetch;
-  private timeout: number;
+  // private timeout: number;
 
   constructor(
     private url: URL,
     options: LongPollListenerOptions = {},
   ) {
     this.headers = options.headers ?? {};
-    this.fetch = options.fetch ?? globalThis.fetch;
-    this.timeout = options.timeout ?? 5_000;
+    this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
+    // this.timeout = options.timeout ?? 5_000;
 
     this.getCommits = this.getCommits.bind(this);
   }
@@ -111,7 +116,7 @@ export class LongPollListener {
     url.searchParams.append("version", version.toString());
 
     const response = await this.fetch(url, {
-      signal: AbortSignal.timeout(this.timeout),
+      // signal: AbortSignal.timeout(this.timeout),
       headers: this.headers,
     });
 

@@ -2,7 +2,7 @@
   "extends": "@tsconfig/strictest",
   "compilerOptions": {
     "composite": true,
-    "emitDeclarationOnly": true,
+    "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
     "moduleResolution": "nodenext",

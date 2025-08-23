@@ -3,6 +3,9 @@
   "references": [
     {
       "path": "packages/collab-client"
+    },
+    {
+      "path": "packages/collab-server"
     }
   ]
 }

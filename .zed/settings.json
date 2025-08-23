@@ -24,6 +24,14 @@
         }
       }
     },
+    "TSX": {
+      "formatter": {
+        "external": {
+          "command": "yarn",
+          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+        }
+      }
+    },
     "JavaScript": {
       "formatter": {
         "external": {
