@@ -101,7 +101,10 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.pub.publish(docId, commitJSON.version.toString());
+    await this.pub.publish(
+      `pitter-patter:collab:${docId}`,
+      commitJSON.version.toString(),
+    );
   }
 
   async listenForCommit(docId: string, version: number) {
@@ -111,7 +114,7 @@ export class RedisBroadcastManager {
       if (parseInt(message, 10) >= version) resolve();
     }
 
-    await this.sub.subscribe(docId, listener);
+    await this.sub.subscribe(`pitter-patter:collab:${docId}`, listener);
 
     return await Promise.race([
       promise,
@@ -119,7 +122,7 @@ export class RedisBroadcastManager {
         setTimeout(resolve, this.timeout);
       }),
     ]).finally(async () => {
-      await this.sub.unsubscribe(docId, listener);
+      await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
     });
   }
 }
