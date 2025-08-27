@@ -1,0 +1,21 @@
+diff --git a/package.json b/package.json
+index 4cc17d53b35cac46890fcce6cd26f68c2d268dc5..d77d46bde2f8f1af1de802cc5e2fbdd0f94ac649 100644
+--- a/package.json
++++ b/package.json
+@@ -15,11 +15,16 @@
+   "type": "module",
+   "bin": "bin/tsconfck.js",
+   "types": "types/index.d.ts",
++  "main": "src/index.js",
+   "exports": {
+     ".": {
+       "import": {
+         "types": "./types/index.d.ts",
+         "default": "./src/index.js"
++      },
++      "require": {
++        "types": "./types/index.d.ts",
++        "default": "./src/index.js"
+       }
+     }
+   },

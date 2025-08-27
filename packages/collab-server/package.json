@@ -1,0 +1,22 @@
+{
+  "name": "@pitter-patter/collab-server",
+  "version": "0.0.1",
+  "type": "module",
+  "packageManager": "yarn@4.9.1",
+  "exports": "./dist/index.js",
+  "dependencies": {
+    "@stepwisehq/prosemirror-collab-commit": "^1.0.3",
+    "redis": "^5.8.2"
+  },
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.5",
+    "prosemirror-model": "^1.0.0",
+    "prosemirror-state": "^1.0.0",
+    "prosemirror-transform": "^1.0.0"
+  },
+  "peerDependencies": {
+    "prosemirror-model": "^1.0.0",
+    "prosemirror-state": "^1.0.0",
+    "prosemirror-transform": "^1.0.0"
+  }
+}
