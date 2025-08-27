@@ -1,0 +1,22 @@
+{
+  "extends": "@tsconfig/strictest",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "target": "ESNext"
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../collab-client"
+    },
+    {
+      "path": "../collab-server"
+    }
+  ]
+}
