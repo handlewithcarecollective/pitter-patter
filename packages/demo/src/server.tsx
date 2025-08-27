@@ -65,7 +65,7 @@ const authority = new CollabAuthority({
       id: uuid(),
     });
   },
-  broadcastCommit: broadcaster.broadcastCommit,
+  broadcastManager: broadcaster,
 });
 
 app.post("/api/docs", async (_, res) => {
@@ -82,7 +82,7 @@ app.post("/api/docs", async (_, res) => {
 });
 
 app.get("/api/docs/:docId/commits", async (req, res) => {
-  const commits = await broadcaster.listenForCommit(
+  const commits = await authority.listenForCommit(
     req.params.docId,
     parseInt(req.query["version"] as string, 10),
   );

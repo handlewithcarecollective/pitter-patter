@@ -23,7 +23,10 @@ interface CollabAuthorityConfig {
   getCommits: (docId: string, version: number) => Promise<CommitJSON[]>;
   saveDoc: (docId: string, docJSON: NodeJSON, version: number) => Promise<void>;
   saveCommit: (docId: string, commitJSON: CommitJSON) => Promise<void>;
-  broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
+  broadcastManager: {
+    broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
+    listenForCommit: (docId: string, version: number) => Promise<void>;
+  };
 }
 
 export class CollabAuthority {
@@ -33,7 +36,7 @@ export class CollabAuthority {
   private getCommit: CollabAuthorityConfig["getCommit"];
   private saveDoc: CollabAuthorityConfig["saveDoc"];
   private saveCommit: CollabAuthorityConfig["saveCommit"];
-  private broadcastCommit: CollabAuthorityConfig["broadcastCommit"];
+  private broadcastManager: CollabAuthorityConfig["broadcastManager"];
 
   constructor(config: CollabAuthorityConfig) {
     this.schema = config.schema;
@@ -42,7 +45,7 @@ export class CollabAuthority {
     this.getCommits = config.getCommits;
     this.saveDoc = config.saveDoc;
     this.saveCommit = config.saveCommit;
-    this.broadcastCommit = config.broadcastCommit;
+    this.broadcastManager = config.broadcastManager;
   }
 
   async receiveCommit(docId: string, commitJSON: CommitJSON) {
@@ -58,7 +61,15 @@ export class CollabAuthority {
 
     await this.saveCommit(docId, appliedCommitJSON);
     await this.saveDoc(docId, appliedDocJSON, appliedCommitJSON.version);
-    await this.broadcastCommit(docId, appliedCommitJSON);
+    await this.broadcastManager.broadcastCommit(docId, appliedCommitJSON);
+  }
+
+  async listenForCommit(docId: string, version: number) {
+    const preCommits = await this.getCommits(docId, version);
+    if (preCommits.length) return preCommits;
+    await this.broadcastManager.listenForCommit(docId, version);
+    const postCommits = await this.getCommits(docId, version);
+    return postCommits;
   }
 }
 
@@ -68,213 +79,47 @@ interface RedisBroadcastManagerConfig {
 }
 
 export class RedisBroadcastManager {
-  private unblockClient: RedisClientType;
-  private readClient: RedisClientType;
-  private readClientId: number | null = null;
-  private writeClient: RedisClientType;
-  private streamManager: RedisStreamManager;
-  // private blocked = false;
+  private pub: RedisClientType;
+  private sub: RedisClientType;
   private timeout: number;
 
   constructor(config: RedisBroadcastManagerConfig) {
-    this.unblockClient = createClient({
+    this.pub = createClient({
       url: config.redisUrl,
     });
-    this.readClient = createClient({
+    this.sub = createClient({
       url: config.redisUrl,
     });
-    this.writeClient = createClient({
-      url: config.redisUrl,
-    });
+
     this.timeout = config.timeout ?? 5_000;
-
-    this.streamManager = new RedisStreamManager(async (streams) => {
-      if (this.readClientId === null) {
-        throw new Error(`Failed to unblock redis read client: not connected`);
-      }
-
-      await this.unblockClient.sendCommand([
-        "CLIENT",
-        "UNBLOCK",
-        this.readClientId.toString(),
-      ]);
-
-      if (streams.length) {
-        this.readClient
-          .xRead(streams, { BLOCK: this.timeout })
-          .then(this.streamManager.processMessages);
-      }
-    });
 
     this.broadcastCommit = this.broadcastCommit.bind(this);
   }
 
   async connect() {
-    await Promise.all([
-      this.unblockClient.connect(),
-      this.readClient.connect().then(async (client) => {
-        this.readClientId = await client.clientId();
-      }),
-      this.writeClient.connect(),
-    ]);
+    await Promise.all([this.sub.connect(), this.pub.connect()]);
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.writeClient.xAdd(docId, commitJSON.version.toString() + "-1", {
-      commitJSON: JSON.stringify(commitJSON),
-    });
+    await this.pub.publish(docId, commitJSON.version.toString());
   }
 
   async listenForCommit(docId: string, version: number) {
-    const { promise, resolve } = PromiseWithResolvers<CommitJSON[]>();
-    this.streamManager.listenForCommit(docId, version, resolve);
+    const { promise, resolve } = PromiseWithResolvers<void>();
+
+    function listener(message: string) {
+      if (parseInt(message, 10) >= version) resolve();
+    }
+
+    await this.sub.subscribe(docId, listener);
 
     return await Promise.race([
       promise,
-      new Promise((resolve) => {
+      new Promise<void>((resolve) => {
         setTimeout(resolve, this.timeout);
-      }).then(async () => {
-        await this.streamManager.clearListener(docId, version, resolve);
-        return [] as CommitJSON[];
       }),
-    ]);
-  }
-}
-
-class RedisStreamManager {
-  private map = new Map<
-    string,
-    Map<number, ((commits: CommitJSON[]) => void)[]>
-  >();
-  private streamCancellations = new Map<string, number>();
-
-  constructor(
-    private restartStreams: (
-      streams: { key: string; id: string }[],
-    ) => Promise<void>,
-  ) {
-    this.processMessages = this.processMessages.bind(this);
-  }
-
-  async restart() {
-    const streams = Array.from(this.map.entries())
-      .map(
-        ([stream, versionMap]) =>
-          [
-            stream,
-            Array.from(versionMap.keys()).reduce((acc, version) =>
-              acc < version ? acc : version,
-            ),
-          ] as const,
-      )
-      .map(([stream, id]) => ({ key: stream, id: id.toString() + "-1" }));
-
-    await this.restartStreams(streams);
-  }
-
-  async listenForCommit(
-    streamKey: string,
-    version: number,
-    callback: (commits: CommitJSON[]) => void,
-  ) {
-    const existing = this.map.get(streamKey);
-    if (!existing) {
-      this.map.set(streamKey, new Map([[version, [callback]]]));
-
-      await this.restart();
-    } else {
-      const alreadyListening = Array.from(existing.keys()).some(
-        (v) => v <= version,
-      );
-      const existingResolvers = existing.get(version);
-
-      if (existingResolvers) {
-        existingResolvers.push(callback);
-        const cancellation = this.streamCancellations.get(
-          `${streamKey}:${version}`,
-        );
-        if (cancellation) {
-          clearTimeout(cancellation);
-          this.streamCancellations.delete(`${streamKey}:${version}`);
-        }
-      } else {
-        existing.set(version, [callback]);
-      }
-
-      if (!alreadyListening) {
-        await this.restart();
-      }
-    }
-  }
-
-  async processMessages(events: Awaited<ReturnType<RedisClientType["xRead"]>>) {
-    if (!events) {
-      await this.restart();
-      return;
-    }
-    for (const { name: stream, messages } of events as {
-      name: string;
-      messages: { id: string; message: { commitJSON: string } }[];
-    }[]) {
-      const messageMap = new Map<
-        (commitJSON: CommitJSON[]) => void,
-        CommitJSON[]
-      >();
-      const versionMap = this.map.get(stream);
-      if (!versionMap) continue;
-      const versionsToDelete = new Set<number>();
-      for (const { id, message } of messages) {
-        const commitJSON = JSON.parse(message.commitJSON) as CommitJSON;
-        for (const [version, resolvers] of versionMap.entries()) {
-          const idVersion = id.split("-")[0]!;
-          if (version >= parseInt(idVersion, 10)) {
-            continue;
-          }
-
-          for (const resolve of resolvers) {
-            const foundMessages = messageMap.get(resolve);
-            if (foundMessages) {
-              foundMessages.push(commitJSON);
-            } else {
-              messageMap.set(resolve, [commitJSON]);
-            }
-          }
-          versionsToDelete.add(version);
-        }
-      }
-
-      for (const version of versionsToDelete) {
-        versionMap.delete(version);
-
-        if (versionMap.size === 0) {
-          this.map.delete(stream);
-        }
-      }
-      for (const [resolve, foundMessages] of messageMap.entries()) {
-        resolve(foundMessages);
-      }
-    }
-    await this.restart();
-  }
-
-  async clearListener(
-    streamKey: string,
-    version: number,
-    callback: (commits: CommitJSON[]) => void,
-  ) {
-    const versionMap = this.map.get(streamKey);
-    if (!versionMap) return;
-    if ((versionMap.get(version)?.length ?? 0) <= 1) {
-      versionMap.delete(version);
-      if (versionMap.size === 0) {
-        this.map.delete(streamKey);
-      }
-      await this.restart();
-    } else {
-      versionMap.set(
-        version,
-        versionMap.get(version)!.filter((r) => r === callback),
-      );
-    }
+    ]).finally(async () => {
+      await this.sub.unsubscribe(docId, listener);
+    });
   }
 }
