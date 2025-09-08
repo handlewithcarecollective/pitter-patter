@@ -1,9 +1,13 @@
-import { Insertable } from "kysely";
+import { Insertable, Transaction } from "kysely";
 import { getDb } from "./db";
 import { DB } from "./schema";
 
-export async function getCommitByRef(docId: string, ref: string) {
-  const db = await getDb();
+export async function getCommitByRef(
+  tr: Transaction<DB> | null,
+  docId: string,
+  ref: string,
+) {
+  const db = tr ?? (await getDb());
   return await db
     .selectFrom("commit")
     .selectAll()
@@ -12,8 +16,12 @@ export async function getCommitByRef(docId: string, ref: string) {
     .executeTakeFirst();
 }
 
-export async function getCommitsAfter(docId: string, version: number) {
-  const db = await getDb();
+export async function getCommitsAfter(
+  tr: Transaction<DB> | null,
+  docId: string,
+  version: number,
+) {
+  const db = tr ?? (await getDb());
   return await db
     .selectFrom("commit")
     .selectAll()
@@ -22,7 +30,10 @@ export async function getCommitsAfter(docId: string, version: number) {
     .execute();
 }
 
-export async function createCommit(commit: Insertable<DB["commit"]>) {
-  const db = await getDb();
+export async function createCommit(
+  tr: Transaction<DB> | null,
+  commit: Insertable<DB["commit"]>,
+) {
+  const db = tr ?? (await getDb());
   return await db.insertInto("commit").values(commit).execute();
 }

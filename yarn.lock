@@ -32,9 +32,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@handlewithcare/react-prosemirror@npm:^2.4.12":
-  version: 2.4.12
-  resolution: "@handlewithcare/react-prosemirror@npm:2.4.12"
+"@handlewithcare/react-prosemirror@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "@handlewithcare/react-prosemirror@npm:2.5.0"
   dependencies:
     classnames: "npm:^2.3.2"
   peerDependencies:
@@ -43,7 +43,8 @@ __metadata:
     prosemirror-view: 1.39.2
     react: ">=17 <=19.1.0"
     react-dom: ">=17 <=19.1.0"
-  checksum: 10c0/5f52988e56da7c002df9c12435b62b6a28c92d5d0e0f03fae57631d5e15e35751eeaec6132c717cddfe53811bddbeaaf49a11b59cfeafa3174556939164a7a38
+    react-reconciler: ">=0.26.1 <=0.32.0"
+  checksum: 10c0/d71839a39faf6174c7b7507b465902a74455725fcf5f53d9b68ee10edebbbafb59f2f7aac31b018db41331550d3cf3585ddb697ff2248e75aa6c0fccddc4c257
   languageName: node
   linkType: hard
 
@@ -1375,18 +1376,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/demo@workspace:packages/demo"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^2.4.12"
+    "@handlewithcare/react-prosemirror": "npm:^2.5.0"
     "@parcel/rsc": "npm:^2.15.4"
     "@parcel/runtime-react-refresh": "npm:^2.13.3"
     "@parcel/runtime-rsc": "npm:^2.15.4"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/collab-server": "workspace:^"
+    "@pitter-patter/presence-client": "workspace:^"
+    "@pitter-patter/presence-server": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/better-sqlite3": "npm:^7.6.13"
     "@types/express": "npm:^5"
     "@types/node": "npm:^24.3.0"
-    "@types/react": "npm:^19.1.11"
-    "@types/react-dom": "npm:^19.1.7"
+    "@types/react": "npm:^19.1.12"
+    "@types/react-dom": "npm:^19.1.9"
     "@types/react-reconciler": "npm:^0"
     better-sqlite3: "npm:^12.2.0"
     express: "npm:^5.1.0"
@@ -1404,8 +1407,44 @@ __metadata:
     react: "npm:^19.1.1"
     react-dom: "npm:^19.1.1"
     react-reconciler: "npm:^0.32.0"
-    react-server-dom-parcel: "npm:^19.1.1"
+    react-server-dom-parcel: "npm:19.1.0"
     uuid: "npm:^11.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@pitter-patter/presence-client@workspace:^, @pitter-patter/presence-client@workspace:packages/presence-client":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/presence-client@workspace:packages/presence-client"
+  dependencies:
+    "@handlewithcare/react-prosemirror": "npm:^2.5.0"
+    "@pitter-patter/collab-client": "workspace:^"
+    "@tsconfig/strictest": "npm:^2.0.5"
+    "@types/react": "npm:^19.1.12"
+    "@types/react-dom": "npm:^19.1.9"
+    "@types/react-reconciler": "npm:^0"
+    classnames: "npm:^2.5.1"
+    prosemirror-model: "npm:^1.0.0"
+    prosemirror-state: "npm:^1.0.0"
+    prosemirror-transform: "npm:^1.0.0"
+    prosemirror-view: "npm:1.39.2"
+    react: "npm:^19.1.1"
+    react-dom: "npm:^19.1.1"
+    react-reconciler: "npm:^0.32.0"
+    typescript: "npm:^5.9.2"
+  peerDependencies:
+    prosemirror-model: ^1.0.0
+    prosemirror-state: ^1.0.0
+    prosemirror-transform: ^1.0.0
+    prosemirror-view: ^1.0.0
+  languageName: unknown
+  linkType: soft
+
+"@pitter-patter/presence-server@workspace:^, @pitter-patter/presence-server@workspace:packages/presence-server":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/presence-server@workspace:packages/presence-server"
+  dependencies:
+    "@tsconfig/strictest": "npm:^2.0.5"
+    redis: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
 
@@ -1757,12 +1796,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.1.7":
-  version: 19.1.7
-  resolution: "@types/react-dom@npm:19.1.7"
+"@types/react-dom@npm:^19.1.9":
+  version: 19.1.9
+  resolution: "@types/react-dom@npm:19.1.9"
   peerDependencies:
     "@types/react": ^19.0.0
-  checksum: 10c0/8db5751c1567552fe4e1ece9f5823b682f2994ec8d30ed34ba0ef984e3c8ace1435f8be93d02f55c350147e78ac8c4dbcd8ed2c3b6a60f575bc5374f588c51c9
+  checksum: 10c0/34c8dda86c1590b3ef0e7ecd38f9663a66ba2dd69113ba74fb0adc36b83bbfb8c94c1487a2505282a5f7e5e000d2ebf36f4c0fd41b3b672f5178fd1d4f1f8f58
   languageName: node
   linkType: hard
 
@@ -1775,12 +1814,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.11":
-  version: 19.1.11
-  resolution: "@types/react@npm:19.1.11"
+"@types/react@npm:^19.1.12":
+  version: 19.1.12
+  resolution: "@types/react@npm:19.1.12"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10c0/639b225c2bbcd4b8a30e1ea7a73aec81ae5b952a4c432460b48c9881c9d12e76645c9032d24f15eefae9985a12d5cb26557fe10e9850b2da0fabfb0a1e2d16bd
+  checksum: 10c0/e35912b43da0caaab5252444bab87a31ca22950cde2822b3b3dc32e39c2d42dad1a4cf7b5dde9783aa2d007f0b2cba6ab9563fc6d2dbcaaa833b35178118767c
   languageName: node
   linkType: hard
 
@@ -2321,7 +2360,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.3.2":
+"classnames@npm:^2.3.2, classnames@npm:^2.5.1":
   version: 2.5.1
   resolution: "classnames@npm:2.5.1"
   checksum: 10c0/afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
@@ -4505,7 +4544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-view@npm:1.39.2":
+"prosemirror-view@npm:1.39.2, prosemirror-view@npm:^1.27.0":
   version: 1.39.2
   resolution: "prosemirror-view@npm:1.39.2"
   dependencies:
@@ -4513,17 +4552,6 @@ __metadata:
     prosemirror-state: "npm:^1.0.0"
     prosemirror-transform: "npm:^1.1.0"
   checksum: 10c0/b175284082a3ab1be223ba1860931d094f996c0eabf046a78271fc8136c4e9b63de2c9a51c09a1fe73a9618d269402e30a611d260f153fba595fe465f0a94cee
-  languageName: node
-  linkType: hard
-
-"prosemirror-view@npm:^1.27.0":
-  version: 1.40.1
-  resolution: "prosemirror-view@npm:1.40.1"
-  dependencies:
-    prosemirror-model: "npm:^1.20.0"
-    prosemirror-state: "npm:^1.0.0"
-    prosemirror-transform: "npm:^1.1.0"
-  checksum: 10c0/b63335343edc68a9dec8c9fddf145e493f0b541b0ce4847dd20c42f2068c5ac6c00762978389e3448bc575230914ab0882679f66077fd1d950e40c83b5e2831f
   languageName: node
   linkType: hard
 
@@ -4656,7 +4684,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-server-dom-parcel@npm:^19.1.0, react-server-dom-parcel@npm:^19.1.1":
+"react-server-dom-parcel@npm:19.1.0":
+  version: 19.1.0
+  resolution: "react-server-dom-parcel@npm:19.1.0"
+  peerDependencies:
+    react: ^19.1.0
+    react-dom: ^19.1.0
+  checksum: 10c0/82f4822e427308474118a705419b057cf325018078e3c3d622070fdb85a566835f9a902ee367bd94c8ccde35947086614ce6c9319074368be90651fbd2c3696f
+  languageName: node
+  linkType: hard
+
+"react-server-dom-parcel@npm:^19.1.0":
   version: 19.1.1
   resolution: "react-server-dom-parcel@npm:19.1.1"
   peerDependencies:

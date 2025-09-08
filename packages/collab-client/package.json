@@ -1,6 +1,6 @@
 {
   "name": "@pitter-patter/collab-client",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "packageManager": "yarn@4.9.1",
   "exports": "./dist/index.js",

@@ -1,5 +1,4 @@
 import {
-  collab,
   receiveCommitTransaction,
   Commit,
   CommitJSON,
@@ -10,16 +9,21 @@ import {
 import { EditorState } from "prosemirror-state";
 
 export {
-  collab,
   receiveCommitTransaction,
+  getVersion,
   Commit,
   type CommitJSON,
   type NodeJSON,
 };
 
+export { collab, collabKey } from "./plugin";
+
 export interface CollabClientConfig {
   sendCommit: (commit: Commit) => Promise<void>;
-  getCommits: (version: number) => Promise<CommitJSON[]>;
+  getCommits: (
+    version: number,
+    options?: { signal?: AbortSignal },
+  ) => Promise<CommitJSON[]>;
   receiveCommits: (commits: Commit[]) => void;
 }
 
@@ -68,7 +72,7 @@ export class CollabClient {
 
     while (!signal.aborted) {
       try {
-        const commitJSONs = await this.getCommits(this.version);
+        const commitJSONs = await this.getCommits(this.version, { signal });
         const commits = commitJSONs.map((json) =>
           Commit.FromJSON(editorState.schema, json),
         );
