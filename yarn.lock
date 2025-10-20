@@ -32,18 +32,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@handlewithcare/react-prosemirror@npm:^2.4.12":
-  version: 2.4.12
-  resolution: "@handlewithcare/react-prosemirror@npm:2.4.12"
+"@handlewithcare/react-prosemirror@npm:^2.5.4":
+  version: 2.5.4
+  resolution: "@handlewithcare/react-prosemirror@npm:2.5.4"
   dependencies:
     classnames: "npm:^2.3.2"
   peerDependencies:
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
     prosemirror-view: 1.39.2
-    react: ">=17 <=19.1.0"
-    react-dom: ">=17 <=19.1.0"
-  checksum: 10c0/5f52988e56da7c002df9c12435b62b6a28c92d5d0e0f03fae57631d5e15e35751eeaec6132c717cddfe53811bddbeaaf49a11b59cfeafa3174556939164a7a38
+    react: ">=17 <20"
+    react-dom: ">=17 <20"
+    react-reconciler: ">=0.26.1 <=0.32.0"
+  checksum: 10c0/fe8983c5f08152ae3718df26e82e7ec970d04899600567dd9de375805ec0d891d6ca9e871bcb9cb5abf2562ca0337d069b6ddb87a4e10253b20b903a156dfe55
   languageName: node
   linkType: hard
 
@@ -276,6 +277,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/codeframe@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/codeframe@npm:2.16.0"
+  dependencies:
+    chalk: "npm:^4.1.2"
+  checksum: 10c0/48e9497f00ad2ebb624f1c26ee52bcc68760a01456e640a78d8a4e6355e4bbac73d1ca47ad7b60099ca66d7816b71784ced070c8791fb855dc28b5bca0d05a82
+  languageName: node
+  linkType: hard
+
 "@parcel/compressor-raw@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/compressor-raw@npm:2.15.4"
@@ -380,6 +390,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/diagnostic@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/diagnostic@npm:2.16.0"
+  dependencies:
+    "@mischnic/json-sourcemap": "npm:^0.1.1"
+    nullthrows: "npm:^1.1.1"
+  checksum: 10c0/328a7a8b311fe904aae1ed3f4673adbb57e3413c593c465eb158a17119f815cdb115ecef6f501dae2379005ef9808d58160f0efa689ac630d9646ffc89465434
+  languageName: node
+  linkType: hard
+
 "@parcel/error-overlay@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/error-overlay@npm:2.15.4"
@@ -401,6 +421,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/events@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/events@npm:2.16.0"
+  checksum: 10c0/7a0668add1ba0bc817292a46436faef2ad394069b3f31097244c2522de6158da46e4ef238dbf8aeeb0340b9f61887657ec07020aa3b69082f392a2f48a18590d
+  languageName: node
+  linkType: hard
+
 "@parcel/feature-flags@npm:2.13.3":
   version: 2.13.3
   resolution: "@parcel/feature-flags@npm:2.13.3"
@@ -412,6 +439,13 @@ __metadata:
   version: 2.15.4
   resolution: "@parcel/feature-flags@npm:2.15.4"
   checksum: 10c0/5b4bb4bc9940c54f624b2dc3cbdc35fae3f1516d3a325cf3d8e1fbe515795e3d153f572440f742df3d27b4c8fa7aa0d16c8f1d75358ab66af8b877998c1723f9
+  languageName: node
+  linkType: hard
+
+"@parcel/feature-flags@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/feature-flags@npm:2.16.0"
+  checksum: 10c0/a62e06eea16e9c3fe9abd52dfe3fa6766d5a34a5869c007a6a6b0b8d8d06740ec9e49ed091efeada55716d245517ac3788d8ddcb2fc96256a71f7830f9327b32
   languageName: node
   linkType: hard
 
@@ -461,6 +495,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/logger@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/logger@npm:2.16.0"
+  dependencies:
+    "@parcel/diagnostic": "npm:2.16.0"
+    "@parcel/events": "npm:2.16.0"
+  checksum: 10c0/46b9e2a5dfcc9bc6186968d037027cdc050a7923f448de7fbd4ceea64b08015c3bdb1f89c1465a4e28ec83d15f0c7d6ed1ad05492c291f361bcffc57677c4621
+  languageName: node
+  linkType: hard
+
 "@parcel/markdown-ansi@npm:2.13.3":
   version: 2.13.3
   resolution: "@parcel/markdown-ansi@npm:2.13.3"
@@ -476,6 +520,15 @@ __metadata:
   dependencies:
     chalk: "npm:^4.1.2"
   checksum: 10c0/4980739e68e0a1958983f060f3acfea049062bf50c0b296e35b8867b06bd9a54bab2e9154a91fb02110390c8fd6900cd2137780be29571b725bca9a6f97b3014
+  languageName: node
+  linkType: hard
+
+"@parcel/markdown-ansi@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/markdown-ansi@npm:2.16.0"
+  dependencies:
+    chalk: "npm:^4.1.2"
+  checksum: 10c0/b84976a76c00cbc0c028e4a402ccb178f89967189fa0fa7d7040622ab8fbfdca0f61161964b71fd542f1c3c35c637f64392f4cceff1f4726fc262658eeaa7505
   languageName: node
   linkType: hard
 
@@ -680,6 +733,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/plugin@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/plugin@npm:2.16.0"
+  dependencies:
+    "@parcel/types": "npm:2.16.0"
+  checksum: 10c0/886e4f77868c5c7922352717c056ab763d65d327e1623cc95e2a7e4d4977ebd6b5a48f0b5569a925f56c99953e715e65ed365a249a0ebd8db5ccbfe00b32f8e0
+  languageName: node
+  linkType: hard
+
 "@parcel/profiler@npm:2.13.3":
   version: 2.13.3
   resolution: "@parcel/profiler@npm:2.13.3"
@@ -701,6 +763,18 @@ __metadata:
     "@parcel/types-internal": "npm:2.15.4"
     chrome-trace-event: "npm:^1.0.2"
   checksum: 10c0/ccb44c8fa886e6201ce2f3775db0f69694c4f855e6b0430ba099355e4a25b4069bb93193e6967f9d1165019920469cd250acfa30f5b73a044be075900014d2de
+  languageName: node
+  linkType: hard
+
+"@parcel/profiler@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/profiler@npm:2.16.0"
+  dependencies:
+    "@parcel/diagnostic": "npm:2.16.0"
+    "@parcel/events": "npm:2.16.0"
+    "@parcel/types-internal": "npm:2.16.0"
+    chrome-trace-event: "npm:^1.0.2"
+  checksum: 10c0/abc58fe222c01f5ff9c3f738295f2fc119e6aeee48cafd863c5c5bcd7d5e39d185d7e3a3516338de883b7cee8424f5ab757133210a716efa47bf3082bf2a90aa
   languageName: node
   linkType: hard
 
@@ -751,16 +825,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/rsc@npm:^2.15.4":
-  version: 2.15.4
-  resolution: "@parcel/rsc@npm:2.15.4"
+"@parcel/rsc@npm:^2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rsc@npm:2.16.0"
   dependencies:
     react-server-dom-parcel: "npm:^19.1.0"
     rsc-html-stream: "npm:^0.0.6"
   peerDependencies:
     react: ^19.1.0
     react-dom: ^19.1.0
-  checksum: 10c0/d91ac6e42026353193532a85d39c48572173d51b68ff40a2b5661b2e7c4244a53846f90ddabfce6f1b8245da167c1adf3376e16c2d18d9e4c02d0a3bf0e6f0d2
+  checksum: 10c0/6a9c20c6091a179232cb9ea40831f6be8a9d56eb21012422c1175dcd81336db3f3505b94fe23a4d477f3c9402f7692db6fed4f8fab5cd34960392edf51cb4e20
   languageName: node
   linkType: hard
 
@@ -798,7 +872,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/runtime-rsc@npm:2.15.4, @parcel/runtime-rsc@npm:^2.15.4":
+"@parcel/runtime-rsc@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/runtime-rsc@npm:2.15.4"
   dependencies:
@@ -807,6 +881,18 @@ __metadata:
     "@parcel/utils": "npm:2.15.4"
     nullthrows: "npm:^1.1.1"
   checksum: 10c0/65d70ee48a9b971f04cd5c64d9741598be7d662f8c143548e427f1cba4651fb694a27ff0504f6a8e36e43207920289add499f90db339ecd84fc63fd9c2535c4e
+  languageName: node
+  linkType: hard
+
+"@parcel/runtime-rsc@npm:^2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/runtime-rsc@npm:2.16.0"
+  dependencies:
+    "@parcel/plugin": "npm:2.16.0"
+    "@parcel/rust": "npm:2.16.0"
+    "@parcel/utils": "npm:2.16.0"
+    nullthrows: "npm:^1.1.1"
+  checksum: 10c0/84ae276afd7970f7372217e976ceaaf466997fe66011583c6dfc69e7d8694537c91dd79dd221b9df7b0b74530ff61615094b9f3a5dbdc90ad6ebceb06d890a54
   languageName: node
   linkType: hard
 
@@ -828,9 +914,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/rust-darwin-arm64@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-darwin-arm64@npm:2.16.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@parcel/rust-darwin-x64@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/rust-darwin-x64@npm:2.15.4"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@parcel/rust-darwin-x64@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-darwin-x64@npm:2.16.0"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
@@ -842,9 +942,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/rust-linux-arm-gnueabihf@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-linux-arm-gnueabihf@npm:2.16.0"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
 "@parcel/rust-linux-arm64-gnu@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/rust-linux-arm64-gnu@npm:2.15.4"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@parcel/rust-linux-arm64-gnu@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-linux-arm64-gnu@npm:2.16.0"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
@@ -856,9 +970,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/rust-linux-arm64-musl@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-linux-arm64-musl@npm:2.16.0"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
 "@parcel/rust-linux-x64-gnu@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/rust-linux-x64-gnu@npm:2.15.4"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@parcel/rust-linux-x64-gnu@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-linux-x64-gnu@npm:2.16.0"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
@@ -870,9 +998,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/rust-linux-x64-musl@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-linux-x64-musl@npm:2.16.0"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
 "@parcel/rust-win32-x64-msvc@npm:2.15.4":
   version: 2.15.4
   resolution: "@parcel/rust-win32-x64-msvc@npm:2.15.4"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@parcel/rust-win32-x64-msvc@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust-win32-x64-msvc@npm:2.16.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -919,6 +1061,44 @@ __metadata:
     napi-wasm:
       optional: true
   checksum: 10c0/375ba783d68f6ffb3080052d2d79e7db0eae8286c45acee1c6c4f6b4360237263cfaea462d1e6b82b4f6775a756098220a743c374141786d3a355560f2c33504
+  languageName: node
+  linkType: hard
+
+"@parcel/rust@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/rust@npm:2.16.0"
+  dependencies:
+    "@parcel/rust-darwin-arm64": "npm:2.16.0"
+    "@parcel/rust-darwin-x64": "npm:2.16.0"
+    "@parcel/rust-linux-arm-gnueabihf": "npm:2.16.0"
+    "@parcel/rust-linux-arm64-gnu": "npm:2.16.0"
+    "@parcel/rust-linux-arm64-musl": "npm:2.16.0"
+    "@parcel/rust-linux-x64-gnu": "npm:2.16.0"
+    "@parcel/rust-linux-x64-musl": "npm:2.16.0"
+    "@parcel/rust-win32-x64-msvc": "npm:2.16.0"
+  peerDependencies:
+    napi-wasm: ^1.1.2
+  dependenciesMeta:
+    "@parcel/rust-darwin-arm64":
+      optional: true
+    "@parcel/rust-darwin-x64":
+      optional: true
+    "@parcel/rust-linux-arm-gnueabihf":
+      optional: true
+    "@parcel/rust-linux-arm64-gnu":
+      optional: true
+    "@parcel/rust-linux-arm64-musl":
+      optional: true
+    "@parcel/rust-linux-x64-gnu":
+      optional: true
+    "@parcel/rust-linux-x64-musl":
+      optional: true
+    "@parcel/rust-win32-x64-msvc":
+      optional: true
+  peerDependenciesMeta:
+    napi-wasm:
+      optional: true
+  checksum: 10c0/417d1c96c39648c55233e0d8e69ef6c34ca55d5d8776c7d036ae7441005da64fd4d03a6343275ba8369357f743519338912564e2c0748f8b1bda279116615abd
   languageName: node
   linkType: hard
 
@@ -1109,6 +1289,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/types-internal@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/types-internal@npm:2.16.0"
+  dependencies:
+    "@parcel/diagnostic": "npm:2.16.0"
+    "@parcel/feature-flags": "npm:2.16.0"
+    "@parcel/source-map": "npm:^2.1.1"
+    utility-types: "npm:^3.11.0"
+  checksum: 10c0/68ec5318cbebb77ed472fee43d6cd46b1efeb37c5868c559e9685dbdee67e97e72cc60bae53e9fbdd4c53a737a6bd275baba2dbe99add4310c63ac70a207582c
+  languageName: node
+  linkType: hard
+
 "@parcel/types@npm:2.13.3":
   version: 2.13.3
   resolution: "@parcel/types@npm:2.13.3"
@@ -1126,6 +1318,16 @@ __metadata:
     "@parcel/types-internal": "npm:2.15.4"
     "@parcel/workers": "npm:2.15.4"
   checksum: 10c0/aa12a6b56f7d3b65883391d9ccedca5e84a6893c8469c69c7fc38a6bc24a9dcdaa1e4fb2cbdbd8d5ea362fb6d52c35c6c0680d216beed6f3af93e3b65abb1bbe
+  languageName: node
+  linkType: hard
+
+"@parcel/types@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/types@npm:2.16.0"
+  dependencies:
+    "@parcel/types-internal": "npm:2.16.0"
+    "@parcel/workers": "npm:2.16.0"
+  checksum: 10c0/8818f1ea01ff67c5303a0d122c763a22750482e2354c1b42ea834c3c3ef4bc6d3bb1083ac42061e4e3fb84732a0b873b175b8737377555b03c70d1c7e441deec
   languageName: node
   linkType: hard
 
@@ -1158,6 +1360,22 @@ __metadata:
     chalk: "npm:^4.1.2"
     nullthrows: "npm:^1.1.1"
   checksum: 10c0/8dc6d6436703be626def1d8fa1c37f778dd175650d0866712136fca89ae5e5e7e1b95a3fa7cfb9ecd27b13c58652a9c3567986d035fa94c40efa9740a3f49cfe
+  languageName: node
+  linkType: hard
+
+"@parcel/utils@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/utils@npm:2.16.0"
+  dependencies:
+    "@parcel/codeframe": "npm:2.16.0"
+    "@parcel/diagnostic": "npm:2.16.0"
+    "@parcel/logger": "npm:2.16.0"
+    "@parcel/markdown-ansi": "npm:2.16.0"
+    "@parcel/rust": "npm:2.16.0"
+    "@parcel/source-map": "npm:^2.1.1"
+    chalk: "npm:^4.1.2"
+    nullthrows: "npm:^1.1.1"
+  checksum: 10c0/62a9755cff8d2dac834172261db79825b82bc813de172c87f8e9a171a7aa25e03e594fd698ce210b545a4e8e5e8c62f059d799a8a8eb8ef1a8ff9925e62affb0
   languageName: node
   linkType: hard
 
@@ -1337,16 +1555,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/workers@npm:2.16.0":
+  version: 2.16.0
+  resolution: "@parcel/workers@npm:2.16.0"
+  dependencies:
+    "@parcel/diagnostic": "npm:2.16.0"
+    "@parcel/logger": "npm:2.16.0"
+    "@parcel/profiler": "npm:2.16.0"
+    "@parcel/types-internal": "npm:2.16.0"
+    "@parcel/utils": "npm:2.16.0"
+    nullthrows: "npm:^1.1.1"
+  peerDependencies:
+    "@parcel/core": ^2.16.0
+  checksum: 10c0/cffde2837ebecba568595bab541475cd79a945d2b13dc1c8157b344f29776cc4418f9c70900ba6a2c700c52352613e74b838fcc18d69dd862dfc02ee0da6d696
+  languageName: node
+  linkType: hard
+
 "@pitter-patter/collab-client@workspace:^, @pitter-patter/collab-client@workspace:packages/collab-client":
   version: 0.0.0-use.local
   resolution: "@pitter-patter/collab-client@workspace:packages/collab-client"
   dependencies:
     "@stepwisehq/prosemirror-collab-commit": "npm:^1.0.0"
     "@tsconfig/strictest": "npm:^2.0.5"
-    prosemirror-model: "npm:^1.0.0"
-    prosemirror-state: "npm:^1.0.0"
-    prosemirror-transform: "npm:^1.0.0"
-    typescript: "npm:^5.9.2"
+    prosemirror-model: "npm:^1.25.3"
+    prosemirror-state: "npm:^1.4.3"
+    prosemirror-transform: "npm:^1.10.4"
+    typescript: "npm:^5.9.3"
   peerDependencies:
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
@@ -1360,9 +1594,9 @@ __metadata:
   dependencies:
     "@stepwisehq/prosemirror-collab-commit": "npm:^1.0.3"
     "@tsconfig/strictest": "npm:^2.0.5"
-    prosemirror-model: "npm:^1.0.0"
-    prosemirror-state: "npm:^1.0.0"
-    prosemirror-transform: "npm:^1.0.0"
+    prosemirror-model: "npm:^1.25.3"
+    prosemirror-state: "npm:^1.4.3"
+    prosemirror-transform: "npm:^1.10.4"
     redis: "npm:^5.8.2"
   peerDependencies:
     prosemirror-model: ^1.0.0
@@ -1375,22 +1609,24 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/demo@workspace:packages/demo"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^2.4.12"
-    "@parcel/rsc": "npm:^2.15.4"
+    "@handlewithcare/react-prosemirror": "npm:^2.5.4"
+    "@parcel/rsc": "npm:^2.16.0"
     "@parcel/runtime-react-refresh": "npm:^2.13.3"
-    "@parcel/runtime-rsc": "npm:^2.15.4"
+    "@parcel/runtime-rsc": "npm:^2.16.0"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/collab-server": "workspace:^"
+    "@pitter-patter/presence-client": "workspace:^"
+    "@pitter-patter/presence-server": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/better-sqlite3": "npm:^7.6.13"
-    "@types/express": "npm:^5"
-    "@types/node": "npm:^24.3.0"
-    "@types/react": "npm:^19.1.11"
-    "@types/react-dom": "npm:^19.1.7"
-    "@types/react-reconciler": "npm:^0"
-    better-sqlite3: "npm:^12.2.0"
+    "@types/express": "npm:^5.0.3"
+    "@types/node": "npm:^24.9.0"
+    "@types/react": "npm:^19.2.2"
+    "@types/react-dom": "npm:^19.2.2"
+    "@types/react-reconciler": "npm:^0.32.2"
+    better-sqlite3: "npm:^12.4.1"
     express: "npm:^5.1.0"
-    kysely: "npm:^0.28.5"
+    kysely: "npm:^0.28.8"
     kysely-codegen: "npm:^0.18.5"
     kysely-ctl: "npm:^0.17.0"
     parcel: "npm:^2.15.4"
@@ -1401,11 +1637,47 @@ __metadata:
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
     prosemirror-view: "npm:1.39.2"
-    react: "npm:^19.1.1"
-    react-dom: "npm:^19.1.1"
+    react: "npm:^19.2.0"
+    react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
-    react-server-dom-parcel: "npm:^19.1.1"
+    react-server-dom-parcel: "npm:19.1.0"
     uuid: "npm:^11.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@pitter-patter/presence-client@workspace:^, @pitter-patter/presence-client@workspace:packages/presence-client":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/presence-client@workspace:packages/presence-client"
+  dependencies:
+    "@handlewithcare/react-prosemirror": "npm:^2.5.4"
+    "@pitter-patter/collab-client": "workspace:^"
+    "@tsconfig/strictest": "npm:^2.0.5"
+    "@types/react": "npm:^19.2.2"
+    "@types/react-dom": "npm:^19.2.2"
+    "@types/react-reconciler": "npm:^0.32.2"
+    classnames: "npm:^2.5.1"
+    prosemirror-model: "npm:^1.25.3"
+    prosemirror-state: "npm:^1.4.3"
+    prosemirror-transform: "npm:^1.10.4"
+    prosemirror-view: "npm:1.39.2"
+    react: "npm:^19.2.0"
+    react-dom: "npm:^19.2.0"
+    react-reconciler: "npm:^0.32.0"
+    typescript: "npm:^5.9.3"
+  peerDependencies:
+    prosemirror-model: ^1.0.0
+    prosemirror-state: ^1.0.0
+    prosemirror-transform: ^1.0.0
+    prosemirror-view: ^1.0.0
+  languageName: unknown
+  linkType: soft
+
+"@pitter-patter/presence-server@workspace:^, @pitter-patter/presence-server@workspace:packages/presence-server":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/presence-server@workspace:packages/presence-server"
+  dependencies:
+    "@tsconfig/strictest": "npm:^2.0.5"
+    redis: "npm:^5.8.2"
   languageName: unknown
   linkType: soft
 
@@ -1693,7 +1965,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^5":
+"@types/express@npm:^5.0.3":
   version: 5.0.3
   resolution: "@types/express@npm:5.0.3"
   dependencies:
@@ -1734,12 +2006,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^24.3.0":
+"@types/node@npm:*":
   version: 24.3.0
   resolution: "@types/node@npm:24.3.0"
   dependencies:
     undici-types: "npm:~7.10.0"
   checksum: 10c0/96bdeca01f690338957c2dcc92cb9f76c262c10398f8d91860865464412b0f9d309c24d9b03d0bdd26dd47fa7ee3f8227893d5c89bc2009d919a525a22512030
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^24.9.0":
+  version: 24.9.0
+  resolution: "@types/node@npm:24.9.0"
+  dependencies:
+    undici-types: "npm:~7.16.0"
+  checksum: 10c0/c0129572f2c1528d2d1b7f4ebdbc3c4b40273964d40786c8be3596e7482394ed4882676b2a44362d4b1da5bac0274fdf2cae11dce3d76319cadac541fd76e531
   languageName: node
   linkType: hard
 
@@ -1757,30 +2038,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.1.7":
-  version: 19.1.7
-  resolution: "@types/react-dom@npm:19.1.7"
+"@types/react-dom@npm:^19.2.2":
+  version: 19.2.2
+  resolution: "@types/react-dom@npm:19.2.2"
   peerDependencies:
-    "@types/react": ^19.0.0
-  checksum: 10c0/8db5751c1567552fe4e1ece9f5823b682f2994ec8d30ed34ba0ef984e3c8ace1435f8be93d02f55c350147e78ac8c4dbcd8ed2c3b6a60f575bc5374f588c51c9
+    "@types/react": ^19.2.0
+  checksum: 10c0/6154dfb8e7a638313d7fa15b2b16494f2235afda4c43be37d10f34e5c7a730f6b95117facb5e6eebc73b15cceea7f6da23be46cda5d2262fd00fd7e6069547e3
   languageName: node
   linkType: hard
 
-"@types/react-reconciler@npm:^0":
-  version: 0.32.0
-  resolution: "@types/react-reconciler@npm:0.32.0"
+"@types/react-reconciler@npm:^0.32.2":
+  version: 0.32.2
+  resolution: "@types/react-reconciler@npm:0.32.2"
   peerDependencies:
     "@types/react": "*"
-  checksum: 10c0/43bfbb0471811dc3aeb6e46a4724663b2bb26137a0169977f415e31c253037d53e549ed1b71d0f9bec9fe9dda5c22e7be9e55dcba564bf3eaf01ed19e950874e
+  checksum: 10c0/3d6f082b41340b14e6900da1f3e9aeb046dd51c88ac7390ec53b0e63dcd33a2ce8657f46da2e6c201ca4a0bbbc1f392fb49cab6b5042e531c87dd10438924c36
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.11":
-  version: 19.1.11
-  resolution: "@types/react@npm:19.1.11"
+"@types/react@npm:^19.2.2":
+  version: 19.2.2
+  resolution: "@types/react@npm:19.2.2"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10c0/639b225c2bbcd4b8a30e1ea7a73aec81ae5b952a4c432460b48c9881c9d12e76645c9032d24f15eefae9985a12d5cb26557fe10e9850b2da0fabfb0a1e2d16bd
+  checksum: 10c0/f830b1204aca4634ce3c6cb3477b5d3d066b80a4dd832a4ee0069acb504b6debd2416548a43a11c1407c12bc60e2dc6cf362934a18fe75fe06a69c0a98cba8ab
   languageName: node
   linkType: hard
 
@@ -2032,14 +2313,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:^12.2.0":
-  version: 12.2.0
-  resolution: "better-sqlite3@npm:12.2.0"
+"better-sqlite3@npm:^12.4.1":
+  version: 12.4.1
+  resolution: "better-sqlite3@npm:12.4.1"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/842247e9bbb775f366ac91f604117112c312497e643bac21648d8b69f479763de0ac049b14b609d6d5ecaee50debcc09a854f682d3dc099a1d933fea92ce68d0
+  checksum: 10c0/88773a75d996b4171e5690a38459b05dc814a792701b224bd9909ee084dc0b4c64aaffbdbcf4bbbc6d4e247faf19e91b2a56cf4175d746d3bd9ff14764eb05aa
   languageName: node
   linkType: hard
 
@@ -2321,7 +2602,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.3.2":
+"classnames@npm:^2.3.2, classnames@npm:^2.5.1":
   version: 2.5.1
   resolution: "classnames@npm:2.5.1"
   checksum: 10c0/afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
@@ -3542,10 +3823,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kysely@npm:^0.28.5":
-  version: 0.28.5
-  resolution: "kysely@npm:0.28.5"
-  checksum: 10c0/f987cad2453c412ecb4664c76bd6256748c6a75f0fb8dc09616864a67771745f267d3bc8eadbda0ea61269c71fa7acca808212c30cdcf4d0eef80d41d343288f
+"kysely@npm:^0.28.8":
+  version: 0.28.8
+  resolution: "kysely@npm:0.28.8"
+  checksum: 10c0/e654c940bed73299291c727e5ef3ecf23fcf4712ac0062cab3cbbb3e2ce4f1f98a74919638b9c034e555a1988d387ca4b28714710e7d46919ee3acf4b7ec23bd
   languageName: node
   linkType: hard
 
@@ -4369,7 +4650,7 @@ __metadata:
   dependencies:
     "@yarnpkg/sdks": "npm:^3.2.3"
     prettier: "npm:^3.6.2"
-    typescript: "npm:^5.9.2"
+    typescript: "npm:^5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -4505,7 +4786,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-view@npm:1.39.2":
+"prosemirror-view@npm:1.39.2, prosemirror-view@npm:^1.27.0":
   version: 1.39.2
   resolution: "prosemirror-view@npm:1.39.2"
   dependencies:
@@ -4513,17 +4794,6 @@ __metadata:
     prosemirror-state: "npm:^1.0.0"
     prosemirror-transform: "npm:^1.1.0"
   checksum: 10c0/b175284082a3ab1be223ba1860931d094f996c0eabf046a78271fc8136c4e9b63de2c9a51c09a1fe73a9618d269402e30a611d260f153fba595fe465f0a94cee
-  languageName: node
-  linkType: hard
-
-"prosemirror-view@npm:^1.27.0":
-  version: 1.40.1
-  resolution: "prosemirror-view@npm:1.40.1"
-  dependencies:
-    prosemirror-model: "npm:^1.20.0"
-    prosemirror-state: "npm:^1.0.0"
-    prosemirror-transform: "npm:^1.1.0"
-  checksum: 10c0/b63335343edc68a9dec8c9fddf145e493f0b541b0ce4847dd20c42f2068c5ac6c00762978389e3448bc575230914ab0882679f66077fd1d950e40c83b5e2831f
   languageName: node
   linkType: hard
 
@@ -4613,14 +4883,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.1.1":
-  version: 19.1.1
-  resolution: "react-dom@npm:19.1.1"
+"react-dom@npm:^19.2.0":
+  version: 19.2.0
+  resolution: "react-dom@npm:19.2.0"
   dependencies:
-    scheduler: "npm:^0.26.0"
+    scheduler: "npm:^0.27.0"
   peerDependencies:
-    react: ^19.1.1
-  checksum: 10c0/8c91198510521299c56e4e8d5e3a4508b2734fb5e52f29eeac33811de64e76fe586ad32c32182e2e84e070d98df67125da346c3360013357228172dbcd20bcdd
+    react: ^19.2.0
+  checksum: 10c0/fa2cae05248d01288e91523b590ce4e7635b1e13f1344e225f850d722a8da037bf0782f63b1c1d46353334e0c696909b82e582f8cad607948fde6f7646cc18d9
   languageName: node
   linkType: hard
 
@@ -4656,7 +4926,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-server-dom-parcel@npm:^19.1.0, react-server-dom-parcel@npm:^19.1.1":
+"react-server-dom-parcel@npm:19.1.0":
+  version: 19.1.0
+  resolution: "react-server-dom-parcel@npm:19.1.0"
+  peerDependencies:
+    react: ^19.1.0
+    react-dom: ^19.1.0
+  checksum: 10c0/82f4822e427308474118a705419b057cf325018078e3c3d622070fdb85a566835f9a902ee367bd94c8ccde35947086614ce6c9319074368be90651fbd2c3696f
+  languageName: node
+  linkType: hard
+
+"react-server-dom-parcel@npm:^19.1.0":
   version: 19.1.1
   resolution: "react-server-dom-parcel@npm:19.1.1"
   peerDependencies:
@@ -4666,10 +4946,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.1.1":
-  version: 19.1.1
-  resolution: "react@npm:19.1.1"
-  checksum: 10c0/8c9769a2dfd02e603af6445058325e6c8a24b47b185d0e461f66a6454765ddcaecb3f0a90184836c68bb509f3c38248359edbc42f0d07c23eb500a5c30c87b4e
+"react@npm:^19.2.0":
+  version: 19.2.0
+  resolution: "react@npm:19.2.0"
+  checksum: 10c0/1b6d64eacb9324725bfe1e7860cb7a6b8a34bc89a482920765ebff5c10578eb487e6b46b2f0df263bd27a25edbdae2c45e5ea5d81ae61404301c1a7192c38330
   languageName: node
   linkType: hard
 
@@ -4837,6 +5117,13 @@ __metadata:
   version: 0.26.0
   resolution: "scheduler@npm:0.26.0"
   checksum: 10c0/5b8d5bfddaae3513410eda54f2268e98a376a429931921a81b5c3a2873aab7ca4d775a8caac5498f8cbc7d0daeab947cf923dbd8e215d61671f9f4e392d34356
+  languageName: node
+  linkType: hard
+
+"scheduler@npm:^0.27.0":
+  version: 0.27.0
+  resolution: "scheduler@npm:0.27.0"
+  checksum: 10c0/4f03048cb05a3c8fddc45813052251eca00688f413a3cee236d984a161da28db28ba71bd11e7a3dd02f7af84ab28d39fb311431d3b3772fed557945beb00c452
   languageName: node
   linkType: hard
 
@@ -5318,23 +5605,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.9.2":
-  version: 5.9.2
-  resolution: "typescript@npm:5.9.2"
+"typescript@npm:^5.9.3":
+  version: 5.9.3
+  resolution: "typescript@npm:5.9.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/cd635d50f02d6cf98ed42de2f76289701c1ec587a363369255f01ed15aaf22be0813226bff3c53e99d971f9b540e0b3cc7583dbe05faded49b1b0bed2f638a18
+  checksum: 10c0/6bd7552ce39f97e711db5aa048f6f9995b53f1c52f7d8667c1abdc1700c68a76a308f579cd309ce6b53646deb4e9a1be7c813a93baaf0a28ccd536a30270e1c5
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.9.2#optional!builtin<compat/typescript>":
-  version: 5.9.2
-  resolution: "typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"
+"typescript@patch:typescript@npm%3A^5.9.3#optional!builtin<compat/typescript>":
+  version: 5.9.3
+  resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/34d2a8e23eb8e0d1875072064d5e1d9c102e0bdce56a10a25c0b917b8aa9001a9cf5c225df12497e99da107dc379360bc138163c66b55b95f5b105b50578067e
+  checksum: 10c0/ad09fdf7a756814dce65bc60c1657b40d44451346858eea230e10f2e95a289d9183b6e32e5c11e95acc0ccc214b4f36289dcad4bf1886b0adb84d711d336a430
   languageName: node
   linkType: hard
 
@@ -5349,6 +5636,13 @@ __metadata:
   version: 7.10.0
   resolution: "undici-types@npm:7.10.0"
   checksum: 10c0/8b00ce50e235fe3cc601307f148b5e8fb427092ee3b23e8118ec0a5d7f68eca8cee468c8fc9f15cbb2cf2a3797945ebceb1cbd9732306a1d00e0a9b6afa0f635
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.16.0":
+  version: 7.16.0
+  resolution: "undici-types@npm:7.16.0"
+  checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
   languageName: node
   linkType: hard
 

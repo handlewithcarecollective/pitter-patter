@@ -8,6 +8,12 @@
       "path": "packages/collab-server"
     },
     {
+      "path": "packages/presence-client"
+    },
+    {
+      "path": "packages/presence-server"
+    },
+    {
       "path": "packages/demo"
     }
   ]
