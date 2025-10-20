@@ -9,7 +9,7 @@
   "devDependencies": {
     "@yarnpkg/sdks": "^3.2.3",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "resolutions": {
     "tsconfck@npm:^3.1.6": "patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch"

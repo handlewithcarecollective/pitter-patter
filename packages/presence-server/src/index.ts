@@ -154,7 +154,7 @@ export class RedisPresenceBroadcastManager {
 
   async broadcastIndicator(docId: string, indicator: PresenceIndicator) {
     await this.pub.publish(
-      `pitter-pattor:presence:${docId}`,
+      `pitter-patter:presence:${docId}`,
       JSON.stringify({ ref: indicator.ref, clientId: indicator.clientId }),
     );
   }
@@ -177,7 +177,7 @@ export class RedisPresenceBroadcastManager {
       }
     }
 
-    await this.sub.subscribe(`pitter-patter:persistence:${docId}`, listener);
+    await this.sub.subscribe(`pitter-patter:presence:${docId}`, listener);
 
     return await Promise.race([
       promise,

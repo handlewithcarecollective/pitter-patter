@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "type": "module",
   "packageManager": "yarn@4.9.1",
-  "exports": "./dist/index.js",
+  "exports": "./src/index.ts",
   "dependencies": {
     "redis": "^5.8.2"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": "./dist/index.js"
   }
 }

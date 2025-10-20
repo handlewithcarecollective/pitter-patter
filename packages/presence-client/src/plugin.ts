@@ -52,12 +52,27 @@ export function presence(
         if (incoming) {
           for (const [clientId, indicator] of Object.entries(incoming)) {
             if (clientId in nextIndicators) {
+              // We may get a new indicator for an existing version,
+              // because the version is only updated when the actual
+              // document contents change, but a user can move their
+              // cursor without updating the document.
               nextIndicators[clientId] = [
-                ...nextIndicators[clientId]!,
+                ...nextIndicators[clientId]!.filter(
+                  (i) => i.version !== indicator.version,
+                ),
                 indicator,
               ];
             } else {
               nextIndicators[clientId] = [indicator];
+            }
+          }
+
+          // Any clients that are not reported by the server
+          // have left the document, so we should drop their
+          // indicators
+          for (const clientId of Object.keys(nextIndicators)) {
+            if (!(clientId in incoming)) {
+              delete nextIndicators[clientId];
             }
           }
         }
@@ -75,10 +90,19 @@ export function presence(
             continue;
           }
 
-          const mappables = stepMaps
+          const confirmedMappables = stepMaps
             .filter(({ version }) => version > indicator.version)
-            .flatMap(({ mappables }) => mappables)
-            .concat(unconfirmed.map(({ step }) => step.getMap()));
+            .flatMap(({ mappables }) => mappables);
+
+          // This indicator may predate when we started tracking stepMaps.
+          // If so, we have to ignore it, because we can't map it forward.
+          if (confirmedMappables.length < version - indicator.version) {
+            continue;
+          }
+
+          const mappables = confirmedMappables.concat(
+            unconfirmed.map(({ step }) => step.getMap()),
+          );
 
           const anchor = mappables.reduce(
             (acc, mappable) => mappable.map(acc),
@@ -101,6 +125,7 @@ export function presence(
           );
 
           nextDecorations.push(
+            // @ts-expect-error I dunno
             widget(anchor, PresenceAnchor, {
               ignoreSelection: true,
               key: indicator.clientId,
