@@ -3,11 +3,17 @@ import { renderRequest } from "@parcel/rsc/node";
 import { EditorPage } from "./editor/EditorPage.js";
 import type { CommitJSON, NodeJSON } from "@pitter-patter/collab-client";
 import {
+  PresenceAuthority,
+  PresenceIndicator,
+  RedisPresenceBroadcastManager,
+  RedisPresencePersistenceManager,
+} from "@pitter-patter/presence-server";
+import {
   CollabAuthority,
   RedisBroadcastManager,
 } from "@pitter-patter/collab-server";
 import { schema } from "prosemirror-schema-basic";
-import { Migrator } from "kysely";
+import { Migrator, Transaction } from "kysely";
 import { TSFileMigrationProvider } from "kysely-ctl";
 import { v7 as uuid } from "uuid";
 import { getDb } from "./database/db.js";
@@ -19,6 +25,7 @@ import {
   getCommitByRef,
   getCommitsAfter,
 } from "./database/commits.js";
+import { DB } from "./database/schema.js";
 
 const app = express();
 app.use("/client", express.static("dist/client"));
@@ -29,48 +36,65 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/editor/:docId", async (req, res) => {
-  const doc = await getDoc(req.params.docId);
+  const doc = await getDoc(null, req.params.docId);
   await renderRequest(req, res, <EditorPage doc={doc} />, {
     component: EditorPage as ComponentType,
   });
 });
 
-const broadcaster = new RedisBroadcastManager({
+const collabBroadcaster = new RedisBroadcastManager({
   redisUrl: process.env["REDIS_URL"] ?? "redis://localhost:6379",
 });
 
-const authority = new CollabAuthority({
+const collabAuthority = new CollabAuthority<Transaction<DB>>({
   schema,
-  getDoc: async (docId) => {
-    const doc = await getDoc(docId);
+  runWithTransaction: async (callback) => {
+    const db = await getDb();
+    return await db.transaction().execute(callback);
+  },
+  getDoc: async (tr, docId) => {
+    const doc = await getDoc(tr, docId);
     return { docJSON: doc.content, version: doc.version };
   },
-  getCommit: async (docId, commitRef) => {
-    return (await getCommitByRef(docId, commitRef)) ?? null;
+  getCommit: async (tr, docId, commitRef) => {
+    return (await getCommitByRef(tr, docId, commitRef)) ?? null;
   },
-  getCommits: async (docId, version) => {
-    return await getCommitsAfter(docId, version);
+  getCommits: async (tr, docId, version) => {
+    return await getCommitsAfter(tr, docId, version);
   },
-  saveDoc: async (docId, docJSON, version) => {
-    await updateDoc(docId, {
+  saveDoc: async (tr, docId, docJSON, version) => {
+    await updateDoc(tr, docId, {
       content: JSON.stringify(docJSON) as unknown as NodeJSON,
       version,
     });
   },
-  saveCommit: async (docId, commitJSON) => {
-    await createCommit({
+  saveCommit: async (tr, docId, commitJSON) => {
+    await createCommit(tr, {
       ...commitJSON,
       steps: JSON.stringify(commitJSON.steps) as unknown as CommitJSON["steps"],
       docId,
       id: uuid(),
     });
   },
-  broadcastManager: broadcaster,
+  broadcastManager: collabBroadcaster,
+});
+
+const presenceBroadcaster = new RedisPresenceBroadcastManager({
+  redisUrl: process.env["REDIS_URL"] ?? "redis://localhost:6379",
+});
+
+const presencePersister = new RedisPresencePersistenceManager({
+  redisUrl: process.env["REDIS_URL"] ?? "redis://localhost:6379",
+});
+
+const presenceAuthority = new PresenceAuthority({
+  persistenceManager: presencePersister,
+  broadcastManager: presenceBroadcaster,
 });
 
 app.post("/api/docs", async (_, res) => {
   const docId = uuid();
-  await createDoc({
+  await createDoc(null, {
     id: docId,
     version: 0,
     content: JSON.stringify(
@@ -82,16 +106,38 @@ app.post("/api/docs", async (_, res) => {
 });
 
 app.get("/api/docs/:docId/commits", async (req, res) => {
-  const commits = await authority.listenForCommit(
+  const commits = await collabAuthority.listenForCommit(
     req.params.docId,
     parseInt(req.query["version"] as string, 10),
   );
   res.status(200).send(commits);
 });
 
+app.post("/api/docs/:docId/presence", async (req, res) => {
+  const { refs, clientId } = req.body as {
+    refs: Record<string, string> | undefined;
+    clientId: string;
+  };
+
+  const presence = await presenceAuthority.listenForPresence(
+    req.params.docId,
+    clientId,
+    refs,
+  );
+
+  res.status(200).send(presence);
+});
+
+app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
+  const indicator = req.body as PresenceIndicator;
+  await presenceAuthority.updatePresence(req.params.docId, indicator);
+
+  res.status(204).send(null);
+});
+
 app.post("/api/docs/:docId/commits", async (req, res) => {
-  authority.receiveCommit(req.params.docId, req.body);
-  res.send(null);
+  collabAuthority.receiveCommit(req.params.docId, req.body);
+  res.status(204).send(null);
 });
 
 async function startServer() {
@@ -108,7 +154,11 @@ async function startServer() {
   if (results.error) {
     throw results.error;
   }
-  await broadcaster.connect();
+  await Promise.all([
+    collabBroadcaster.connect(),
+    presenceBroadcaster.connect(),
+    presencePersister.connect(),
+  ]);
 
   app.listen(3000, () => {
     console.log("Listening on port 3000");

@@ -16,30 +16,55 @@ function PromiseWithResolvers<T>() {
   return { promise, resolve, reject };
 }
 
-interface CollabAuthorityConfig {
+interface CollabAuthorityConfig<Transaction> {
   schema: Schema;
-  getDoc: (docId: string) => Promise<{ docJSON: NodeJSON; version: number }>;
-  getCommit: (docId: string, commitRef: string) => Promise<CommitJSON | null>;
-  getCommits: (docId: string, version: number) => Promise<CommitJSON[]>;
-  saveDoc: (docId: string, docJSON: NodeJSON, version: number) => Promise<void>;
-  saveCommit: (docId: string, commitJSON: CommitJSON) => Promise<void>;
+  runWithTransaction: <Result>(
+    callback: (tr: Transaction) => Promise<Result>,
+  ) => Promise<Result>;
+  getDoc: (
+    tr: Transaction | null,
+    docId: string,
+  ) => Promise<{ docJSON: NodeJSON; version: number }>;
+  getCommit: (
+    tr: Transaction | null,
+    docId: string,
+    commitRef: string,
+  ) => Promise<CommitJSON | null>;
+  getCommits: (
+    tr: Transaction | null,
+    docId: string,
+    version: number,
+  ) => Promise<CommitJSON[]>;
+  saveDoc: (
+    tr: Transaction | null,
+    docId: string,
+    docJSON: NodeJSON,
+    version: number,
+  ) => Promise<void>;
+  saveCommit: (
+    tr: Transaction | null,
+    docId: string,
+    commitJSON: CommitJSON,
+  ) => Promise<void>;
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
     listenForCommit: (docId: string, version: number) => Promise<void>;
   };
 }
 
-export class CollabAuthority {
-  private schema: CollabAuthorityConfig["schema"];
-  private getDoc: CollabAuthorityConfig["getDoc"];
-  private getCommits: CollabAuthorityConfig["getCommits"];
-  private getCommit: CollabAuthorityConfig["getCommit"];
-  private saveDoc: CollabAuthorityConfig["saveDoc"];
-  private saveCommit: CollabAuthorityConfig["saveCommit"];
-  private broadcastManager: CollabAuthorityConfig["broadcastManager"];
+export class CollabAuthority<Transaction> {
+  private schema: CollabAuthorityConfig<Transaction>["schema"];
+  private runWithTransaction: CollabAuthorityConfig<Transaction>["runWithTransaction"];
+  private getDoc: CollabAuthorityConfig<Transaction>["getDoc"];
+  private getCommits: CollabAuthorityConfig<Transaction>["getCommits"];
+  private getCommit: CollabAuthorityConfig<Transaction>["getCommit"];
+  private saveDoc: CollabAuthorityConfig<Transaction>["saveDoc"];
+  private saveCommit: CollabAuthorityConfig<Transaction>["saveCommit"];
+  private broadcastManager: CollabAuthorityConfig<Transaction>["broadcastManager"];
 
-  constructor(config: CollabAuthorityConfig) {
+  constructor(config: CollabAuthorityConfig<Transaction>) {
     this.schema = config.schema;
+    this.runWithTransaction = config.runWithTransaction;
     this.getDoc = config.getDoc;
     this.getCommit = config.getCommit;
     this.getCommits = config.getCommits;
@@ -49,26 +74,33 @@ export class CollabAuthority {
   }
 
   async receiveCommit(docId: string, commitJSON: CommitJSON) {
-    // If we've already received this commit, skip it
-    if (await this.getCommit(docId, commitJSON.ref)) {
-      return;
-    }
-    const { docJSON, version } = await this.getDoc(docId);
-    const newCommits = await this.getCommits(docId, commitJSON.version);
+    const appliedCommitJSON = await this.runWithTransaction(async (tr) => {
+      // If we've already received this commit, skip it
+      if (await this.getCommit(tr, docId, commitJSON.ref)) {
+        return null;
+      }
+      const { docJSON, version } = await this.getDoc(tr, docId);
+      const newCommits = await this.getCommits(tr, docId, commitJSON.version);
 
-    const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } =
-      applyCommitJSON(version, this.schema, docJSON, newCommits, commitJSON);
+      const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } =
+        applyCommitJSON(version, this.schema, docJSON, newCommits, commitJSON);
 
-    await this.saveCommit(docId, appliedCommitJSON);
-    await this.saveDoc(docId, appliedDocJSON, appliedCommitJSON.version);
+      await this.saveCommit(tr, docId, appliedCommitJSON);
+      await this.saveDoc(tr, docId, appliedDocJSON, appliedCommitJSON.version);
+
+      return appliedCommitJSON;
+    });
+
+    if (!appliedCommitJSON) return;
+
     await this.broadcastManager.broadcastCommit(docId, appliedCommitJSON);
   }
 
   async listenForCommit(docId: string, version: number) {
-    const preCommits = await this.getCommits(docId, version);
+    const preCommits = await this.getCommits(null, docId, version);
     if (preCommits.length) return preCommits;
     await this.broadcastManager.listenForCommit(docId, version);
-    const postCommits = await this.getCommits(docId, version);
+    const postCommits = await this.getCommits(null, docId, version);
     return postCommits;
   }
 }
@@ -101,7 +133,10 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.pub.publish(docId, commitJSON.version.toString());
+    await this.pub.publish(
+      `pitter-patter:collab:${docId}`,
+      commitJSON.version.toString(),
+    );
   }
 
   async listenForCommit(docId: string, version: number) {
@@ -111,7 +146,7 @@ export class RedisBroadcastManager {
       if (parseInt(message, 10) >= version) resolve();
     }
 
-    await this.sub.subscribe(docId, listener);
+    await this.sub.subscribe(`pitter-patter:collab:${docId}`, listener);
 
     return await Promise.race([
       promise,
@@ -119,7 +154,7 @@ export class RedisBroadcastManager {
         setTimeout(resolve, this.timeout);
       }),
     ]).finally(async () => {
-      await this.sub.unsubscribe(docId, listener);
+      await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
     });
   }
 }

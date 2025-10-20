@@ -17,6 +17,12 @@
     },
     {
       "path": "../collab-server"
+    },
+    {
+      "path": "../presence-client"
+    },
+    {
+      "path": "../presence-server"
     }
   ]
 }
