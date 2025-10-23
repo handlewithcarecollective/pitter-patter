@@ -1,0 +1,13 @@
+{
+  "extends": "@tsconfig/strictest",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "lib": ["es2020", "dom"]
+  },
+  "include": ["src"]
+}

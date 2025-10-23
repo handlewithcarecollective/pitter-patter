@@ -1,11 +1,12 @@
 "use server-entry";
 
+import { Selectable } from "kysely";
 import "../client.js";
 import { DB } from "../database/schema.js";
 import { Editor } from "./Editor.js";
 
 interface Props {
-  doc: DB["doc"];
+  doc: Selectable<DB["doc"]>;
 }
 
 export function EditorPage({ doc }: Props) {

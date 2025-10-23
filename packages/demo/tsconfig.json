@@ -23,6 +23,12 @@
     },
     {
       "path": "../presence-server"
+    },
+    {
+      "path": "../version-history-client"
+    },
+    {
+      "path": "../version-history-server"
     }
   ]
 }

@@ -16,7 +16,7 @@ function PromiseWithResolvers<T>() {
   return { promise, resolve, reject };
 }
 
-interface CollabAuthorityConfig<Transaction> {
+export interface CollabAuthorityConfig<Transaction> {
   schema: Schema;
   runWithTransaction: <Result>(
     callback: (tr: Transaction) => Promise<Result>,
@@ -24,7 +24,11 @@ interface CollabAuthorityConfig<Transaction> {
   getDoc: (
     tr: Transaction | null,
     docId: string,
-  ) => Promise<{ docJSON: NodeJSON; version: number }>;
+  ) => Promise<{
+    docJSON: NodeJSON;
+    version: number;
+    lastUpdatedTimestamp: number;
+  }>;
   getCommit: (
     tr: Transaction | null,
     docId: string,
@@ -40,6 +44,7 @@ interface CollabAuthorityConfig<Transaction> {
     docId: string,
     docJSON: NodeJSON,
     version: number,
+    lastUpdatedTimestamp: number,
   ) => Promise<void>;
   saveCommit: (
     tr: Transaction | null,
@@ -79,14 +84,23 @@ export class CollabAuthority<Transaction> {
       if (await this.getCommit(tr, docId, commitJSON.ref)) {
         return null;
       }
-      const { docJSON, version } = await this.getDoc(tr, docId);
+      const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(
+        tr,
+        docId,
+      );
       const newCommits = await this.getCommits(tr, docId, commitJSON.version);
 
       const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } =
         applyCommitJSON(version, this.schema, docJSON, newCommits, commitJSON);
 
       await this.saveCommit(tr, docId, appliedCommitJSON);
-      await this.saveDoc(tr, docId, appliedDocJSON, appliedCommitJSON.version);
+      await this.saveDoc(
+        tr,
+        docId,
+        appliedDocJSON,
+        appliedCommitJSON.version,
+        lastUpdatedTimestamp,
+      );
 
       return appliedCommitJSON;
     });

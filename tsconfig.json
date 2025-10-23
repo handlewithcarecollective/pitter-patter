@@ -14,6 +14,12 @@
       "path": "packages/presence-server"
     },
     {
+      "path": "packages/version-history-client"
+    },
+    {
+      "path": "packages/version-history-server"
+    },
+    {
       "path": "packages/demo"
     }
   ]
