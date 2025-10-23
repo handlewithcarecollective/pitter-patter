@@ -19,6 +19,15 @@ async function initializeDb(): Promise<Kysely<DB>> {
   const database = new Database(process.env["DATABASE_PATH"] ?? ":memory:");
 
   dbInstance = new Kysely<DB>({
+    log(event) {
+      // console.log(event.query.sql)
+      // console.log(event.query.parameters)
+      // console.log(`Completed in ${event.queryDurationMillis}ms`)
+      if (event.level === "error") {
+        console.error(event.query.sql);
+        console.error(event.error);
+      }
+    },
     dialect: new SqliteDialect({
       database,
     }),

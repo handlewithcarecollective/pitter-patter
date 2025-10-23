@@ -11,13 +11,13 @@ export async function up(db: Kysely<unknown>): Promise<void> {
   await db.schema
     .createTable("commit")
     .addColumn("id", "text", (col) => col.primaryKey().notNull())
-    .addColumn("docId", "text", (col) =>
+    .addColumn("doc_id", "text", (col) =>
       col.notNull().references("doc.id").onDelete("cascade"),
     )
     .addColumn("ref", "text", (col) => col.notNull())
     .addColumn("version", "integer", (col) => col.notNull())
-    .addUniqueConstraint("ref_doc_unique", ["docId", "ref"])
-    .addUniqueConstraint("version_doc_unique", ["docId", "version"])
+    .addUniqueConstraint("ref_doc_unique", ["doc_id", "ref"])
+    .addUniqueConstraint("version_doc_unique", ["doc_id", "version"])
     .addColumn("steps", "text", (col) => col.notNull())
     .execute();
 }
