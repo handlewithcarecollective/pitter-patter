@@ -20,14 +20,20 @@ import {
   LongPollListener as PresenceListener,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
+import {
+  Snapshot,
+  VersionHistoryClient,
+  VersionHistoryClientConfig,
+} from "@pitter-patter/version-history-client";
 import { DB } from "../database/schema";
 import { Node } from "prosemirror-model";
 
 import "prosemirror-view/style/prosemirror.css";
 import "@pitter-patter/presence-client/styles.css";
+import { Selectable } from "kysely";
 
 interface Props {
-  doc: DB["doc"];
+  doc: Selectable<DB["doc"]>;
 }
 
 function randomRef() {
@@ -43,6 +49,8 @@ function randomRef() {
 const userId = randomRef();
 
 export function Editor({ doc }: Props) {
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+
   const [state, setState] = useState(() =>
     EditorState.create({
       doc: Node.fromJSON(schema, doc.content),
@@ -52,84 +60,112 @@ export function Editor({ doc }: Props) {
 
   const [initialState] = useState(state);
 
-  const [listener] = useState(() =>
-    typeof window === "undefined"
-      ? null
-      : new LongPollListener(
-          new URL(`/api/docs/${doc.id}/commits`, window.location.href),
+  const [listener] = useState(
+    () =>
+      new LongPollListener(
+        new URL(
+          `/api/docs/${doc.id}/commits`,
+          typeof window !== "undefined"
+            ? window.location.href
+            : "http://localhost:3000",
         ),
+      ),
   );
 
-  const collabConfig = useMemo<CollabClientConfig | null>(
-    () =>
-      listener && {
-        sendCommit: async (commit) => {
-          await fetch(`/api/docs/${doc.id}/commits`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(commit.toJSON()),
-          });
-        },
-        getCommits: listener.getCommits,
-        receiveCommits: (commits) => {
-          setState((prev) =>
-            commits.reduce(
-              (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
-              prev,
-            ),
-          );
-        },
+  const collabConfig = useMemo<CollabClientConfig>(
+    () => ({
+      sendCommit: async (commit) => {
+        await fetch(`/api/docs/${doc.id}/commits`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(commit.toJSON()),
+        });
       },
+      getCommits: listener.getCommits,
+      receiveCommits: (commits) => {
+        setState((prev) =>
+          commits.reduce(
+            (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
+            prev,
+          ),
+        );
+      },
+    }),
     [listener],
   );
 
-  const [presenceListener] = useState(() =>
-    typeof window === "undefined"
-      ? null
-      : new PresenceListener(
-          new URL(`/api/docs/${doc.id}/presence`, window.location.href),
+  const [presenceListener] = useState(
+    () =>
+      new PresenceListener(
+        new URL(
+          `/api/docs/${doc.id}/presence`,
+          typeof window !== "undefined"
+            ? window.location.href
+            : "http://localhost:3000",
         ),
+      ),
   );
 
-  const presenceConfig = useMemo<PresenceClientConfig | null>(
-    () =>
-      presenceListener && {
-        userId,
-        sendIndicator: async (clientId, indicator) => {
-          await fetch(`/api/docs/${doc.id}/presence/${clientId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(indicator),
-          });
-        },
-        getIndicators: presenceListener.getIndicators,
-        receiveIndicators: (indicators) => {
-          setState((prev) =>
-            prev.apply(receivePresenceTransaction(prev, indicators)),
-          );
-        },
+  const presenceConfig = useMemo<PresenceClientConfig>(
+    () => ({
+      userId,
+      sendIndicator: async (clientId, indicator) => {
+        await fetch(`/api/docs/${doc.id}/presence/${clientId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(indicator),
+        });
       },
+      getIndicators: presenceListener.getIndicators,
+      receiveIndicators: (indicators) => {
+        setState((prev) =>
+          prev.apply(receivePresenceTransaction(prev, indicators)),
+        );
+      },
+    }),
     [presenceListener],
   );
 
-  const [presenceClient] = useState(
-    () => presenceConfig && new PresenceClient(presenceConfig),
+  const versionHistoryConfig = useMemo<VersionHistoryClientConfig>(
+    () => ({
+      getSnapshots: async (version?: number) => {
+        const url = new URL(
+          `/api/docs/${doc.id}/snapshots`,
+          window.location.href,
+        );
+        if (version !== undefined) {
+          url.searchParams.append("version", version.toString());
+        }
+        const response = await fetch(url);
+        const snapshots: Snapshot[] = await response.json();
+        return snapshots;
+      },
+      receiveSnapshots: (snapshots) => {
+        setSnapshots((prev) => [...prev, ...snapshots]);
+      },
+      pollDuration: 5 * 1_000,
+    }),
+    [],
   );
 
-  const [collabClient] = useState(
-    () => collabConfig && new CollabClient(collabConfig),
+  const [versionHistoryClient] = useState(
+    () => new VersionHistoryClient(versionHistoryConfig),
   );
+
+  const [presenceClient] = useState(() => new PresenceClient(presenceConfig));
+
+  const [collabClient] = useState(() => new CollabClient(collabConfig));
 
   const dispatchTransaction = useCallback((tr: Transaction) => {
     setState((prev) => prev.apply(tr));
   }, []);
 
   useEffect(() => {
-    collabClient?.send(state);
+    collabClient.send(state);
   }, [collabClient, state]);
 
   useEffect(() => {
-    presenceClient?.send(state);
+    presenceClient.send(state);
   }, [presenceClient, state]);
 
   useEffect(() => {
@@ -143,16 +179,42 @@ export function Editor({ doc }: Props) {
 
   useEffect(() => {
     const abortController = new AbortController();
-    presenceClient?.listen(abortController.signal);
+    presenceClient.listen(abortController.signal);
 
     return () => {
       abortController.abort();
     };
   }, [presenceClient, initialState]);
 
+  useEffect(() => {
+    const abortController = new AbortController();
+    versionHistoryClient.poll(abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+
   return (
-    <ProseMirror state={state} dispatchTransaction={dispatchTransaction}>
-      <ProseMirrorDoc />
-    </ProseMirror>
+    <div>
+      <ProseMirror state={state} dispatchTransaction={dispatchTransaction}>
+        <ProseMirrorDoc />
+      </ProseMirror>
+      <h2>Version history</h2>
+      {snapshots.map((snapshot) => (
+        <div key={snapshot.snapshotId}>
+          <p>{new Date(snapshot.createdAt).toISOString()}</p>
+          <ProseMirror
+            defaultState={EditorState.create({
+              doc: Node.fromJSON(schema, snapshot.snapshotJSON),
+            })}
+            dispatchTransaction={() => {}}
+            editable={() => false}
+          >
+            <ProseMirrorDoc />
+          </ProseMirror>
+        </div>
+      ))}
+    </div>
   );
 }

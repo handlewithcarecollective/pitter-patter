@@ -33,6 +33,14 @@ const RAW_RUNTIME_STATE =
     {\
       "name": "@pitter-patter/presence-server",\
       "reference": "workspace:packages/presence-server"\
+    },\
+    {\
+      "name": "@pitter-patter/version-history-client",\
+      "reference": "workspace:packages/version-history-client"\
+    },\
+    {\
+      "name": "@pitter-patter/version-history-server",\
+      "reference": "workspace:packages/version-history-server"\
     }\
   ],\
   "enableTopLevelFallback": true,\
@@ -44,6 +52,8 @@ const RAW_RUNTIME_STATE =
     ["@pitter-patter/demo", ["workspace:packages/demo"]],\
     ["@pitter-patter/presence-client", ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/presence-client", "workspace:packages/presence-client"]],\
     ["@pitter-patter/presence-server", ["workspace:packages/presence-server"]],\
+    ["@pitter-patter/version-history-client", ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-client", "workspace:packages/version-history-client"]],\
+    ["@pitter-patter/version-history-server", ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-server", "workspace:packages/version-history-server"]],\
     ["pitter-patter", ["workspace:."]]\
   ],\
   "fallbackPool": [\
@@ -2001,6 +2011,8 @@ const RAW_RUNTIME_STATE =
           ["@pitter-patter/demo", "workspace:packages/demo"],\
           ["@pitter-patter/presence-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/presence-client"],\
           ["@pitter-patter/presence-server", "workspace:packages/presence-server"],\
+          ["@pitter-patter/version-history-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-client"],\
+          ["@pitter-patter/version-history-server", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-server"],\
           ["@tsconfig/strictest", "npm:2.0.5"],\
           ["@types/better-sqlite3", "npm:7.6.13"],\
           ["@types/express", "npm:5.0.3"],\
@@ -2012,7 +2024,7 @@ const RAW_RUNTIME_STATE =
           ["express", "npm:5.1.0"],\
           ["kysely", "npm:0.28.8"],\
           ["kysely-codegen", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.18.5"],\
-          ["kysely-ctl", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.17.0"],\
+          ["kysely-ctl", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.19.0"],\
           ["parcel", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.15.4"],\
           ["prosemirror-commands", "npm:1.7.1"],\
           ["prosemirror-keymap", "npm:1.2.3"],\
@@ -2097,6 +2109,110 @@ const RAW_RUNTIME_STATE =
           ["@pitter-patter/presence-server", "workspace:packages/presence-server"],\
           ["@tsconfig/strictest", "npm:2.0.5"],\
           ["redis", "npm:5.8.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["@pitter-patter/version-history-client", [\
+      ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-client", {\
+        "packageLocation": "./.yarn/__virtual__/@pitter-patter-version-history-client-virtual-76952307d7/1/packages/version-history-client/",\
+        "packageDependencies": [\
+          ["@handlewithcare/react-prosemirror", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.5.4"],\
+          ["@pitter-patter/collab-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/collab-client"],\
+          ["@pitter-patter/version-history-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-client"],\
+          ["@tsconfig/strictest", "npm:2.0.5"],\
+          ["@types/prosemirror-model", null],\
+          ["@types/prosemirror-state", null],\
+          ["@types/prosemirror-transform", null],\
+          ["@types/prosemirror-view", null],\
+          ["@types/react", "npm:19.2.2"],\
+          ["@types/react-dom", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.2.2"],\
+          ["@types/react-reconciler", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.32.2"],\
+          ["classnames", "npm:2.5.1"],\
+          ["prosemirror-model", "npm:1.25.3"],\
+          ["prosemirror-state", "npm:1.4.3"],\
+          ["prosemirror-transform", "npm:1.10.4"],\
+          ["prosemirror-view", "npm:1.39.2"],\
+          ["react", "npm:19.2.0"],\
+          ["react-dom", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.2.0"],\
+          ["react-reconciler", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.32.0"],\
+          ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
+        ],\
+        "packagePeers": [\
+          "@types/prosemirror-model",\
+          "@types/prosemirror-state",\
+          "@types/prosemirror-transform",\
+          "@types/prosemirror-view",\
+          "prosemirror-model",\
+          "prosemirror-state",\
+          "prosemirror-transform",\
+          "prosemirror-view"\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["workspace:packages/version-history-client", {\
+        "packageLocation": "./packages/version-history-client/",\
+        "packageDependencies": [\
+          ["@handlewithcare/react-prosemirror", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.5.4"],\
+          ["@pitter-patter/collab-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/collab-client"],\
+          ["@pitter-patter/version-history-client", "workspace:packages/version-history-client"],\
+          ["@tsconfig/strictest", "npm:2.0.5"],\
+          ["@types/react", "npm:19.2.2"],\
+          ["@types/react-dom", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.2.2"],\
+          ["@types/react-reconciler", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.32.2"],\
+          ["classnames", "npm:2.5.1"],\
+          ["prosemirror-model", "npm:1.25.3"],\
+          ["prosemirror-state", "npm:1.4.3"],\
+          ["prosemirror-transform", "npm:1.10.4"],\
+          ["prosemirror-view", "npm:1.39.2"],\
+          ["react", "npm:19.2.0"],\
+          ["react-dom", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:19.2.0"],\
+          ["react-reconciler", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.32.0"],\
+          ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["@pitter-patter/version-history-server", [\
+      ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-server", {\
+        "packageLocation": "./.yarn/__virtual__/@pitter-patter-version-history-server-virtual-fb1596de20/1/packages/version-history-server/",\
+        "packageDependencies": [\
+          ["@pitter-patter/collab-server", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/collab-server"],\
+          ["@pitter-patter/version-history-server", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/version-history-server"],\
+          ["@stepwisehq/prosemirror-collab-commit", "virtual:fcd14e7904a4e57798c3780eac794d1aef89fc4c339f867e16389ce7e77ca066de4e9ea769b1fea62304181ad8be51cb5955e016e8a01e4e8f7b3c2f169217d5#npm:1.0.3"],\
+          ["@tsconfig/strictest", "npm:2.0.5"],\
+          ["@types/pitter-patter__collab-server", null],\
+          ["@types/prosemirror-model", null],\
+          ["@types/prosemirror-state", null],\
+          ["@types/prosemirror-transform", null],\
+          ["@types/stepwisehq__prosemirror-collab-commit", null],\
+          ["prosemirror-model", "npm:1.25.3"],\
+          ["prosemirror-state", "npm:1.4.3"],\
+          ["prosemirror-transform", "npm:1.10.4"]\
+        ],\
+        "packagePeers": [\
+          "@pitter-patter/collab-server",\
+          "@types/pitter-patter__collab-server",\
+          "@types/prosemirror-model",\
+          "@types/prosemirror-state",\
+          "@types/prosemirror-transform",\
+          "@types/stepwisehq__prosemirror-collab-commit",\
+          "prosemirror-model",\
+          "prosemirror-state",\
+          "prosemirror-transform"\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["workspace:packages/version-history-server", {\
+        "packageLocation": "./packages/version-history-server/",\
+        "packageDependencies": [\
+          ["@pitter-patter/collab-server", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/collab-server"],\
+          ["@pitter-patter/version-history-server", "workspace:packages/version-history-server"],\
+          ["@stepwisehq/prosemirror-collab-commit", "virtual:fcd14e7904a4e57798c3780eac794d1aef89fc4c339f867e16389ce7e77ca066de4e9ea769b1fea62304181ad8be51cb5955e016e8a01e4e8f7b3c2f169217d5#npm:1.0.3"],\
+          ["@tsconfig/strictest", "npm:2.0.5"],\
+          ["prosemirror-model", "npm:1.25.3"],\
+          ["prosemirror-state", "npm:1.4.3"],\
+          ["prosemirror-transform", "npm:1.10.4"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -3019,11 +3135,11 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#npm:3.2.0", {\
-        "packageLocation": "./.yarn/__virtual__/c12-virtual-07f1612785/0/cache/c12-npm-3.2.0-94947105ca-b0a72e639d.zip/node_modules/c12/",\
+      ["virtual:6085dc7c02277bb0821dc484d184a5aca950b23b1bf701993cd95a54851ce7260e081a9e120b222cbf548793183778341c651f51eaacfb1d78dfb3e59e4e96c9#npm:3.2.0", {\
+        "packageLocation": "./.yarn/__virtual__/c12-virtual-eef7475753/0/cache/c12-npm-3.2.0-94947105ca-b0a72e639d.zip/node_modules/c12/",\
         "packageDependencies": [\
           ["@types/magicast", null],\
-          ["c12", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#npm:3.2.0"],\
+          ["c12", "virtual:6085dc7c02277bb0821dc484d184a5aca950b23b1bf701993cd95a54851ce7260e081a9e120b222cbf548793183778341c651f51eaacfb1d78dfb3e59e4e96c9#npm:3.2.0"],\
           ["chokidar", "npm:4.0.3"],\
           ["confbox", "npm:0.2.2"],\
           ["defu", "npm:6.1.4"],\
@@ -4640,36 +4756,45 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["kysely-ctl", [\
-      ["npm:0.17.0", {\
-        "packageLocation": "./.yarn/cache/kysely-ctl-npm-0.17.0-1a6996b7af-9fe66bd15b.zip/node_modules/kysely-ctl/",\
+      ["npm:0.19.0", {\
+        "packageLocation": "./.yarn/cache/kysely-ctl-npm-0.19.0-34a7d9bfb2-a641aefee0.zip/node_modules/kysely-ctl/",\
         "packageDependencies": [\
-          ["kysely-ctl", "npm:0.17.0"]\
+          ["kysely-ctl", "npm:0.19.0"]\
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.17.0", {\
-        "packageLocation": "./.yarn/__virtual__/kysely-ctl-virtual-c52c2cddef/0/cache/kysely-ctl-npm-0.17.0-1a6996b7af-9fe66bd15b.zip/node_modules/kysely-ctl/",\
+      ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.19.0", {\
+        "packageLocation": "./.yarn/__virtual__/kysely-ctl-virtual-6085dc7c02/0/cache/kysely-ctl-npm-0.19.0-34a7d9bfb2-a641aefee0.zip/node_modules/kysely-ctl/",\
         "packageDependencies": [\
           ["@types/kysely", null],\
+          ["@types/kysely-neon", null],\
           ["@types/kysely-postgres-js", null],\
-          ["c12", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#npm:3.2.0"],\
+          ["@types/kysely-prisma-postgres", null],\
+          ["c12", "virtual:6085dc7c02277bb0821dc484d184a5aca950b23b1bf701993cd95a54851ce7260e081a9e120b222cbf548793183778341c651f51eaacfb1d78dfb3e59e4e96c9#npm:3.2.0"],\
           ["citty", "npm:0.1.6"],\
+          ["confbox", "npm:0.2.2"],\
           ["consola", "npm:3.4.2"],\
           ["jiti", "npm:2.5.1"],\
           ["kysely", "npm:0.28.8"],\
-          ["kysely-ctl", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.17.0"],\
+          ["kysely-ctl", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:0.19.0"],\
+          ["kysely-neon", null],\
           ["kysely-postgres-js", null],\
+          ["kysely-prisma-postgres", null],\
           ["nypm", "npm:0.6.1"],\
           ["ofetch", "npm:1.4.1"],\
           ["pathe", "npm:2.0.3"],\
           ["pkg-types", "npm:2.3.0"],\
           ["std-env", "npm:3.9.0"],\
-          ["tsconfck", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"]\
+          ["tsconfck", "virtual:6085dc7c02277bb0821dc484d184a5aca950b23b1bf701993cd95a54851ce7260e081a9e120b222cbf548793183778341c651f51eaacfb1d78dfb3e59e4e96c9#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"]\
         ],\
         "packagePeers": [\
+          "@types/kysely-neon",\
           "@types/kysely-postgres-js",\
+          "@types/kysely-prisma-postgres",\
           "@types/kysely",\
+          "kysely-neon",\
           "kysely-postgres-js",\
+          "kysely-prisma-postgres",\
           "kysely"\
         ],\
         "linkType": "HARD"\
@@ -6589,11 +6714,11 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d", {\
-        "packageLocation": "./.yarn/__virtual__/tsconfck-virtual-159dc5b09c/0/cache/tsconfck-patch-1609f909d9-6faf065dd6.zip/node_modules/tsconfck/",\
+      ["virtual:6085dc7c02277bb0821dc484d184a5aca950b23b1bf701993cd95a54851ce7260e081a9e120b222cbf548793183778341c651f51eaacfb1d78dfb3e59e4e96c9#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d", {\
+        "packageLocation": "./.yarn/__virtual__/tsconfck-virtual-c264e78800/0/cache/tsconfck-patch-1609f909d9-6faf065dd6.zip/node_modules/tsconfck/",\
         "packageDependencies": [\
           ["@types/typescript", null],\
-          ["tsconfck", "virtual:c52c2cddef1d39389625c57f87b083dbc6f534aa8f3c6ecc255d0a3b24152388fde8ccb53b51196169fd31f53e490a9cb927852a367bf06f692ff319f765e0e6#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"],\
+          ["tsconfck", "virtual:6085dc7c02277bb0821dc484d184a5aca950b23b1bf701993cd95a54851ce7260e081a9e120b222cbf548793183778341c651f51eaacfb1d78dfb3e59e4e96c9#patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch::version=3.1.6&hash=f0a27d"],\
           ["typescript", null]\
         ],\
         "packagePeers": [\
