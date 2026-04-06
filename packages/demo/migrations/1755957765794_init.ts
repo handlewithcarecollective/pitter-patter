@@ -16,8 +16,10 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     )
     .addColumn("ref", "text", (col) => col.notNull())
     .addColumn("version", "integer", (col) => col.notNull())
-    .addUniqueConstraint("ref_doc_unique", ["doc_id", "ref"])
-    .addUniqueConstraint("version_doc_unique", ["doc_id", "version"])
+    .addUniqueConstraint("commit_ref_doc_unique", ["doc_id", "ref"])
+    // IMPORTANT: We rely on this constraint to prevent simultaneous
+    // writes from producing commits with the same version
+    .addUniqueConstraint("commit_version_doc_unique", ["doc_id", "version"])
     .addColumn("steps", "text", (col) => col.notNull())
     .execute();
 }

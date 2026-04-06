@@ -19,6 +19,16 @@ interface Commit {
   updatedAt: Generated<string>;
 }
 
+interface Commit {
+  id: string;
+  docId: string;
+  ref: string;
+  version: number;
+  comment: NodeJSON;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+}
+
 interface Snapshot {
   id: string;
   docId: string;

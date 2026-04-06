@@ -10,13 +10,5 @@
     "lib": ["es2020", "dom"],
     "jsx": "react-jsx"
   },
-  "include": ["src"],
-  "references": [
-    {
-      "path": "../collab-client"
-    },
-    {
-      "path": "../refs"
-    }
-  ]
+  "include": ["src"]
 }

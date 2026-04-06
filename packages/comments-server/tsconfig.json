@@ -7,16 +7,12 @@
     "rootDir": "src",
     "moduleResolution": "bundler",
     "module": "ESNext",
-    "lib": ["es2020", "dom"],
-    "jsx": "react-jsx"
+    "target": "ES2020"
   },
   "include": ["src"],
   "references": [
     {
       "path": "../collab-client"
-    },
-    {
-      "path": "../refs"
     }
   ]
 }

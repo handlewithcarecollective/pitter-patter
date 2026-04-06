@@ -1,9 +1,4 @@
-import {
-  CommitJSON,
-  NodeJSON,
-} from "@stepwisehq/prosemirror-collab-commit/collab-commit";
-import { applyCommitJSON } from "@stepwisehq/prosemirror-collab-commit/apply-commit";
-import { Schema } from "prosemirror-model";
+import { type NodeJSON } from "@pitter-patter/collab-client";
 import { createClient, RedisClientType } from "redis";
 
 function PromiseWithResolvers<T>() {
@@ -23,40 +18,39 @@ export class TooMuchContentionError extends Error {
   }
 }
 
+export interface Comment {
+  userId: string;
+  createdAt: number;
+  updatedAt: number;
+  version: number;
+  ref: string;
+  commentJSON: NodeJSON;
+}
+
+export interface NewComment {
+  userId: string;
+  ref: string;
+  commentJSON: NodeJSON;
+}
+
 export interface CollabAuthorityConfig<Transaction> {
-  schema: Schema;
   runWithTransaction: <Result>(
     callback: (tr: Transaction) => Promise<Result>,
   ) => Promise<Result>;
-  getDoc: (
+  getComment: (
     tr: Transaction | null,
     docId: string,
-  ) => Promise<{
-    docJSON: NodeJSON;
-    version: number;
-    lastUpdatedTimestamp: number;
-  }>;
-  getCommit: (
-    tr: Transaction | null,
-    docId: string,
-    commitRef: string,
-  ) => Promise<CommitJSON | null>;
-  getCommits: (
+    commentRef: string,
+  ) => Promise<Comment | null>;
+  getComments: (
     tr: Transaction | null,
     docId: string,
     version: number,
-  ) => Promise<CommitJSON[]>;
-  saveDoc: (
+  ) => Promise<Comment[]>;
+  saveComment: (
     tr: Transaction | null,
     docId: string,
-    docJSON: NodeJSON,
-    version: number,
-    lastUpdatedTimestamp: number,
-  ) => Promise<void>;
-  saveCommit: (
-    tr: Transaction | null,
-    docId: string,
-    commitJSON: CommitJSON,
+    comment: NewComment,
   ) => Promise<void>;
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;

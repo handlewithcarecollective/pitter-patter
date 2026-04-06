@@ -1,4 +1,4 @@
-import { type PresenceIndicator } from "./PresenceIndicator";
+import { PresenceIndicator } from "./PresenceIndicator";
 
 export interface PresenceClientConfig {
   userId: string;
