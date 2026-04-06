@@ -107,7 +107,6 @@ export interface LongPollListenerOptions {
 export class LongPollListener {
   private headers: HeadersInit;
   private fetch: typeof globalThis.fetch;
-  // private timeout: number;
 
   constructor(
     private url: URL,
@@ -115,8 +114,6 @@ export class LongPollListener {
   ) {
     this.headers = options.headers ?? {};
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-    // this.timeout = options.timeout ?? 5_000;
-
     this.getCommits = this.getCommits.bind(this);
   }
 
@@ -125,7 +122,6 @@ export class LongPollListener {
     url.searchParams.append("version", version.toString());
 
     const response = await this.fetch(url, {
-      // signal: AbortSignal.timeout(this.timeout),
       headers: this.headers,
     });
 

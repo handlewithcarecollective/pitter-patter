@@ -11,6 +11,7 @@ import {
 import {
   CollabAuthority,
   RedisBroadcastManager,
+  TooMuchContentionError,
 } from "@pitter-patter/collab-server";
 import { withVersionHistory } from "@pitter-patter/version-history-server";
 import { schema } from "prosemirror-schema-basic";
@@ -188,7 +189,15 @@ app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
 });
 
 app.post("/api/docs/:docId/commits", async (req, res) => {
-  collabAuthority.receiveCommit(req.params.docId, req.body);
+  try {
+    collabAuthority.receiveCommit(req.params.docId, req.body);
+  } catch (e) {
+    if (e instanceof TooMuchContentionError) {
+      res.status(409).send(null);
+      return;
+    }
+    throw e;
+  }
   res.status(204).send(null);
 });
 

@@ -1605,6 +1605,45 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@pitter-patter/comments-client@workspace:packages/comments-client":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/comments-client@workspace:packages/comments-client"
+  dependencies:
+    "@handlewithcare/react-prosemirror": "npm:^2.5.4"
+    "@pitter-patter/collab-client": "workspace:^"
+    "@pitter-patter/refs": "workspace:^"
+    "@tsconfig/strictest": "npm:^2.0.5"
+    "@types/react": "npm:^19.2.2"
+    "@types/react-dom": "npm:^19.2.2"
+    "@types/react-reconciler": "npm:^0.32.2"
+    classnames: "npm:^2.5.1"
+    prosemirror-commands: "npm:^1.7.1"
+    prosemirror-model: "npm:^1.25.3"
+    prosemirror-state: "npm:^1.4.3"
+    prosemirror-transform: "npm:^1.10.4"
+    prosemirror-view: "npm:1.39.2"
+    react: "npm:^19.2.0"
+    react-dom: "npm:^19.2.0"
+    react-reconciler: "npm:^0.32.0"
+    typescript: "npm:^5.9.3"
+  peerDependencies:
+    prosemirror-model: ^1.0.0
+    prosemirror-state: ^1.0.0
+    prosemirror-transform: ^1.0.0
+    prosemirror-view: ^1.0.0
+  languageName: unknown
+  linkType: soft
+
+"@pitter-patter/comments-server@workspace:packages/comments-server":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/comments-server@workspace:packages/comments-server"
+  dependencies:
+    "@pitter-patter/collab-client": "workspace:^"
+    "@tsconfig/strictest": "npm:^2.0.5"
+    redis: "npm:^5.8.2"
+  languageName: unknown
+  linkType: soft
+
 "@pitter-patter/demo@workspace:packages/demo":
   version: 0.0.0-use.local
   resolution: "@pitter-patter/demo@workspace:packages/demo"
@@ -1653,6 +1692,7 @@ __metadata:
   dependencies:
     "@handlewithcare/react-prosemirror": "npm:^2.5.4"
     "@pitter-patter/collab-client": "workspace:^"
+    "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/react": "npm:^19.2.2"
     "@types/react-dom": "npm:^19.2.2"
@@ -1683,24 +1723,25 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@pitter-patter/refs@workspace:^, @pitter-patter/refs@workspace:packages/refs":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/refs@workspace:packages/refs"
+  dependencies:
+    "@tsconfig/strictest": "npm:^2.0.5"
+    typescript: "npm:^5.9.3"
+  languageName: unknown
+  linkType: soft
+
 "@pitter-patter/version-history-client@workspace:*, @pitter-patter/version-history-client@workspace:packages/version-history-client":
   version: 0.0.0-use.local
   resolution: "@pitter-patter/version-history-client@workspace:packages/version-history-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^2.5.4"
     "@pitter-patter/collab-client": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
-    "@types/react": "npm:^19.2.2"
-    "@types/react-dom": "npm:^19.2.2"
-    "@types/react-reconciler": "npm:^0.32.2"
-    classnames: "npm:^2.5.1"
     prosemirror-model: "npm:^1.25.3"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
     prosemirror-view: "npm:1.39.2"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
-    react-reconciler: "npm:^0.32.0"
     typescript: "npm:^5.9.3"
   peerDependencies:
     prosemirror-model: ^1.0.0

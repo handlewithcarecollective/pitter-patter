@@ -1,5 +1,5 @@
 {
-  "name": "@pitter-patter/presence-client",
+  "name": "@pitter-patter/comments-client",
   "version": "0.1.0",
   "type": "module",
   "packageManager": "yarn@4.9.1",
@@ -16,6 +16,7 @@
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/refs": "workspace:^",
     "classnames": "^2.5.1",
+    "prosemirror-commands": "^1.7.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-reconciler": "^0.32.0"
