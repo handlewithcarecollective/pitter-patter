@@ -9,6 +9,7 @@ import { createRoot } from "react-dom/client";
 
 import { addOrgNodes } from "../src/schema.ts";
 import { organize } from "../src/plugin.ts";
+import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
 import "../src/styles.css";
 
 const imageSpec = basic.spec.nodes.get("image");
@@ -22,21 +23,25 @@ basic.spec.nodes = basic.spec.nodes.update("image", {
 const schema = addOrgNodes(basic, "block+", "block");
 
 const doc = schema.nodes.doc.create(null, [
-  schema.nodes.row.create({ orgStart: 1, orgEnd: 11 }, [
-    schema.nodes.image.create({
-      orgStart: 1,
-      orgEnd: 5,
-      src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
-    }),
-    schema.nodes.container.create({ orgStart: 7, orgEnd: 11 }, [
-      schema.nodes.paragraph.create(null, [
-        schema.text("This is some sample text"),
-      ]),
-      schema.nodes.paragraph.create(null, [
-        schema.text("This is some more sample text"),
-      ]),
-    ]),
-  ]),
+  // schema.nodes.row.create({ orgStart: 1, orgEnd: 12 }, [
+  //   schema.nodes.image.create({
+  //     orgStart: 1,
+  //     orgEnd: 5,
+  //     src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
+  //   }),
+  //   schema.nodes.container.create({ orgStart: 7, orgEnd: 12 }, [
+  //     schema.nodes.paragraph.create(null, [
+  //       schema.text("This is some sample text"),
+  //     ]),
+  //     schema.nodes.paragraph.create(null, [
+  //       schema.text("This is some more sample text"),
+  //     ]),
+  //   ]),
+  // ]),
+  schema.nodes.paragraph.create(
+    null,
+    schema.text("Another paragraph not in a row."),
+  ),
 ]);
 
 const editorState = EditorState.create({
@@ -47,7 +52,9 @@ const editorState = EditorState.create({
 function Editor() {
   return (
     <ProseMirror defaultState={editorState}>
-      <ProseMirrorDoc />
+      <GridSkeleton>
+        <ProseMirrorDoc />
+      </GridSkeleton>
     </ProseMirror>
   );
 }

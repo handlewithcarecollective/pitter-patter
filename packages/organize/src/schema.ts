@@ -2,7 +2,7 @@ import { NodeSpec, Schema } from "prosemirror-model";
 
 export const gridAttrs: NodeSpec["attrs"] = {
   orgStart: {
-    default: 2,
+    default: 4,
     validate(value) {
       return typeof value === "number" && value <= 11 && value >= 1;
     },

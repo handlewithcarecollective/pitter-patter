@@ -64,6 +64,10 @@ export function organize() {
       decorations(state) {
         return organizePluginKey.getState(state);
       },
+      attributes: {
+        class: "pp-org row start-left end-right",
+      },
     },
+    // view(view) {},
   });
 }
