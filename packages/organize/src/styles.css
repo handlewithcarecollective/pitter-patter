@@ -1,0 +1,114 @@
+:root {
+  --column-width: 3rem;
+  --gutter-width: 1.5rem;
+}
+
+.ProseMirror {
+  align-content: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(12, minmax(0, var(--column-width))) minmax(0, 1fr);
+  column-gap: var(--gutter-wdith);
+}
+
+.row {
+  align-items: start;
+  display: grid;
+  grid-template-columns: subgrid;
+  row-gap: var(--gutter-width);
+}
+
+.pp-org {
+  width: 100%;
+}
+
+.start-1 {
+  grid-column-start: 2;
+}
+
+.start-1>.start-1 {
+  grid-column-start: 1;
+}
+
+.end-1 {
+  grid-column-end: 3;
+}
+
+.start-2 {
+  grid-column-start: 3;
+}
+
+.end-2 {
+  grid-column-end: 4;
+}
+
+.start-3 {
+  grid-column-start: 4;
+}
+
+.end-3 {
+  grid-column-end: 5;
+}
+
+.start-4 {
+  grid-column-start: 5;
+}
+
+.end-4 {
+  grid-column-end: 6;
+}
+
+.start-5 {
+  grid-column-start: 6;
+}
+
+.end-5 {
+  grid-column-end: 7;
+}
+
+.start-6 {
+  grid-column-start: 7;
+}
+
+.end-6 {
+  grid-column-end: 8;
+}
+
+.start-7 {
+  grid-column-start: 8;
+}
+
+.end-7 {
+  grid-column-end: 8;
+}
+
+.start-8 {
+  grid-column-start: 9;
+}
+
+.end-8 {
+  grid-column-end: 10;
+}
+
+.start-9 {
+  grid-column-start: 10;
+}
+
+.end-9 {
+  grid-column-end: 11;
+}
+
+.start-10 {
+  grid-column-start: 11;
+}
+
+.end-10 {
+  grid-column-end: 12;
+}
+
+.start-11 {
+  grid-column-start: 12;
+}
+
+.end-11 {
+  grid-column-end: 13;
+}
