@@ -97,7 +97,11 @@ export function shuffle() {
 
           if (viewDesc.contentDOM?.contains(event.target)) return false;
 
-          dom.style.zIndex = "100";
+          const clone = dom.cloneNode(true) as HTMLElement;
+          parent.appendChild(clone);
+
+          const initialOpacity = dom.style.opacity;
+          dom.style.opacity = "40%";
 
           const transform = new DOMMatrixReadOnly(
             getComputedStyle(dom).transform,
@@ -118,16 +122,16 @@ export function shuffle() {
           const initialBoxShadow = dom.style.boxShadow;
           const initialZIndex = parent.style.zIndex;
 
-          parent.style.perspective = "180cm";
+          parent.style.perspective = "80cm";
           parent.style.zIndex = "100";
 
-          dom.style.transition = "transform 0.1s ease";
-          dom.style.transform = translateCalc.calculate(startX, startY);
-          dom.style.boxShadow =
+          clone.style.transition = "transform 0.1s ease";
+          clone.style.transform = translateCalc.calculate(startX, startY);
+          clone.style.boxShadow =
             "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
 
           setTimeout(() => {
-            dom.style.transition = "none";
+            clone.style.transition = "none";
           }, 100);
 
           let skeletonOn = false;
@@ -144,7 +148,22 @@ export function shuffle() {
             }
             if (!(dom instanceof HTMLElement)) return;
 
-            dom.style.transform = translateCalc.calculate(e.clientX, e.clientY);
+            clone.style.transform = translateCalc.calculate(
+              e.clientX,
+              e.clientY,
+            );
+
+            const posResult = view.posAtCoords({
+              left: e.clientX,
+              top: e.clientY,
+            });
+            if (!posResult) return;
+            const domResult = view.domAtPos(posResult.pos);
+
+            const overDom = domResult.node;
+            if (!(overDom instanceof HTMLElement)) return;
+
+            const overRect = overDom.getBoundingClientRect();
           }
 
           function onUp() {
@@ -162,17 +181,19 @@ export function shuffle() {
 
             if (!(dom instanceof HTMLElement)) return;
 
-            dom.style.transition = "transform 0.2s ease";
-            dom.style.boxShadow = initialBoxShadow;
-            dom.style.zIndex = initialZIndex;
-            dom.style.transform = "none";
+            clone.style.transition = "transform 0.2s ease";
+            clone.style.boxShadow = initialBoxShadow;
+            clone.style.zIndex = initialZIndex;
+            clone.style.transform = "none";
 
             setTimeout(() => {
-              dom.style.transition = "none";
+              clone.style.transition = "none";
               if (parent) {
                 parent.style.perspective = "none";
                 parent.style.zIndex = initialZIndex;
               }
+              dom.style.opacity = initialOpacity;
+              clone.remove();
             }, 200);
 
             return;
