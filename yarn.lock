@@ -32,19 +32,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@handlewithcare/react-prosemirror@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@handlewithcare/react-prosemirror@npm:3.0.0"
+"@handlewithcare/react-prosemirror@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@handlewithcare/react-prosemirror@npm:3.0.1"
   dependencies:
-    classnames: "npm:^2.3.2"
+    classnames: "npm:^2.5.1"
   peerDependencies:
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
-    prosemirror-view: 1.41.4
+    prosemirror-view: 1.41.7
     react: ">=17 <20"
     react-dom: ">=17 <20"
     react-reconciler: ">=0.26.1 <=0.33.0"
-  checksum: 10c0/b86b2b7d1f099d946236b3952d34689e4cd27a03794c2b5aa14796190d1ad68b88aaa63de84e0eb57a40ba9cc58c3f59d003fe739285b6b2cc9e48c706ed3152
+  checksum: 10c0/33cf0c3ccc8771d8e2adec9f14e557b8bf1c687a9c57042eba5bcaa670e8026622625a3cd98d2f886775f2263eed3d4ddb45899872db46d81ed6e1520fe6b3ec
   languageName: node
   linkType: hard
 
@@ -1628,7 +1628,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/comments-client@workspace:packages/comments-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.0"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
@@ -1670,7 +1670,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/demo@workspace:packages/demo"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.0"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
     "@parcel/rsc": "npm:^2.16.0"
     "@parcel/runtime-react-refresh": "npm:^2.13.3"
     "@parcel/runtime-rsc": "npm:^2.16.0"
@@ -1712,7 +1712,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/presence-client@workspace:packages/presence-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.0"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
@@ -1758,16 +1758,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/shuffle@workspace:packages/shuffle"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.0"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/react": "npm:^19.2.2"
     "@types/react-dom": "npm:^19.2.2"
     "@types/react-reconciler": "npm:^0.32.2"
     "@vitejs/plugin-react": "npm:^6.0.1"
+    animejs: "npm:^4.3.6"
     classnames: "npm:^2.5.1"
     motion: "npm:^12.38.0"
     orderedmap: "npm:^2.1.1"
     prettier: "npm:^3.8.1"
+    prosemirror-commands: "npm:^1.7.1"
+    prosemirror-keymap: "npm:^1.2.3"
     prosemirror-model: "npm:^1.25.3"
     prosemirror-schema-basic: "npm:^1.2.4"
     prosemirror-state: "npm:^1.4.3"
@@ -2527,6 +2530,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"animejs@npm:^4.3.6":
+  version: 4.3.6
+  resolution: "animejs@npm:4.3.6"
+  checksum: 10c0/d430ce275ba175c67c8c9a1f4d6c6c7df2ab374f062f895fa928016c9a6865801f4c6b11210718c6b87ff1c63d0ed5ef2405325a47fa0e8bcf4850754be09adb
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
@@ -2894,7 +2904,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.3.2, classnames@npm:^2.5.1":
+"classnames@npm:^2.5.1":
   version: 2.5.1
   resolution: "classnames@npm:2.5.1"
   checksum: 10c0/afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
@@ -5356,17 +5366,6 @@ __metadata:
     prosemirror-state: "npm:^1.0.0"
     prosemirror-transform: "npm:^1.1.0"
   checksum: 10c0/613e36cb27757c115ab301d3f7674e979450c928064b95fe26666765a2fc3efa80402ca8f6e4b8484e5d2f6945a14d842e1ff2900c86e4deea73613be0f42d5a
-  languageName: node
-  linkType: hard
-
-"prosemirror-view@npm:^1.27.0":
-  version: 1.41.8
-  resolution: "prosemirror-view@npm:1.41.8"
-  dependencies:
-    prosemirror-model: "npm:^1.20.0"
-    prosemirror-state: "npm:^1.0.0"
-    prosemirror-transform: "npm:^1.1.0"
-  checksum: 10c0/fae3947fec39e2b274bd10e46a2f3b671708e133dc2cc1fb2af0bd97576abd941bbdcc9dc240adf8b34dd0420a020a4006293450fc9c76e2578dba65de6dd9dc
   languageName: node
   linkType: hard
 

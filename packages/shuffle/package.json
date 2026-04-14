@@ -15,7 +15,8 @@
     "demo": "yarn vite"
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.0",
+    "@handlewithcare/react-prosemirror": "^3.0.1",
+    "animejs": "^4.3.6",
     "classnames": "^2.5.1",
     "motion": "^12.38.0",
     "orderedmap": "^2.1.1",
@@ -31,6 +32,8 @@
     "@types/react-reconciler": "^0.32.2",
     "@vitejs/plugin-react": "^6.0.1",
     "prettier": "^3.8.1",
+    "prosemirror-commands": "^1.7.1",
+    "prosemirror-keymap": "^1.2.3",
     "prosemirror-model": "^1.25.3",
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-state": "^1.4.3",

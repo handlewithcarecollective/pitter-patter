@@ -1,8 +1,9 @@
-import { BoundingBox } from "motion";
+import { createLayout } from "animejs";
 import { animate } from "motion/mini";
 import { Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
+import { reorder, reposition } from "./transform";
 
 export const shufflePluginKey = new PluginKey("@pitter-patter/shuffle");
 
@@ -30,8 +31,32 @@ export function shuffle() {
 
         return DecorationSet.create(state.doc, decorations);
       },
-      apply(tr, value) {
-        const next = value.map(tr.mapping, tr.doc);
+      apply(tr, value, oldState) {
+        let next = value.map(tr.mapping, tr.doc);
+        const meta = tr.getMeta(shufflePluginKey);
+        if (meta) {
+          const { pos, start, end } = meta as {
+            pos: number;
+            start: number;
+            end: number;
+          };
+
+          const node = oldState.doc.resolve(pos).nodeAfter;
+
+          if (node) {
+            const candidates = next.find(pos, pos);
+            const decoration = candidates.find(
+              (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
+            );
+            if (decoration) {
+              next = next.remove([decoration]).add(tr.doc, [
+                Decoration.node(pos, pos + node.nodeSize, {
+                  class: `pp-shuffle-block start-${start} end-${end}`,
+                }),
+              ]);
+            }
+          }
+        }
 
         const decorations: Decoration[] = [];
 
@@ -75,6 +100,7 @@ export function shuffle() {
           event.preventDefault();
         },
         pointerdown(view, event) {
+          if (!view.editable) return false;
           if (!(event.target instanceof HTMLElement)) return false;
 
           let dom: null | HTMLElement = event.target;
@@ -97,8 +123,16 @@ export function shuffle() {
 
           if (viewDesc.contentDOM?.contains(event.target)) return false;
 
+          const domRect = dom.getBoundingClientRect();
+          const bodyRect = document.body.getBoundingClientRect();
+
           const clone = dom.cloneNode(true) as HTMLElement;
-          parent.appendChild(clone);
+          clone.style.position = "absolute";
+          clone.style.top = `${domRect.top - bodyRect.top}px`;
+          clone.style.left = `${domRect.left - bodyRect.left}px`;
+          clone.style.width = `${domRect.width}px`;
+          clone.style.height = `${domRect.height}px`;
+          document.body.appendChild(clone);
 
           const initialOpacity = dom.style.opacity;
           dom.style.opacity = "40%";
@@ -117,24 +151,27 @@ export function shuffle() {
             originY,
             startX,
             startY,
+            domRect,
           );
 
           const initialBoxShadow = dom.style.boxShadow;
           const initialZIndex = parent.style.zIndex;
 
-          parent.style.perspective = "80cm";
-          parent.style.zIndex = "100";
+          document.body.style.perspective = "80cm";
 
           clone.style.transition = "transform 0.1s ease";
-          clone.style.transform = translateCalc.calculate(startX, startY);
+          clone.style.transform = translateCalc.slide(startX, startY);
           clone.style.boxShadow =
             "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
+          clone.style.zIndex = "100";
 
           setTimeout(() => {
             clone.style.transition = "none";
           }, 100);
 
           let skeletonOn = false;
+          // TODO: debounce with requestAnimationFrame
+          // TODO: group all reorders and repositions into one history item
           function onMove(e: PointerEvent) {
             if (!skeletonOn) {
               const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
@@ -148,22 +185,17 @@ export function shuffle() {
             }
             if (!(dom instanceof HTMLElement)) return;
 
-            clone.style.transform = translateCalc.calculate(
-              e.clientX,
-              e.clientY,
-            );
+            clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
 
-            const posResult = view.posAtCoords({
-              left: e.clientX,
-              top: e.clientY,
+            const layout = createLayout(view.dom);
+            layout.update(() => {
+              reposition(
+                view,
+                viewDesc.posBefore,
+                clone.getBoundingClientRect(),
+              );
+              reorder(view, viewDesc.posBefore, e.clientX, e.clientY);
             });
-            if (!posResult) return;
-            const domResult = view.domAtPos(posResult.pos);
-
-            const overDom = domResult.node;
-            if (!(overDom instanceof HTMLElement)) return;
-
-            const overRect = overDom.getBoundingClientRect();
           }
 
           function onUp() {
@@ -183,18 +215,23 @@ export function shuffle() {
 
             clone.style.transition = "transform 0.2s ease";
             clone.style.boxShadow = initialBoxShadow;
-            clone.style.zIndex = initialZIndex;
-            clone.style.transform = "none";
+
+            const domRect = dom.getBoundingClientRect();
+
+            clone.style.transform = translateCalc.place(
+              domRect.left,
+              domRect.top,
+            );
 
             setTimeout(() => {
               clone.style.transition = "none";
               if (parent) {
                 parent.style.perspective = "none";
-                parent.style.zIndex = initialZIndex;
+                clone.style.zIndex = initialZIndex;
               }
               dom.style.opacity = initialOpacity;
               clone.remove();
-            }, 200);
+            }, 250);
 
             return;
           }
@@ -204,25 +241,7 @@ export function shuffle() {
 
           return false;
         },
-        dragend(view) {
-          const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
-          if (!gridWrapper) return false;
-          const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
-          if (!skeleton) return false;
-
-          animate(skeleton, { opacity: 0 }, { duration: 0.25 });
-
-          return false;
-        },
       },
-    },
-    view(view) {
-      const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
-      if (!gridWrapper) return {};
-
-      const bars = gridWrapper.querySelectorAll("[data-pp-grid-skeleton-bar]");
-
-      return {};
     },
   });
 }
@@ -231,9 +250,10 @@ interface ViewDesc {
   node: PmNode;
   dom: HTMLElement;
   contentDOM?: HTMLElement;
+  posBefore: number;
 }
 
-const LIFT_AMOUNT = 8;
+const LIFT_AMOUNT = 24;
 
 class TranslateCalculator {
   constructor(
@@ -241,11 +261,22 @@ class TranslateCalculator {
     private originY: number,
     private startX: number,
     private startY: number,
+    private rect: DOMRect,
   ) {}
 
-  calculate(x: number, y: number) {
+  slide(x: number, y: number) {
     const dx = x - this.startX;
     const dy = y - this.startY;
-    return `rotateX(15deg) translate(${this.originX + dx}px, ${this.originY + dy - LIFT_AMOUNT}px)`;
+    return `rotateX(0) scale(1.05) translate(${this.originX + dx}px, ${this.originY + dy - LIFT_AMOUNT}px)`;
+  }
+
+  place(x: number, y: number) {
+    const offsetX = this.rect.x - this.startX;
+    const offsetY = this.rect.y - this.startY;
+
+    const dx = x - this.startX - offsetX;
+    const dy = y - this.startY - offsetY;
+
+    return `rotateX(0) scale(1) translate(${this.originX + dx}px, ${this.originY + dy}px)`;
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "pitter-patter",
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.13.0+sha512.5c20ba010c99815433e5c8453112165e673f1c7948d8d2b267f4b5e52097538658388ebc9f9580656d9b75c5cc996f990f611f99304a2197d4c56d21eea370e7",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -12,6 +12,7 @@
     "typescript": "^5.9.3"
   },
   "resolutions": {
-    "tsconfck@npm:^3.1.6": "patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch"
+    "tsconfck@npm:^3.1.6": "patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch",
+    "prosemirror-view@npm:^1.27.0": "1.41.4"
   }
 }

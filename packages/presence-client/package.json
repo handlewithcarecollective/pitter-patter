@@ -12,7 +12,7 @@
     "./dist"
   ],
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.0",
+    "@handlewithcare/react-prosemirror": "^3.0.1",
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/refs": "workspace:^",
     "classnames": "^2.5.1",

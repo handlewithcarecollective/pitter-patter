@@ -27,6 +27,9 @@ export const container: NodeSpec = {
       0,
     ];
   },
+  pitterPatter: {
+    isGridContainer: true,
+  },
 };
 
 export const row: NodeSpec = {
@@ -36,6 +39,9 @@ export const row: NodeSpec = {
   isolating: true,
   toDOM() {
     return ["div", { "data-node-type": "shuffle-row", class: "row" }, 0];
+  },
+  pitterPatter: {
+    isGridContainer: true,
   },
 };
 
@@ -72,6 +78,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
 interface PitterPatterSpec {
   hasGridHandle?: boolean;
   isGridBlock?: boolean;
+  isGridContainer?: boolean;
 }
 
 declare module "prosemirror-model" {

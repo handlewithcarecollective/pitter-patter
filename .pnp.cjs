@@ -123,17 +123,17 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@handlewithcare/react-prosemirror", [\
-      ["npm:3.0.0", {\
-        "packageLocation": "./.yarn/cache/@handlewithcare-react-prosemirror-npm-3.0.0-0ac9d8edfe-b86b2b7d1f.zip/node_modules/@handlewithcare/react-prosemirror/",\
+      ["npm:3.0.1", {\
+        "packageLocation": "./.yarn/cache/@handlewithcare-react-prosemirror-npm-3.0.1-d221f3eba1-33cf0c3ccc.zip/node_modules/@handlewithcare/react-prosemirror/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "npm:3.0.0"]\
+          ["@handlewithcare/react-prosemirror", "npm:3.0.1"]\
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0", {\
-        "packageLocation": "./.yarn/__virtual__/@handlewithcare-react-prosemirror-virtual-bcef09d108/0/cache/@handlewithcare-react-prosemirror-npm-3.0.0-0ac9d8edfe-b86b2b7d1f.zip/node_modules/@handlewithcare/react-prosemirror/",\
+      ["virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1", {\
+        "packageLocation": "./.yarn/__virtual__/@handlewithcare-react-prosemirror-virtual-2649957338/0/cache/@handlewithcare-react-prosemirror-npm-3.0.1-d221f3eba1-33cf0c3ccc.zip/node_modules/@handlewithcare/react-prosemirror/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0"],\
+          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
           ["@types/prosemirror-model", null],\
           ["@types/prosemirror-state", null],\
           ["@types/prosemirror-view", null],\
@@ -2082,7 +2082,7 @@ const RAW_RUNTIME_STATE =
       ["workspace:packages/comments-client", {\
         "packageLocation": "./packages/comments-client/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0"],\
+          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
           ["@pitter-patter/collab-client", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#workspace:packages/collab-client"],\
           ["@pitter-patter/comments-client", "workspace:packages/comments-client"],\
           ["@pitter-patter/refs", "workspace:packages/refs"],\
@@ -2123,7 +2123,7 @@ const RAW_RUNTIME_STATE =
       ["workspace:packages/demo", {\
         "packageLocation": "./packages/demo/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0"],\
+          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
           ["@parcel/rsc", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.16.0"],\
           ["@parcel/runtime-react-refresh", "npm:2.13.3"],\
           ["@parcel/runtime-rsc", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#npm:2.16.0"],\
@@ -2167,7 +2167,7 @@ const RAW_RUNTIME_STATE =
       ["virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/presence-client", {\
         "packageLocation": "./.yarn/__virtual__/@pitter-patter-presence-client-virtual-158ad54c0e/1/packages/presence-client/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0"],\
+          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
           ["@pitter-patter/collab-client", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#workspace:packages/collab-client"],\
           ["@pitter-patter/presence-client", "virtual:688834bc902d099689c96f18ccdc7bb59b9fab741d9f7834f14124066c4447457f649e89eeb5085e407995cdab8a3300104eb8b0ce9ab6db4f32d2b990b683d9#workspace:packages/presence-client"],\
           ["@pitter-patter/refs", "workspace:packages/refs"],\
@@ -2204,7 +2204,7 @@ const RAW_RUNTIME_STATE =
       ["workspace:packages/presence-client", {\
         "packageLocation": "./packages/presence-client/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0"],\
+          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
           ["@pitter-patter/collab-client", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#workspace:packages/collab-client"],\
           ["@pitter-patter/presence-client", "workspace:packages/presence-client"],\
           ["@pitter-patter/refs", "workspace:packages/refs"],\
@@ -2251,17 +2251,20 @@ const RAW_RUNTIME_STATE =
       ["workspace:packages/shuffle", {\
         "packageLocation": "./packages/shuffle/",\
         "packageDependencies": [\
-          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.0"],\
+          ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
           ["@pitter-patter/shuffle", "workspace:packages/shuffle"],\
           ["@tsconfig/strictest", "npm:2.0.5"],\
           ["@types/react", "npm:19.2.2"],\
           ["@types/react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.2"],\
           ["@types/react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.2"],\
           ["@vitejs/plugin-react", "virtual:51ed69749ac2a8afc8bb5a736359e6e33922c163c96204098ccb3c2a9bf9f8802dd4f2319631a674b4da3bb064041231351fba539c61465ae593c08a79a4c0cf#npm:6.0.1"],\
+          ["animejs", "npm:4.3.6"],\
           ["classnames", "npm:2.5.1"],\
           ["motion", "virtual:51ed69749ac2a8afc8bb5a736359e6e33922c163c96204098ccb3c2a9bf9f8802dd4f2319631a674b4da3bb064041231351fba539c61465ae593c08a79a4c0cf#npm:12.38.0"],\
           ["orderedmap", "npm:2.1.1"],\
           ["prettier", "npm:3.8.1"],\
+          ["prosemirror-commands", "npm:1.7.1"],\
+          ["prosemirror-keymap", "npm:1.2.3"],\
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-schema-basic", "npm:1.2.4"],\
           ["prosemirror-state", "npm:1.4.3"],\
@@ -3282,6 +3285,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/agent-base-npm-7.1.4-cb8b4604d5-c2c9ab7599.zip/node_modules/agent-base/",\
         "packageDependencies": [\
           ["agent-base", "npm:7.1.4"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["animejs", [\
+      ["npm:4.3.6", {\
+        "packageLocation": "./.yarn/cache/animejs-npm-4.3.6-884333564f-d430ce275b.zip/node_modules/animejs/",\
+        "packageDependencies": [\
+          ["animejs", "npm:4.3.6"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6416,7 +6428,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.8"]\
+          ["prosemirror-view", "npm:1.41.4"]\
         ],\
         "linkType": "HARD"\
       }],\
@@ -6426,7 +6438,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.4"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.8"]\
+          ["prosemirror-view", "npm:1.41.4"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6457,16 +6469,6 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
           ["prosemirror-view", "npm:1.41.4"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:1.41.8", {\
-        "packageLocation": "./.yarn/cache/prosemirror-view-npm-1.41.8-417ec62eab-fae3947fec.zip/node_modules/prosemirror-view/",\
-        "packageDependencies": [\
-          ["prosemirror-model", "npm:1.25.3"],\
-          ["prosemirror-state", "npm:1.4.3"],\
-          ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.8"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -7958,16 +7960,16 @@ function convertToBigIntStats(stats) {
     if (Object.hasOwn(stats, key)) {
       const element = stats[key];
       if (typeof element === `number`) {
-        bigintStats[key] = BigInt(element);
+        bigintStats[key] = BigInt(Math.floor(element));
       } else if (nodeUtils__namespace.types.isDate(element)) {
         bigintStats[key] = new Date(element);
       }
     }
   }
-  bigintStats.atimeNs = bigintStats.atimeMs * BigInt(1e6);
-  bigintStats.mtimeNs = bigintStats.mtimeMs * BigInt(1e6);
-  bigintStats.ctimeNs = bigintStats.ctimeMs * BigInt(1e6);
-  bigintStats.birthtimeNs = bigintStats.birthtimeMs * BigInt(1e6);
+  bigintStats.atimeNs = bigintStats.atimeMs * BigInt(1e6) + BigInt(Math.floor(stats.atimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.mtimeNs = bigintStats.mtimeMs * BigInt(1e6) + BigInt(Math.floor(stats.mtimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.ctimeNs = bigintStats.ctimeMs * BigInt(1e6) + BigInt(Math.floor(stats.ctimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.birthtimeNs = bigintStats.birthtimeMs * BigInt(1e6) + BigInt(Math.floor(stats.birthtimeMs % 1 * 1e3)) * BigInt(1e3);
   return bigintStats;
 }
 function areStatsEqual(a, b) {
@@ -10645,28 +10647,40 @@ class FileHandle {
   sync() {
     throw new Error(`Method not implemented.`);
   }
-  async read(bufferOrOptions, offset, length, position) {
+  async read(bufferOrOptions, offsetOrOptions, length, position) {
     try {
       this[kRef](this.read);
       let buffer;
-      if (!Buffer.isBuffer(bufferOrOptions)) {
-        bufferOrOptions ??= {};
-        buffer = bufferOrOptions.buffer ?? Buffer.alloc(16384);
-        offset = bufferOrOptions.offset || 0;
-        length = bufferOrOptions.length ?? buffer.byteLength;
-        position = bufferOrOptions.position ?? null;
+      let offset;
+      if (!ArrayBuffer.isView(bufferOrOptions)) {
+        buffer = bufferOrOptions?.buffer ?? Buffer.alloc(16384);
+        offset = bufferOrOptions?.offset ?? 0;
+        length = bufferOrOptions?.length ?? buffer.byteLength - offset;
+        position = bufferOrOptions?.position ?? null;
+      } else if (typeof offsetOrOptions === `object` && offsetOrOptions !== null) {
+        buffer = bufferOrOptions;
+        offset = offsetOrOptions?.offset ?? 0;
+        length = offsetOrOptions?.length ?? buffer.byteLength - offset;
+        position = offsetOrOptions?.position ?? null;
       } else {
         buffer = bufferOrOptions;
+        offset = offsetOrOptions ?? 0;
+        length ??= 0;
       }
-      offset ??= 0;
-      length ??= 0;
       if (length === 0) {
         return {
           bytesRead: length,
           buffer
         };
       }
-      const bytesRead = await this[kBaseFs].readPromise(this.fd, buffer, offset, length, position);
+      const bytesRead = await this[kBaseFs].readPromise(
+        this.fd,
+        // FIXME: FakeFS should support ArrayBufferViews directly
+        Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength),
+        offset,
+        length,
+        position
+      );
       return {
         bytesRead,
         buffer
@@ -13061,7 +13075,8 @@ class ZipFS extends BasePortableFakeFS {
         const entries = Array.from(directoryListing, (name) => {
           return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
             name,
-            path: PortablePath.dot
+            path: PortablePath.dot,
+            parentPath: PortablePath.dot
           });
         });
         for (const entry of entries) {
@@ -13072,7 +13087,8 @@ class ZipFS extends BasePortableFakeFS {
           for (const child of subListing) {
             entries.push(Object.assign(this.statImpl(`lstat`, ppath.join(p, subPath, child)), {
               name: child,
-              path: subPath
+              path: subPath,
+              parentPath: subPath
             }));
           }
         }
@@ -13093,7 +13109,8 @@ class ZipFS extends BasePortableFakeFS {
       return Array.from(directoryListing, (name) => {
         return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
           name,
-          path: void 0
+          path: void 0,
+          parentPath: void 0
         });
       });
     } else {
@@ -13568,6 +13585,7 @@ function applyPatch(pnpapi, opts) {
       const optionNames = new Set(Object.keys(options));
       optionNames.delete(`paths`);
       optionNames.delete(`plugnplay`);
+      optionNames.delete(`conditions`);
       if (optionNames.size > 0) {
         throw makeError(
           ErrorCode.UNSUPPORTED,
@@ -13596,11 +13614,15 @@ function applyPatch(pnpapi, opts) {
       const issuerApi = apiPath !== null ? opts.manager.getApiEntry(apiPath, true).instance : null;
       try {
         if (issuerApi !== null) {
-          resolution = issuerApi.resolveRequest(request, path !== null ? `${path}/` : null);
+          resolution = issuerApi.resolveRequest(request, path !== null ? `${path}/` : null, {
+            conditions: options?.conditions
+          });
         } else {
           if (path === null)
             throw new Error(`Assertion failed: Expected the path to be set`);
-          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain);
+          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain, {
+            conditions: options?.conditions
+          });
         }
       } catch (error) {
         firstError = firstError || error;
