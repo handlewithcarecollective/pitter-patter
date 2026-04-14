@@ -9,8 +9,8 @@ import { schema as basic } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { createRoot } from "react-dom/client";
 
-import { addOrgNodes } from "../src/schema.ts";
-import { organize } from "../src/plugin.ts";
+import { addShuffleNodes } from "../src/schema.ts";
+import { shuffle } from "../src/plugin.ts";
 import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
 import "../src/styles.css";
 
@@ -22,16 +22,16 @@ basic.spec.nodes = basic.spec.nodes.update("image", {
   inline: false,
 });
 
-const schema = addOrgNodes(basic, "block+", "block");
+const schema = addShuffleNodes(basic, "block+", "block");
 
 const doc = schema.nodes.doc.create(null, [
-  schema.nodes.row.create({ orgStart: 1, orgEnd: 12 }, [
+  schema.nodes.row.create({ shuffleStart: 1, shuffleEnd: 12 }, [
     schema.nodes.image.create({
-      orgStart: 1,
-      orgEnd: 5,
+      shuffleStart: 1,
+      shuffleEnd: 5,
       src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
     }),
-    schema.nodes.container.create({ orgStart: 7, orgEnd: 12 }, [
+    schema.nodes.container.create({ shuffleStart: 7, shuffleEnd: 12 }, [
       schema.nodes.paragraph.create(null, [
         schema.text("This is some sample text"),
       ]),
@@ -68,7 +68,7 @@ const nodeViewComponents = {
 
 const editorState = EditorState.create({
   doc,
-  plugins: [reactKeys(), organize()],
+  plugins: [reactKeys(), shuffle()],
 });
 
 function Editor() {

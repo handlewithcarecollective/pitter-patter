@@ -1,5 +1,5 @@
 {
-  "name": "@pitter-patter/organize",
+  "name": "@pitter-patter/shuffle",
   "version": "0.1.0",
   "type": "module",
   "packageManager": "yarn@4.9.1",
@@ -11,6 +11,9 @@
     "./styles.css",
     "./dist"
   ],
+  "scripts": {
+    "demo": "yarn vite"
+  },
   "dependencies": {
     "@handlewithcare/react-prosemirror": "^3.0.0",
     "classnames": "^2.5.1",

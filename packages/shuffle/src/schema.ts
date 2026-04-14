@@ -1,13 +1,13 @@
 import { NodeSpec, Schema } from "prosemirror-model";
 
 export const gridAttrs: NodeSpec["attrs"] = {
-  orgStart: {
+  shuffleStart: {
     default: 4,
     validate(value) {
       return typeof value === "number" && value <= 11 && value >= 1;
     },
   },
-  orgEnd: {
+  shuffleEnd: {
     default: 9,
     validate(value) {
       return typeof value === "number" && value <= 11 && value >= 1;
@@ -19,11 +19,11 @@ export const container: NodeSpec = {
   attrs: gridAttrs,
   defining: true,
   isolating: true,
-  parseDOM: [{ tag: 'div[data-node-type="org-container"]' }],
+  parseDOM: [{ tag: 'div[data-node-type="shuffle-container"]' }],
   toDOM() {
     return [
       "div",
-      { "data-node-type": "org-container", class: "container" },
+      { "data-node-type": "shuffle-container", class: "container" },
       0,
     ];
   },
@@ -31,15 +31,15 @@ export const container: NodeSpec = {
 
 export const row: NodeSpec = {
   attrs: gridAttrs,
-  parseDOM: [{ tag: 'div[data-node-type="org-row"]' }],
+  parseDOM: [{ tag: 'div[data-node-type="shuffle-row"]' }],
   defining: true,
   isolating: true,
   toDOM() {
-    return ["div", { "data-node-type": "org-row", class: "row" }, 0];
+    return ["div", { "data-node-type": "shuffle-row", class: "row" }, 0];
   },
 };
 
-export function addOrgNodes<Nodes extends string, Marks extends string>(
+export function addShuffleNodes<Nodes extends string, Marks extends string>(
   schema: Schema<Nodes, Marks>,
   content: string,
   group: string,

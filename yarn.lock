@@ -1708,39 +1708,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@pitter-patter/organize@workspace:packages/organize":
-  version: 0.0.0-use.local
-  resolution: "@pitter-patter/organize@workspace:packages/organize"
-  dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.0"
-    "@tsconfig/strictest": "npm:^2.0.5"
-    "@types/react": "npm:^19.2.2"
-    "@types/react-dom": "npm:^19.2.2"
-    "@types/react-reconciler": "npm:^0.32.2"
-    "@vitejs/plugin-react": "npm:^6.0.1"
-    classnames: "npm:^2.5.1"
-    motion: "npm:^12.38.0"
-    orderedmap: "npm:^2.1.1"
-    prettier: "npm:^3.8.1"
-    prosemirror-model: "npm:^1.25.3"
-    prosemirror-schema-basic: "npm:^1.2.4"
-    prosemirror-state: "npm:^1.4.3"
-    prosemirror-transform: "npm:^1.10.4"
-    prosemirror-view: "npm:1.41.4"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
-    react-reconciler: "npm:^0.32.0"
-    tw-merge: "npm:0.0.1-alpha.3"
-    typescript: "npm:^5.9.3"
-    vite: "npm:^8.0.5"
-  peerDependencies:
-    prosemirror-model: ^1.0.0
-    prosemirror-state: ^1.0.0
-    prosemirror-transform: ^1.0.0
-    prosemirror-view: ^1.0.0
-  languageName: unknown
-  linkType: soft
-
 "@pitter-patter/presence-client@workspace:*, @pitter-patter/presence-client@workspace:packages/presence-client":
   version: 0.0.0-use.local
   resolution: "@pitter-patter/presence-client@workspace:packages/presence-client"
@@ -1784,6 +1751,39 @@ __metadata:
   dependencies:
     "@tsconfig/strictest": "npm:^2.0.5"
     typescript: "npm:^5.9.3"
+  languageName: unknown
+  linkType: soft
+
+"@pitter-patter/shuffle@workspace:packages/shuffle":
+  version: 0.0.0-use.local
+  resolution: "@pitter-patter/shuffle@workspace:packages/shuffle"
+  dependencies:
+    "@handlewithcare/react-prosemirror": "npm:^3.0.0"
+    "@tsconfig/strictest": "npm:^2.0.5"
+    "@types/react": "npm:^19.2.2"
+    "@types/react-dom": "npm:^19.2.2"
+    "@types/react-reconciler": "npm:^0.32.2"
+    "@vitejs/plugin-react": "npm:^6.0.1"
+    classnames: "npm:^2.5.1"
+    motion: "npm:^12.38.0"
+    orderedmap: "npm:^2.1.1"
+    prettier: "npm:^3.8.1"
+    prosemirror-model: "npm:^1.25.3"
+    prosemirror-schema-basic: "npm:^1.2.4"
+    prosemirror-state: "npm:^1.4.3"
+    prosemirror-transform: "npm:^1.10.4"
+    prosemirror-view: "npm:1.41.4"
+    react: "npm:^19.2.0"
+    react-dom: "npm:^19.2.0"
+    react-reconciler: "npm:^0.32.0"
+    tw-merge: "npm:0.0.1-alpha.3"
+    typescript: "npm:^5.9.3"
+    vite: "npm:^8.0.5"
+  peerDependencies:
+    prosemirror-model: ^1.0.0
+    prosemirror-state: ^1.0.0
+    prosemirror-transform: ^1.0.0
+    prosemirror-view: ^1.0.0
   languageName: unknown
   linkType: soft
 
