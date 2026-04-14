@@ -5,20 +5,59 @@ interface Props {
 }
 export function GridSkeleton({ children }: Props) {
   return (
-    <div className="grid-wrapper">
-      <div className="grid-skeleton pp-org row start-1 end-12">
-        <div className="grid-skeleton-bar pp-org start-1 end-1" />
-        <div className="grid-skeleton-bar pp-org start-2 end-2" />
-        <div className="grid-skeleton-bar pp-org start-3 end-3" />
-        <div className="grid-skeleton-bar pp-org start-4 end-4" />
-        <div className="grid-skeleton-bar pp-org start-5 end-5" />
-        <div className="grid-skeleton-bar pp-org start-6 end-6" />
-        <div className="grid-skeleton-bar pp-org start-7 end-7" />
-        <div className="grid-skeleton-bar pp-org start-8 end-8" />
-        <div className="grid-skeleton-bar pp-org start-9 end-9" />
-        <div className="grid-skeleton-bar pp-org start-10 end-10" />
-        <div className="grid-skeleton-bar pp-org start-11 end-11" />
-        <div className="grid-skeleton-bar pp-org start-12 end-12" />
+    <div data-pp-grid-wrapper className="grid-wrapper">
+      <div
+        data-pp-grid-skeleton
+        className="grid-skeleton pp-org row start-1 end-12"
+      >
+        <div
+          data-pp-grid-skeleton-bar="1"
+          className="grid-skeleton-bar pp-org start-1 end-1"
+        />
+        <div
+          data-pp-grid-skeleton-bar="2"
+          className="grid-skeleton-bar pp-org start-2 end-2"
+        />
+        <div
+          data-pp-grid-skeleton-bar="3"
+          className="grid-skeleton-bar pp-org start-3 end-3"
+        />
+        <div
+          data-pp-grid-skeleton-bar="4"
+          className="grid-skeleton-bar pp-org start-4 end-4"
+        />
+        <div
+          data-pp-grid-skeleton-bar="5"
+          className="grid-skeleton-bar pp-org start-5 end-5"
+        />
+        <div
+          data-pp-grid-skeleton-bar="6"
+          className="grid-skeleton-bar pp-org start-6 end-6"
+        />
+        <div
+          data-pp-grid-skeleton-bar="7"
+          className="grid-skeleton-bar pp-org start-7 end-7"
+        />
+        <div
+          data-pp-grid-skeleton-bar="8"
+          className="grid-skeleton-bar pp-org start-8 end-8"
+        />
+        <div
+          data-pp-grid-skeleton-bar="9"
+          className="grid-skeleton-bar pp-org start-9 end-9"
+        />
+        <div
+          data-pp-grid-skeleton-bar="10"
+          className="grid-skeleton-bar pp-org start-10 end-10"
+        />
+        <div
+          data-pp-grid-skeleton-bar="11"
+          className="grid-skeleton-bar pp-org start-11 end-11"
+        />
+        <div
+          data-pp-grid-skeleton-bar="12"
+          className="grid-skeleton-bar pp-org start-12 end-12"
+        />
       </div>
       {children}
     </div>

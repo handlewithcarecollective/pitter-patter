@@ -51,10 +51,14 @@ export function addOrgNodes<Nodes extends string, Marks extends string>(
 
   schema.spec.nodes.forEach((name, node) => {
     if (node.group?.includes(group)) {
-      console.log("updating", name);
       nodes = nodes.update(name, {
         ...node,
         attrs: { ...node.attrs, ...gridAttrs },
+        draggable: false,
+        pitterPatter: {
+          ...node.pitterPatter,
+          isGridBlock: true,
+        },
       });
     }
   });
@@ -63,4 +67,15 @@ export function addOrgNodes<Nodes extends string, Marks extends string>(
     nodes,
     marks: schema.spec.marks,
   });
+}
+
+interface PitterPatterSpec {
+  hasGridHandle?: boolean;
+  isGridBlock?: boolean;
+}
+
+declare module "prosemirror-model" {
+  interface NodeSpec {
+    pitterPatter?: PitterPatterSpec;
+  }
 }
