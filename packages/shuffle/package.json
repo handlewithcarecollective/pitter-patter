@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@handlewithcare/react-prosemirror": "^3.0.1",
+    "@pitter-patter/refs": "workspace:*",
     "animejs": "^4.3.6",
     "classnames": "^2.5.1",
     "motion": "^12.38.0",
@@ -38,7 +39,7 @@
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.41.4",
+    "prosemirror-view": "1.41.7",
     "typescript": "^5.9.3",
     "vite": "^8.0.5"
   },

@@ -143,7 +143,7 @@ const RAW_RUNTIME_STATE =
           ["classnames", "npm:2.5.1"],\
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"]\
@@ -2095,7 +2095,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"],\
@@ -2153,7 +2153,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-schema-basic", "npm:1.2.4"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"],\
@@ -2183,7 +2183,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"],\
@@ -2216,7 +2216,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"],\
@@ -2252,6 +2252,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/shuffle/",\
         "packageDependencies": [\
           ["@handlewithcare/react-prosemirror", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:3.0.1"],\
+          ["@pitter-patter/refs", "workspace:packages/refs"],\
           ["@pitter-patter/shuffle", "workspace:packages/shuffle"],\
           ["@tsconfig/strictest", "npm:2.0.5"],\
           ["@types/react", "npm:19.2.2"],\
@@ -2269,7 +2270,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-schema-basic", "npm:1.2.4"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"],\
@@ -2294,7 +2295,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
         ],\
         "packagePeers": [\
@@ -2318,7 +2319,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"],\
+          ["prosemirror-view", "npm:1.41.7"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
         ],\
         "linkType": "SOFT"\
@@ -6428,7 +6429,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"]\
+          ["prosemirror-view", "npm:1.41.7"]\
         ],\
         "linkType": "HARD"\
       }],\
@@ -6438,7 +6439,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.4"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"]\
+          ["prosemirror-view", "npm:1.41.7"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6462,13 +6463,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["prosemirror-view", [\
-      ["npm:1.41.4", {\
-        "packageLocation": "./.yarn/cache/prosemirror-view-npm-1.41.4-cf361fd330-613e36cb27.zip/node_modules/prosemirror-view/",\
+      ["npm:1.41.7", {\
+        "packageLocation": "./.yarn/cache/prosemirror-view-npm-1.41.7-40d813ae31-e4291023c2.zip/node_modules/prosemirror-view/",\
         "packageDependencies": [\
           ["prosemirror-model", "npm:1.25.3"],\
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
-          ["prosemirror-view", "npm:1.41.4"]\
+          ["prosemirror-view", "npm:1.41.7"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -7960,16 +7961,16 @@ function convertToBigIntStats(stats) {
     if (Object.hasOwn(stats, key)) {
       const element = stats[key];
       if (typeof element === `number`) {
-        bigintStats[key] = BigInt(Math.floor(element));
+        bigintStats[key] = BigInt(element);
       } else if (nodeUtils__namespace.types.isDate(element)) {
         bigintStats[key] = new Date(element);
       }
     }
   }
-  bigintStats.atimeNs = bigintStats.atimeMs * BigInt(1e6) + BigInt(Math.floor(stats.atimeMs % 1 * 1e3)) * BigInt(1e3);
-  bigintStats.mtimeNs = bigintStats.mtimeMs * BigInt(1e6) + BigInt(Math.floor(stats.mtimeMs % 1 * 1e3)) * BigInt(1e3);
-  bigintStats.ctimeNs = bigintStats.ctimeMs * BigInt(1e6) + BigInt(Math.floor(stats.ctimeMs % 1 * 1e3)) * BigInt(1e3);
-  bigintStats.birthtimeNs = bigintStats.birthtimeMs * BigInt(1e6) + BigInt(Math.floor(stats.birthtimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.atimeNs = bigintStats.atimeMs * BigInt(1e6);
+  bigintStats.mtimeNs = bigintStats.mtimeMs * BigInt(1e6);
+  bigintStats.ctimeNs = bigintStats.ctimeMs * BigInt(1e6);
+  bigintStats.birthtimeNs = bigintStats.birthtimeMs * BigInt(1e6);
   return bigintStats;
 }
 function areStatsEqual(a, b) {
@@ -10647,40 +10648,28 @@ class FileHandle {
   sync() {
     throw new Error(`Method not implemented.`);
   }
-  async read(bufferOrOptions, offsetOrOptions, length, position) {
+  async read(bufferOrOptions, offset, length, position) {
     try {
       this[kRef](this.read);
       let buffer;
-      let offset;
-      if (!ArrayBuffer.isView(bufferOrOptions)) {
-        buffer = bufferOrOptions?.buffer ?? Buffer.alloc(16384);
-        offset = bufferOrOptions?.offset ?? 0;
-        length = bufferOrOptions?.length ?? buffer.byteLength - offset;
-        position = bufferOrOptions?.position ?? null;
-      } else if (typeof offsetOrOptions === `object` && offsetOrOptions !== null) {
-        buffer = bufferOrOptions;
-        offset = offsetOrOptions?.offset ?? 0;
-        length = offsetOrOptions?.length ?? buffer.byteLength - offset;
-        position = offsetOrOptions?.position ?? null;
+      if (!Buffer.isBuffer(bufferOrOptions)) {
+        bufferOrOptions ??= {};
+        buffer = bufferOrOptions.buffer ?? Buffer.alloc(16384);
+        offset = bufferOrOptions.offset || 0;
+        length = bufferOrOptions.length ?? buffer.byteLength;
+        position = bufferOrOptions.position ?? null;
       } else {
         buffer = bufferOrOptions;
-        offset = offsetOrOptions ?? 0;
-        length ??= 0;
       }
+      offset ??= 0;
+      length ??= 0;
       if (length === 0) {
         return {
           bytesRead: length,
           buffer
         };
       }
-      const bytesRead = await this[kBaseFs].readPromise(
-        this.fd,
-        // FIXME: FakeFS should support ArrayBufferViews directly
-        Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength),
-        offset,
-        length,
-        position
-      );
+      const bytesRead = await this[kBaseFs].readPromise(this.fd, buffer, offset, length, position);
       return {
         bytesRead,
         buffer
@@ -13075,8 +13064,7 @@ class ZipFS extends BasePortableFakeFS {
         const entries = Array.from(directoryListing, (name) => {
           return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
             name,
-            path: PortablePath.dot,
-            parentPath: PortablePath.dot
+            path: PortablePath.dot
           });
         });
         for (const entry of entries) {
@@ -13087,8 +13075,7 @@ class ZipFS extends BasePortableFakeFS {
           for (const child of subListing) {
             entries.push(Object.assign(this.statImpl(`lstat`, ppath.join(p, subPath, child)), {
               name: child,
-              path: subPath,
-              parentPath: subPath
+              path: subPath
             }));
           }
         }
@@ -13109,8 +13096,7 @@ class ZipFS extends BasePortableFakeFS {
       return Array.from(directoryListing, (name) => {
         return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
           name,
-          path: void 0,
-          parentPath: void 0
+          path: void 0
         });
       });
     } else {
@@ -13585,7 +13571,6 @@ function applyPatch(pnpapi, opts) {
       const optionNames = new Set(Object.keys(options));
       optionNames.delete(`paths`);
       optionNames.delete(`plugnplay`);
-      optionNames.delete(`conditions`);
       if (optionNames.size > 0) {
         throw makeError(
           ErrorCode.UNSUPPORTED,
@@ -13614,15 +13599,11 @@ function applyPatch(pnpapi, opts) {
       const issuerApi = apiPath !== null ? opts.manager.getApiEntry(apiPath, true).instance : null;
       try {
         if (issuerApi !== null) {
-          resolution = issuerApi.resolveRequest(request, path !== null ? `${path}/` : null, {
-            conditions: options?.conditions
-          });
+          resolution = issuerApi.resolveRequest(request, path !== null ? `${path}/` : null);
         } else {
           if (path === null)
             throw new Error(`Assertion failed: Expected the path to be set`);
-          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain, {
-            conditions: options?.conditions
-          });
+          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain);
         }
       } catch (error) {
         firstError = firstError || error;

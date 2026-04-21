@@ -1640,7 +1640,7 @@ __metadata:
     prosemirror-model: "npm:^1.25.3"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
-    prosemirror-view: "npm:1.41.4"
+    prosemirror-view: "npm:1.41.7"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
@@ -1699,7 +1699,7 @@ __metadata:
     prosemirror-schema-basic: "npm:^1.2.4"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
-    prosemirror-view: "npm:1.41.4"
+    prosemirror-view: "npm:1.41.7"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
@@ -1723,7 +1723,7 @@ __metadata:
     prosemirror-model: "npm:^1.25.3"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
-    prosemirror-view: "npm:1.41.4"
+    prosemirror-view: "npm:1.41.7"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
@@ -1745,7 +1745,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@pitter-patter/refs@workspace:^, @pitter-patter/refs@workspace:packages/refs":
+"@pitter-patter/refs@workspace:*, @pitter-patter/refs@workspace:^, @pitter-patter/refs@workspace:packages/refs":
   version: 0.0.0-use.local
   resolution: "@pitter-patter/refs@workspace:packages/refs"
   dependencies:
@@ -1759,6 +1759,7 @@ __metadata:
   resolution: "@pitter-patter/shuffle@workspace:packages/shuffle"
   dependencies:
     "@handlewithcare/react-prosemirror": "npm:^3.0.1"
+    "@pitter-patter/refs": "workspace:*"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/react": "npm:^19.2.2"
     "@types/react-dom": "npm:^19.2.2"
@@ -1775,7 +1776,7 @@ __metadata:
     prosemirror-schema-basic: "npm:^1.2.4"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
-    prosemirror-view: "npm:1.41.4"
+    prosemirror-view: "npm:1.41.7"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
@@ -1799,7 +1800,7 @@ __metadata:
     prosemirror-model: "npm:^1.25.3"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
-    prosemirror-view: "npm:1.41.4"
+    prosemirror-view: "npm:1.41.7"
     typescript: "npm:^5.9.3"
   peerDependencies:
     prosemirror-model: ^1.0.0
@@ -5358,14 +5359,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-view@npm:1.41.4":
-  version: 1.41.4
-  resolution: "prosemirror-view@npm:1.41.4"
+"prosemirror-view@npm:1.41.7":
+  version: 1.41.7
+  resolution: "prosemirror-view@npm:1.41.7"
   dependencies:
     prosemirror-model: "npm:^1.20.0"
     prosemirror-state: "npm:^1.0.0"
     prosemirror-transform: "npm:^1.1.0"
-  checksum: 10c0/613e36cb27757c115ab301d3f7674e979450c928064b95fe26666765a2fc3efa80402ca8f6e4b8484e5d2f6945a14d842e1ff2900c86e4deea73613be0f42d5a
+  checksum: 10c0/e4291023c2bc9a600754015ff5a1c781abf8a4e7598e68fd4f5efd3d3550846408137225ade759d4e7caa4fb65c06cf3b71df522321a0fe07ac23c0413c06950
   languageName: node
   linkType: hard
 

@@ -1,6 +1,7 @@
 import { reorderSiblings } from "@handlewithcare/react-prosemirror";
 import { EditorView } from "prosemirror-view";
 import { setShuffleColumns } from "./commands";
+import { shufflePluginKey } from "./plugin";
 
 export function reorder(
   view: EditorView,
@@ -31,7 +32,14 @@ export function reorder(
       order.splice(fromIndex < toIndex ? toIndex - 1 : toIndex, 0, fromIndex);
     }
 
-    reorderSiblings(0, order)(view.state, view.dispatch, view);
+    reorderSiblings(0, order)(
+      view.state,
+      (tr) => {
+        tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
+        view.dispatch(tr);
+      },
+      view,
+    );
     return true;
   }
   return false;

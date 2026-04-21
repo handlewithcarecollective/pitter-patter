@@ -13,6 +13,7 @@ export function setShuffleColumns(pos: number, start: number, end: number) {
     tr.setNodeAttribute(pos, "shuffleStart", start);
     tr.setNodeAttribute(pos, "shuffleEnd", end);
     tr.setMeta(shufflePluginKey, { pos, start, end });
+    tr.setMeta("composition", shufflePluginKey.getState(state)?.comp);
     dispatch(tr);
     return true;
   };

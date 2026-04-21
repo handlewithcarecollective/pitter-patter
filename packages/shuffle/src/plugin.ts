@@ -1,3 +1,4 @@
+import { randomRef } from "@pitter-patter/refs";
 import { createLayout } from "animejs";
 import { animate } from "motion/mini";
 import { Node as PmNode } from "prosemirror-model";
@@ -5,10 +6,35 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import { reorder, reposition } from "./transform";
 
-export const shufflePluginKey = new PluginKey("@pitter-patter/shuffle");
+interface ShufflePluginStartMeta {
+  type: "start";
+}
+
+interface ShufflePluginEndMeta {
+  type: "end";
+}
+
+interface ShufflePluginResizeMeta {
+  type: "resize";
+  payload: {
+    pos: number;
+    start: number;
+    end: number;
+  };
+}
+
+type ShufflePluginMeta =
+  | ShufflePluginStartMeta
+  | ShufflePluginEndMeta
+  | ShufflePluginResizeMeta;
+
+export const shufflePluginKey = new PluginKey<{
+  deco: DecorationSet;
+  comp: string | undefined;
+}>("@pitter-patter/shuffle");
 
 export function shuffle() {
-  return new Plugin({
+  return new Plugin<{ deco: DecorationSet; comp: string | undefined }>({
     key: shufflePluginKey,
     state: {
       init(_, state) {
@@ -29,27 +55,36 @@ export function shuffle() {
           return true;
         });
 
-        return DecorationSet.create(state.doc, decorations);
+        return {
+          deco: DecorationSet.create(state.doc, decorations),
+          comp: undefined,
+        };
       },
       apply(tr, value, oldState) {
-        let next = value.map(tr.mapping, tr.doc);
-        const meta = tr.getMeta(shufflePluginKey);
-        if (meta) {
-          const { pos, start, end } = meta as {
-            pos: number;
-            start: number;
-            end: number;
-          };
+        const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
+        let nextComp = value.comp;
+
+        if (meta?.type === "start") {
+          nextComp = randomRef();
+        }
+
+        if (meta?.type === "end") {
+          nextComp = undefined;
+        }
+
+        let nextDeco = value.deco.map(tr.mapping, tr.doc);
+        if (meta?.type === "resize") {
+          const { pos, start, end } = meta.payload;
 
           const node = oldState.doc.resolve(pos).nodeAfter;
 
           if (node) {
-            const candidates = next.find(pos, pos);
+            const candidates = nextDeco.find(pos, pos);
             const decoration = candidates.find(
               (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
             );
             if (decoration) {
-              next = next.remove([decoration]).add(tr.doc, [
+              nextDeco = nextDeco.remove([decoration]).add(tr.doc, [
                 Decoration.node(pos, pos + node.nodeSize, {
                   class: `pp-shuffle-block start-${start} end-${end}`,
                 }),
@@ -67,7 +102,7 @@ export function shuffle() {
             return true;
           }
 
-          const existing = next.find(pos, pos + node.nodeSize);
+          const existing = nextDeco.find(pos, pos + node.nodeSize);
           if (
             existing.some(
               (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
@@ -85,12 +120,12 @@ export function shuffle() {
           return true;
         });
 
-        return next.add(tr.doc, decorations);
+        return { deco: nextDeco.add(tr.doc, decorations), comp: nextComp };
       },
     },
     props: {
       decorations(state) {
-        return shufflePluginKey.getState(state);
+        return shufflePluginKey.getState(state)?.deco;
       },
       attributes: {
         class: "pp-shuffle-block  start-left end-right",
@@ -122,6 +157,12 @@ export function shuffle() {
             .pmViewDesc;
 
           if (viewDesc.contentDOM?.contains(event.target)) return false;
+
+          view.dispatch(
+            view.state.tr.setMeta(shufflePluginKey, {
+              type: "start",
+            } satisfies ShufflePluginMeta),
+          );
 
           const domRect = dom.getBoundingClientRect();
           const bodyRect = document.body.getBoundingClientRect();
@@ -171,7 +212,6 @@ export function shuffle() {
 
           let skeletonOn = false;
           // TODO: debounce with requestAnimationFrame
-          // TODO: group all reorders and repositions into one history item
           function onMove(e: PointerEvent) {
             if (!skeletonOn) {
               const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
@@ -212,6 +252,12 @@ export function shuffle() {
             animate(skeleton, { opacity: 0 }, { duration: 0.25 });
 
             if (!(dom instanceof HTMLElement)) return;
+
+            view.dispatch(
+              view.state.tr.setMeta(shufflePluginKey, {
+                type: "end",
+              } satisfies ShufflePluginMeta),
+            );
 
             clone.style.transition = "transform 0.2s ease";
             clone.style.boxShadow = initialBoxShadow;
