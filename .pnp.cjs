@@ -2271,6 +2271,7 @@ const RAW_RUNTIME_STATE =
           ["prosemirror-state", "npm:1.4.3"],\
           ["prosemirror-transform", "npm:1.10.4"],\
           ["prosemirror-view", "npm:1.41.7"],\
+          ["raf-throttle", "npm:2.0.6"],\
           ["react", "npm:19.2.0"],\
           ["react-dom", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:19.2.0"],\
           ["react-reconciler", "virtual:9da27d6dd0805287d29a54b702eccb26088662017adac4cf74e4a1ee72197eeb9c31a962dbf94415071390d4866ef2c815d87474c37669cc88c40552c4f9b56d#npm:0.32.0"],\
@@ -6520,6 +6521,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/quick-lru-npm-5.1.1-e38e0edce3-a24cba5da8.zip/node_modules/quick-lru/",\
         "packageDependencies": [\
           ["quick-lru", "npm:5.1.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["raf-throttle", [\
+      ["npm:2.0.6", {\
+        "packageLocation": "./.yarn/cache/raf-throttle-npm-2.0.6-9c9fec369e-55142b83fd.zip/node_modules/raf-throttle/",\
+        "packageDependencies": [\
+          ["raf-throttle", "npm:2.0.6"]\
         ],\
         "linkType": "HARD"\
       }]\

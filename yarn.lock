@@ -1777,6 +1777,7 @@ __metadata:
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
     prosemirror-view: "npm:1.41.7"
+    raf-throttle: "npm:^2.0.6"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
@@ -5410,6 +5411,13 @@ __metadata:
   version: 5.1.1
   resolution: "quick-lru@npm:5.1.1"
   checksum: 10c0/a24cba5da8cec30d70d2484be37622580f64765fb6390a928b17f60cd69e8dbd32a954b3ff9176fa1b86d86ff2ba05252fae55dc4d40d0291c60412b0ad096da
+  languageName: node
+  linkType: hard
+
+"raf-throttle@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "raf-throttle@npm:2.0.6"
+  checksum: 10c0/55142b83fd8ebd4b18364604af6f76433692f6d83a2cc9f7d242dee2b35c3de444e9bfc54ce2635525c4d5b0b47b4d8c61176f0d5ab70f5be9ebaa3050e2788b
   languageName: node
   linkType: hard
 

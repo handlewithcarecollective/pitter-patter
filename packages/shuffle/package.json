@@ -21,6 +21,7 @@
     "classnames": "^2.5.1",
     "motion": "^12.38.0",
     "orderedmap": "^2.1.1",
+    "raf-throttle": "^2.0.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-reconciler": "^0.32.0",

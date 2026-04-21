@@ -1,4 +1,5 @@
 import { randomRef } from "@pitter-patter/refs";
+import throttle from "raf-throttle";
 import { createLayout } from "animejs";
 import { animate } from "motion/mini";
 import { Node as PmNode } from "prosemirror-model";
@@ -23,7 +24,7 @@ interface ShufflePluginResizeMeta {
   };
 }
 
-type ShufflePluginMeta =
+export type ShufflePluginMeta =
   | ShufflePluginStartMeta
   | ShufflePluginEndMeta
   | ShufflePluginResizeMeta;
@@ -211,8 +212,7 @@ export function shuffle() {
           }, 100);
 
           let skeletonOn = false;
-          // TODO: debounce with requestAnimationFrame
-          function onMove(e: PointerEvent) {
+          const onMove = throttle(function onMove(e: PointerEvent) {
             if (!skeletonOn) {
               const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
               if (!gridWrapper) return;
@@ -236,7 +236,7 @@ export function shuffle() {
               );
               reorder(view, viewDesc.posBefore, e.clientX, e.clientY);
             });
-          }
+          });
 
           function onUp() {
             document.removeEventListener("pointermove", onMove);
