@@ -17,6 +17,7 @@
   grid-template-columns: subgrid;
   grid-column-start: 1;
   grid-column-end: 15;
+  position: relative;
 }
 
 .row {
@@ -303,4 +304,19 @@
 .grid-skeleton-bar {
   background-color: lightgray;
   height: 100%;
+}
+
+.left-resize-handle,
+.right-resize-handle {
+  position: absolute;
+  background-color: lightblue;
+  width: 0.25rem;
+  height: 2rem;
+  z-index: 999;
+  transform: translateY(-50%);
+  border-radius: 0.25rem;
+  cursor: col-resize;
+  padding: 0;
+  margin: 0;
+  border: none;
 }

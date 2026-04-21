@@ -14,8 +14,10 @@ import { createRoot } from "react-dom/client";
 import { addShuffleNodes } from "../src/schema.ts";
 import { shuffle } from "../src/plugin.ts";
 import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
+import { ResizeHandles } from "../src/components/ResizeHandles.tsx";
 import "../src/styles.css";
 import "./styles.css";
+import "prosemirror-view/style/prosemirror.css";
 
 const imageSpec = basic.spec.nodes.get("image");
 
@@ -83,6 +85,7 @@ function Editor() {
     >
       <GridSkeleton>
         <ProseMirrorDoc />
+        <ResizeHandles />
       </GridSkeleton>
     </ProseMirror>
   );

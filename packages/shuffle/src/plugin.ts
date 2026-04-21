@@ -145,7 +145,7 @@ export function shuffle() {
             dom !== view.dom &&
             "pmViewDesc" in dom &&
             !(dom as HTMLElement & { pmViewDesc: ViewDesc }).pmViewDesc.node
-              ?.type.spec.pitterPatter?.isGridBlock
+              ?.type.spec.pitterPatter?.isShuffleBlock
           ) {
             dom = dom.parentElement;
           }
@@ -166,18 +166,6 @@ export function shuffle() {
           );
 
           const domRect = dom.getBoundingClientRect();
-          const bodyRect = document.body.getBoundingClientRect();
-
-          const clone = dom.cloneNode(true) as HTMLElement;
-          clone.style.position = "absolute";
-          clone.style.top = `${domRect.top - bodyRect.top}px`;
-          clone.style.left = `${domRect.left - bodyRect.left}px`;
-          clone.style.width = `${domRect.width}px`;
-          clone.style.height = `${domRect.height}px`;
-          document.body.appendChild(clone);
-
-          const initialOpacity = dom.style.opacity;
-          dom.style.opacity = "40%";
 
           const transform = new DOMMatrixReadOnly(
             getComputedStyle(dom).transform,
@@ -196,24 +184,16 @@ export function shuffle() {
             domRect,
           );
 
-          const initialBoxShadow = dom.style.boxShadow;
-          const initialZIndex = parent.style.zIndex;
-
-          document.body.style.perspective = "80cm";
-
-          clone.style.transition = "transform 0.1s ease";
-          clone.style.transform = translateCalc.slide(startX, startY);
-          clone.style.boxShadow =
-            "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
-          clone.style.zIndex = "100";
-
-          setTimeout(() => {
-            clone.style.transition = "none";
-          }, 100);
+          let clone: HTMLElement | null = null;
+          let initialStyles: InitialStyles | null = null;
 
           let skeletonOn = false;
           const onMove = throttle(function onMove(e: PointerEvent) {
-            if (!skeletonOn) {
+            if (!skeletonOn || !clone || !initialStyles) {
+              const startResult = startDrag(dom, parent, translateCalc);
+              clone = startResult.clone;
+              initialStyles = startResult.initialStyles;
+
               const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
               if (!gridWrapper) return;
               const skeleton = gridWrapper.querySelector(
@@ -221,6 +201,7 @@ export function shuffle() {
               );
               if (!skeleton) return;
 
+              skeletonOn = true;
               animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
             }
             if (!(dom instanceof HTMLElement)) return;
@@ -232,7 +213,7 @@ export function shuffle() {
               reposition(
                 view,
                 viewDesc.posBefore,
-                clone.getBoundingClientRect(),
+                clone!.getBoundingClientRect(),
               );
               reorder(view, viewDesc.posBefore, e.clientX, e.clientY);
             });
@@ -251,6 +232,8 @@ export function shuffle() {
 
             animate(skeleton, { opacity: 0 }, { duration: 0.25 });
 
+            if (!clone || !initialStyles) return;
+
             if (!(dom instanceof HTMLElement)) return;
 
             view.dispatch(
@@ -260,7 +243,7 @@ export function shuffle() {
             );
 
             clone.style.transition = "transform 0.2s ease";
-            clone.style.boxShadow = initialBoxShadow;
+            clone.style.boxShadow = initialStyles.boxShadow;
 
             const domRect = dom.getBoundingClientRect();
 
@@ -270,13 +253,13 @@ export function shuffle() {
             );
 
             setTimeout(() => {
-              clone.style.transition = "none";
+              clone!.style.transition = "none";
               if (parent) {
                 parent.style.perspective = "none";
-                clone.style.zIndex = initialZIndex;
+                clone!.style.zIndex = initialStyles!.zIndex;
               }
-              dom.style.opacity = initialOpacity;
-              clone.remove();
+              dom.style.opacity = initialStyles!.opacity;
+              clone!.remove();
             }, 250);
 
             return;
@@ -305,8 +288,8 @@ class TranslateCalculator {
   constructor(
     private originX: number,
     private originY: number,
-    private startX: number,
-    private startY: number,
+    public startX: number,
+    public startY: number,
     private rect: DOMRect,
   ) {}
 
@@ -325,4 +308,57 @@ class TranslateCalculator {
 
     return `rotateX(0) scale(1) translate(${this.originX + dx}px, ${this.originY + dy}px)`;
   }
+}
+
+interface InitialStyles {
+  opacity: string;
+  boxShadow: string;
+  zIndex: string;
+}
+
+function startDrag(
+  dom: HTMLElement,
+  parent: HTMLElement,
+  translateCalc: TranslateCalculator,
+) {
+  const domRect = dom.getBoundingClientRect();
+  const bodyRect = document.body.getBoundingClientRect();
+
+  const clone = dom.cloneNode(true) as HTMLElement;
+  clone.style.position = "absolute";
+  clone.style.top = `${domRect.top - bodyRect.top}px`;
+  clone.style.left = `${domRect.left - bodyRect.left}px`;
+  clone.style.width = `${domRect.width}px`;
+  clone.style.height = `${domRect.height}px`;
+  document.body.appendChild(clone);
+
+  const initialOpacity = dom.style.opacity;
+  dom.style.opacity = "40%";
+
+  const initialBoxShadow = dom.style.boxShadow;
+  const initialZIndex = parent.style.zIndex;
+
+  document.body.style.perspective = "80cm";
+
+  clone.style.transition = "transform 0.1s ease";
+  clone.style.transform = translateCalc.slide(
+    translateCalc.startX,
+    translateCalc.startY,
+  );
+  clone.style.boxShadow =
+    "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
+  clone.style.zIndex = "100";
+
+  setTimeout(() => {
+    clone.style.transition = "none";
+  }, 100);
+
+  return {
+    clone,
+    initialStyles: {
+      opacity: initialOpacity,
+      boxShadow: initialBoxShadow,
+      zIndex: initialZIndex,
+    } satisfies InitialStyles,
+  };
 }

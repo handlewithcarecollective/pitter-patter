@@ -1,4 +1,4 @@
-import { NodeSpec, Schema } from "prosemirror-model";
+import { Node, NodeSpec, Schema } from "prosemirror-model";
 
 export const gridAttrs: NodeSpec["attrs"] = {
   shuffleStart: {
@@ -28,7 +28,7 @@ export const container: NodeSpec = {
     ];
   },
   pitterPatter: {
-    isGridContainer: true,
+    isShuffleContainer: true,
   },
 };
 
@@ -41,7 +41,7 @@ export const row: NodeSpec = {
     return ["div", { "data-node-type": "shuffle-row", class: "row" }, 0];
   },
   pitterPatter: {
-    isGridContainer: true,
+    isShuffleContainer: true,
   },
 };
 
@@ -63,7 +63,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
         draggable: false,
         pitterPatter: {
           ...node.pitterPatter,
-          isGridBlock: true,
+          isShuffleBlock: true,
         },
       });
     }
@@ -76,9 +76,16 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
 }
 
 interface PitterPatterSpec {
-  hasGridHandle?: boolean;
-  isGridBlock?: boolean;
-  isGridContainer?: boolean;
+  hasShuffleDragHandle?: boolean;
+  isShuffleBlock?: boolean;
+  isShuffleContainer?: boolean;
+}
+
+export function supportsResize(node: Node) {
+  return (
+    node.type.spec.pitterPatter?.isShuffleBlock ||
+    node.type.spec.pitterPatter?.isShuffleContainer
+  );
 }
 
 declare module "prosemirror-model" {
