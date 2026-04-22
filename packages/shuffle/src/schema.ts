@@ -82,10 +82,14 @@ interface PitterPatterSpec {
 }
 
 export function supportsResize(node: Node) {
-  return (
+  return !!(
     node.type.spec.pitterPatter?.isShuffleBlock ||
     node.type.spec.pitterPatter?.isShuffleContainer
   );
+}
+
+export function supportsReorder(node: Node) {
+  return !!node.type.spec.pitterPatter?.isShuffleContainer;
 }
 
 declare module "prosemirror-model" {

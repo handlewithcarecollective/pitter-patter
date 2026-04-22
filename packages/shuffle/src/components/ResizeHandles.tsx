@@ -60,7 +60,6 @@ export function LeftResizeHandle({ pos }: ResizeHandleProps) {
     (view) => {
       const node = view.nodeDOM(pos);
       if (!(node instanceof HTMLElement)) return;
-      console.log(node);
       const rect = node.getBoundingClientRect();
       setLeft(rect.left - 8);
       setTop((rect.bottom + rect.top) / 2);
@@ -110,12 +109,10 @@ export function RightResizeHandle({ pos }: ResizeHandleProps) {
 
 function useHandlePointerDown(pos: number, side: "start" | "end") {
   return useEditorEventCallback((view) => {
-    console.log("pointerdown");
     if (!view.editable) return;
 
     let skeletonOn = false;
     const handleMove = throttle(function handleMove(e: PointerEvent) {
-      console.log("pointermove");
       if (!skeletonOn) {
         const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
         if (!gridWrapper) return;

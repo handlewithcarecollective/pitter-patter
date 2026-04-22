@@ -1,6 +1,6 @@
 import { randomRef } from "@pitter-patter/refs";
 import throttle from "raf-throttle";
-import { createLayout } from "animejs";
+import { createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
@@ -24,18 +24,31 @@ interface ShufflePluginResizeMeta {
   };
 }
 
+interface ShufflePluginMapMeta {
+  type: "map";
+  payload: {
+    newPos: number;
+  };
+}
+
 export type ShufflePluginMeta =
   | ShufflePluginStartMeta
   | ShufflePluginEndMeta
+  | ShufflePluginMapMeta
   | ShufflePluginResizeMeta;
 
-export const shufflePluginKey = new PluginKey<{
+export interface ShufflePluginState {
   deco: DecorationSet;
   comp: string | undefined;
-}>("@pitter-patter/shuffle");
+  activeNodePos: number | undefined;
+}
+
+export const shufflePluginKey = new PluginKey<ShufflePluginState>(
+  "@pitter-patter/shuffle",
+);
 
 export function shuffle() {
-  return new Plugin<{ deco: DecorationSet; comp: string | undefined }>({
+  return new Plugin<ShufflePluginState>({
     key: shufflePluginKey,
     state: {
       init(_, state) {
@@ -59,9 +72,10 @@ export function shuffle() {
         return {
           deco: DecorationSet.create(state.doc, decorations),
           comp: undefined,
+          activeNodePos: undefined,
         };
       },
-      apply(tr, value, oldState) {
+      apply(tr, value, oldState, newState) {
         const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
         let nextComp = value.comp;
 
@@ -69,8 +83,14 @@ export function shuffle() {
           nextComp = randomRef();
         }
 
+        let nextActiveNodePos = value.activeNodePos;
+        if (meta?.type === "map") {
+          nextActiveNodePos = meta.payload.newPos;
+        }
+
         if (meta?.type === "end") {
           nextComp = undefined;
+          nextActiveNodePos = undefined;
         }
 
         let nextDeco = value.deco.map(tr.mapping, tr.doc);
@@ -94,6 +114,42 @@ export function shuffle() {
           }
         }
 
+        if (nextActiveNodePos !== value.activeNodePos) {
+          if (value.activeNodePos !== undefined) {
+            const node = oldState.doc.resolve(value.activeNodePos).nodeAfter;
+
+            if (node) {
+              const candidates = nextDeco.find(
+                value.activeNodePos,
+                value.activeNodePos,
+                (spec) => spec.shuffleActive,
+              );
+              const decoration = candidates.find(
+                (deco) =>
+                  deco.from === value.activeNodePos &&
+                  deco.to === value.activeNodePos + node.nodeSize,
+              );
+              if (decoration) {
+                nextDeco = nextDeco.remove([decoration]);
+              }
+            }
+          }
+          if (nextActiveNodePos !== undefined) {
+            const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
+
+            if (node) {
+              nextDeco = nextDeco.add(newState.doc, [
+                Decoration.node(
+                  nextActiveNodePos,
+                  nextActiveNodePos + node.nodeSize,
+                  { style: "opacity: 0.4" },
+                  { shuffleActive: true },
+                ),
+              ]);
+            }
+          }
+        }
+
         const decorations: Decoration[] = [];
 
         tr.doc.descendants((node, pos) => {
@@ -103,7 +159,12 @@ export function shuffle() {
             return true;
           }
 
-          const existing = nextDeco.find(pos, pos + node.nodeSize);
+          const existing = nextDeco.find(
+            pos,
+            pos + node.nodeSize,
+            (spec) => !spec.shuffleActive,
+          );
+
           if (
             existing.some(
               (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
@@ -121,7 +182,11 @@ export function shuffle() {
           return true;
         });
 
-        return { deco: nextDeco.add(tr.doc, decorations), comp: nextComp };
+        return {
+          deco: nextDeco.add(tr.doc, decorations),
+          comp: nextComp,
+          activeNodePos: nextActiveNodePos,
+        };
       },
     },
     props: {
@@ -151,8 +216,6 @@ export function shuffle() {
           }
 
           if (!dom || dom === view.dom) return false;
-          const parent = dom.parentElement;
-          if (!parent) return false;
 
           const viewDesc = (dom as HTMLElement & { pmViewDesc: ViewDesc })
             .pmViewDesc;
@@ -187,10 +250,20 @@ export function shuffle() {
           let clone: HTMLElement | null = null;
           let initialStyles: InitialStyles | null = null;
 
+          const layout = createLayout(view.dom);
+          let currentAnimation: Timeline | null = null;
           let skeletonOn = false;
           const onMove = throttle(function onMove(e: PointerEvent) {
             if (!skeletonOn || !clone || !initialStyles) {
-              const startResult = startDrag(dom, parent, translateCalc);
+              const startResult = startDrag(dom!, translateCalc);
+
+              view.dispatch(
+                view.state.tr.setMeta(shufflePluginKey, {
+                  type: "map",
+                  payload: { newPos: viewDesc.posBefore },
+                }),
+              );
+
               clone = startResult.clone;
               initialStyles = startResult.initialStyles;
 
@@ -208,15 +281,40 @@ export function shuffle() {
 
             clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
 
-            const layout = createLayout(view.dom);
-            layout.update(() => {
-              reposition(
-                view,
-                viewDesc.posBefore,
-                clone!.getBoundingClientRect(),
-              );
-              reorder(view, viewDesc.posBefore, e.clientX, e.clientY);
+            const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+            if (before === undefined) return;
+
+            const tr =
+              reposition(view, before, clone!.getBoundingClientRect()) ??
+              reorder(view, before, e.clientX, e.clientY);
+
+            if (!tr) return;
+
+            if (
+              currentAnimation &&
+              currentAnimation.began &&
+              !currentAnimation.completed
+            ) {
+              currentAnimation.complete();
+            }
+
+            currentAnimation = layout.update(() => {
+              view.dispatch(tr);
             });
+
+            const updatedBefore = shufflePluginKey.getState(
+              view.state,
+            )?.activeNodePos;
+
+            if (updatedBefore === undefined) return;
+
+            const nodeDom = view.nodeDOM(updatedBefore);
+            if (nodeDom === dom) return;
+            if (!(nodeDom instanceof HTMLElement)) return;
+
+            dom = nodeDom;
+            dom.dataset["shuffleDragged"] = "true";
           });
 
           function onUp() {
@@ -234,6 +332,11 @@ export function shuffle() {
 
             if (!clone || !initialStyles) return;
 
+            const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+            if (before === undefined) return;
+
+            const dom = view.nodeDOM(before);
             if (!(dom instanceof HTMLElement)) return;
 
             view.dispatch(
@@ -254,11 +357,7 @@ export function shuffle() {
 
             setTimeout(() => {
               clone!.style.transition = "none";
-              if (parent) {
-                parent.style.perspective = "none";
-                clone!.style.zIndex = initialStyles!.zIndex;
-              }
-              dom.style.opacity = initialStyles!.opacity;
+              delete dom.dataset["shuffleDragged"];
               clone!.remove();
             }, 250);
 
@@ -311,16 +410,10 @@ class TranslateCalculator {
 }
 
 interface InitialStyles {
-  opacity: string;
   boxShadow: string;
-  zIndex: string;
 }
 
-function startDrag(
-  dom: HTMLElement,
-  parent: HTMLElement,
-  translateCalc: TranslateCalculator,
-) {
+function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   const domRect = dom.getBoundingClientRect();
   const bodyRect = document.body.getBoundingClientRect();
 
@@ -332,11 +425,9 @@ function startDrag(
   clone.style.height = `${domRect.height}px`;
   document.body.appendChild(clone);
 
-  const initialOpacity = dom.style.opacity;
-  dom.style.opacity = "40%";
+  dom.dataset["shuffleDragged"] = "true";
 
   const initialBoxShadow = dom.style.boxShadow;
-  const initialZIndex = parent.style.zIndex;
 
   document.body.style.perspective = "80cm";
 
@@ -356,9 +447,7 @@ function startDrag(
   return {
     clone,
     initialStyles: {
-      opacity: initialOpacity,
       boxShadow: initialBoxShadow,
-      zIndex: initialZIndex,
     } satisfies InitialStyles,
   };
 }
