@@ -5,12 +5,12 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { supportsResize } from "../schema";
 import { animate } from "motion/mini";
-import { createLayout } from "animejs";
-import { resize } from "../transform";
+import { createLayout, Timeline } from "animejs";
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
+import { resize } from "../transform/resize";
 
 export function ResizeHandles() {
   const { selection } = useEditorState();
@@ -108,6 +108,8 @@ export function RightResizeHandle({ pos }: ResizeHandleProps) {
 }
 
 function useHandlePointerDown(pos: number, side: "start" | "end") {
+  const animationRef = useRef<Timeline | null>(null);
+
   return useEditorEventCallback((view) => {
     if (!view.editable) return;
 
@@ -122,8 +124,17 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         skeletonOn = true;
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
+
+      if (
+        animationRef.current &&
+        animationRef.current.began &&
+        !animationRef.current.completed
+      ) {
+        animationRef.current.complete();
+      }
+
       const layout = createLayout(view.dom);
-      layout.update(() => {
+      animationRef.current = layout.update(() => {
         resize(view, pos, side, e.clientX);
       });
     });

@@ -5,7 +5,8 @@ import { animate } from "motion/mini";
 import { Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
-import { reorder, reposition } from "./transform";
+import { reorder } from "./transform/reorder";
+import { reposition } from "./transform/reposition";
 
 interface ShufflePluginStartMeta {
   type: "start";
@@ -185,7 +186,6 @@ export function shuffle() {
 
           return true;
         });
-
 
         return {
           deco: nextDeco.add(tr.doc, decorations),
