@@ -100,7 +100,11 @@ export function shuffle() {
           const node = oldState.doc.resolve(pos).nodeAfter;
 
           if (node) {
-            const candidates = nextDeco.find(pos, pos);
+            const candidates = nextDeco.find(
+              pos,
+              pos,
+              (spec) => !spec.shuffleActive,
+            );
             const decoration = candidates.find(
               (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
             );
@@ -181,6 +185,7 @@ export function shuffle() {
 
           return true;
         });
+
 
         return {
           deco: nextDeco.add(tr.doc, decorations),
@@ -332,6 +337,14 @@ export function shuffle() {
 
             if (!clone || !initialStyles) return;
 
+            if (
+              currentAnimation &&
+              currentAnimation.began &&
+              !currentAnimation.completed
+            ) {
+              currentAnimation.complete();
+            }
+
             const before = shufflePluginKey.getState(view.state)?.activeNodePos;
 
             if (before === undefined) return;
@@ -367,7 +380,8 @@ export function shuffle() {
           document.addEventListener("pointermove", onMove);
           document.addEventListener("pointerup", onUp);
 
-          return false;
+          event.preventDefault();
+          return true;
         },
       },
     },

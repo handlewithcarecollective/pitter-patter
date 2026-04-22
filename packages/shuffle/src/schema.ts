@@ -88,10 +88,6 @@ export function supportsResize(node: Node) {
   );
 }
 
-export function supportsReorder(node: Node) {
-  return !!node.type.spec.pitterPatter?.isShuffleContainer;
-}
-
 declare module "prosemirror-model" {
   interface NodeSpec {
     pitterPatter?: PitterPatterSpec;

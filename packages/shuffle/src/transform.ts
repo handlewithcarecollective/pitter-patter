@@ -1,8 +1,7 @@
-import { reactKeys, reorderSiblings } from "@handlewithcare/react-prosemirror";
+import { reactKeys } from "@handlewithcare/react-prosemirror";
 import { EditorView } from "prosemirror-view";
 import { setShuffleColumns } from "./commands";
 import { shufflePluginKey, ShufflePluginMeta } from "./plugin";
-import { supportsReorder } from "./schema";
 import { Transaction } from "prosemirror-state";
 
 export function resize(
@@ -90,10 +89,23 @@ export function reorder(
 
     const gap = posCoords.bottom < clientY ? $pos.after(1) : $pos.before(1);
 
-    if (gap === from + node.nodeSize) return null;
+    if (gap === from + node.nodeSize || gap === from) return null;
 
     const tr = view.state.tr;
     tr.delete(from, from + node.nodeSize);
+
+    const $from = tr.doc.resolve(from);
+
+    if (
+      $from.parent.type.spec.pitterPatter?.isShuffleContainer &&
+      $from.parent.childCount < 2
+    ) {
+      tr.replaceWith(
+        $from.before(),
+        $from.before() + $from.parent.nodeSize,
+        $from.parent.children,
+      );
+    }
 
     const newPos = tr.mapping.map(gap);
 
