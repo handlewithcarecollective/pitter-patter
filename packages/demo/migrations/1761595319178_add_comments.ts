@@ -15,7 +15,6 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     // IMPORTANT: We rely on this constraint to prevent simultaneous
     // writes from producing commits with the same version
     .addUniqueConstraint("comment_version_doc_unique", ["doc_id", "version"])
-    .addColumn("content", "text", (col) => col.notNull())
     .addColumn("created_at", "text", (col) =>
       col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
     )
