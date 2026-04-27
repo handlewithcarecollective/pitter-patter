@@ -147,7 +147,6 @@ export class CollabAuthority<Transaction> {
     await this.broadcastManager.broadcastCommit(docId, appliedCommitJSON);
   }
 
-  // Todo: Add client side throttling in the case of request failures
   async listenForCommit(docId: string, version: number) {
     // Create listner to notify if commits are made. After this await, the listener is registered with 
     // the notification service and will be notified if a commit is made.
