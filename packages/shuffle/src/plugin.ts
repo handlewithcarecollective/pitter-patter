@@ -2,11 +2,13 @@ import { randomRef } from "@pitter-patter/refs";
 import throttle from "raf-throttle";
 import { createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
-import { Node as PmNode } from "prosemirror-model";
+import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import { reorder } from "./transform/reorder";
 import { reposition } from "./transform/reposition";
+import { autogroup } from "./transform/autogroup";
+import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
 
 interface ShufflePluginStartMeta {
   type: "start";
@@ -63,7 +65,7 @@ export function shuffle() {
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `pp-shuffle-block start-${shuffleStart} end-${shuffleEnd}`,
+              class: `pp-shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
             }),
           );
 
@@ -87,11 +89,11 @@ export function shuffle() {
         let nextActiveNodePos = value.activeNodePos;
         if (meta?.type === "map") {
           nextActiveNodePos = meta.payload.newPos;
-        }
-
-        if (meta?.type === "end") {
+        } else if (meta?.type === "end") {
           nextComp = undefined;
           nextActiveNodePos = undefined;
+        } else if (nextActiveNodePos) {
+          nextActiveNodePos = tr.mapping.map(nextActiveNodePos);
         }
 
         let nextDeco = value.deco.map(tr.mapping, tr.doc);
@@ -112,7 +114,7 @@ export function shuffle() {
             if (decoration) {
               nextDeco = nextDeco.remove([decoration]).add(tr.doc, [
                 Decoration.node(pos, pos + node.nodeSize, {
-                  class: `pp-shuffle-block start-${start} end-${end}`,
+                  class: `pp-shuffle-block start-${getShuffleGridClass(start)} end-${getShuffleGridClass(end)}`,
                 }),
               ]);
             }
@@ -180,7 +182,7 @@ export function shuffle() {
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `pp-shuffle-block start-${shuffleStart} end-${shuffleEnd}`,
+              class: `pp-shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
             }),
           );
 
@@ -193,6 +195,26 @@ export function shuffle() {
           activeNodePos: nextActiveNodePos,
         };
       },
+    },
+    appendTransaction(_transactions, _oldState, newState) {
+      const collapsibleRows: [number, Node][] = [];
+      newState.doc.descendants((node, pos) => {
+        if (isShuffleRow(node) && node.childCount <= 1) {
+          collapsibleRows.push([pos, node]);
+        }
+      });
+
+      const tr = newState.tr;
+
+      for (const [pos, node] of collapsibleRows) {
+        tr.replaceWith(
+          tr.mapping.map(pos),
+          tr.mapping.map(pos + node.nodeSize),
+          node.children,
+        );
+      }
+
+      return tr.docChanged ? tr : null;
     },
     props: {
       decorations(state) {
@@ -214,8 +236,12 @@ export function shuffle() {
             dom &&
             dom !== view.dom &&
             "pmViewDesc" in dom &&
-            !(dom as HTMLElement & { pmViewDesc: ViewDesc }).pmViewDesc.node
-              ?.type.spec.pitterPatter?.isShuffleBlock
+            !supportsResize(
+              (dom as HTMLElement & { pmViewDesc: ViewDesc }).pmViewDesc.node,
+            ) &&
+            !supportsDrag(
+              (dom as HTMLElement & { pmViewDesc: ViewDesc }).pmViewDesc.node,
+            )
           ) {
             dom = dom.parentElement;
           }
@@ -291,8 +317,9 @@ export function shuffle() {
             if (before === undefined) return;
 
             const tr =
-              reposition(view, before, clone!.getBoundingClientRect()) ??
-              reorder(view, before, e.clientX, e.clientY);
+              autogroup(view, before, e.clientX, e.clientY) ??
+              reorder(view, before, e.clientX, e.clientY) ??
+              reposition(view, before, clone!.getBoundingClientRect());
 
             if (!tr) return;
 
@@ -319,7 +346,7 @@ export function shuffle() {
             if (!(nodeDom instanceof HTMLElement)) return;
 
             dom = nodeDom;
-            dom.dataset["shuffleDragged"] = "true";
+            dom.dataset["shuffleActive"] = "true";
           });
 
           function onUp() {
@@ -370,7 +397,7 @@ export function shuffle() {
 
             setTimeout(() => {
               clone!.style.transition = "none";
-              delete dom.dataset["shuffleDragged"];
+              delete dom.dataset["shuffleActive"];
               clone!.remove();
             }, 250);
 
@@ -380,7 +407,6 @@ export function shuffle() {
           document.addEventListener("pointermove", onMove);
           document.addEventListener("pointerup", onUp);
 
-          event.preventDefault();
           return true;
         },
       },
@@ -388,7 +414,7 @@ export function shuffle() {
   });
 }
 
-interface ViewDesc {
+export interface ViewDesc {
   node: PmNode;
   dom: HTMLElement;
   contentDOM?: HTMLElement;
@@ -439,11 +465,9 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   clone.style.height = `${domRect.height}px`;
   document.body.appendChild(clone);
 
-  dom.dataset["shuffleDragged"] = "true";
+  dom.dataset["shuffleActive"] = "true";
 
   const initialBoxShadow = dom.style.boxShadow;
-
-  document.body.style.perspective = "80cm";
 
   clone.style.transition = "transform 0.1s ease";
   clone.style.transform = translateCalc.slide(
@@ -464,4 +488,10 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
       boxShadow: initialBoxShadow,
     } satisfies InitialStyles,
   };
+}
+
+function getShuffleGridClass(col: number) {
+  if (col === 0) return "left";
+  if (col === 13) return "right";
+  return col;
 }

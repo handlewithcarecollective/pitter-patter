@@ -2,6 +2,9 @@ import { reactKeys } from "@handlewithcare/react-prosemirror";
 import { Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
+import { isShuffleContainer } from "../schema";
+import { insertPoint } from "prosemirror-transform";
+import { Node, NodeType } from "prosemirror-model";
 
 export function reorder(
   view: EditorView,
@@ -12,120 +15,47 @@ export function reorder(
   const node = view.state.doc.resolve(from).nodeAfter;
   if (!node) return null;
 
-  const elements = document
-    .elementsFromPoint(clientX, clientY)
-    // The top element is _always_ the drag clone, so we can slice that off
-    .slice(1)
-    .filter((el) => el instanceof HTMLElement && !el.dataset["shuffleDragged"]);
+  const posResult = view.posAtCoords({ left: clientX, top: clientY });
+  if (!posResult) return null;
 
-  const firstPmDom = elements.find(
-    (el) => "pmViewDesc" in el || el === view.dom,
-  );
+  const { pos } = posResult;
 
-  if (!firstPmDom) return null;
+  const gap = findGap(view.state.doc, pos, node.type);
 
-  if (firstPmDom === view.dom) {
-    const posResult = view.posAtCoords({ left: clientX, top: clientY });
-    if (!posResult) return null;
+  if (gap === null) return null;
 
-    const posCoords = view.coordsAtPos(posResult.pos);
+  if (gap === from + node.nodeSize || gap === from) return null;
 
-    const $pos = view.state.doc.resolve(posResult.pos);
+  const tr = view.state.tr;
+  tr.delete(from, from + node.nodeSize);
 
-    const gap = posCoords.bottom < clientY ? $pos.after(1) : $pos.before(1);
+  const newPos = tr.mapping.map(gap);
 
-    if (gap === from + node.nodeSize || gap === from) return null;
+  tr.insert(tr.mapping.map(gap), node);
 
-    const tr = view.state.tr;
-    tr.delete(from, from + node.nodeSize);
+  tr.setMeta(reactKeys().spec.key!, {
+    overrides: { [from]: newPos },
+  });
+  tr.setMeta(shufflePluginKey, {
+    type: "map",
+    payload: { newPos },
+  } satisfies ShufflePluginMeta);
+  tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 
-    const $from = tr.doc.resolve(from);
+  return tr;
+}
 
-    if (
-      $from.parent.type.spec.pitterPatter?.isShuffleContainer &&
-      $from.parent.childCount < 2
-    ) {
-      tr.replaceWith(
-        $from.before(),
-        $from.before() + $from.parent.nodeSize,
-        $from.parent.children,
-      );
-    }
+function findGap(doc: Node, pos: number, nodeType: NodeType) {
+  const $pos = doc.resolve(pos);
 
-    const newPos = tr.mapping.map(gap);
-
-    tr.insert(tr.mapping.map(gap), node);
-
-    tr.setMeta(reactKeys().spec.key!, {
-      overrides: { [from]: newPos },
-    });
-    tr.setMeta(shufflePluginKey, {
-      type: "map",
-      payload: { newPos },
-    } satisfies ShufflePluginMeta);
-    tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
-
-    return tr;
+  let d = $pos.depth;
+  while (!$pos.node(d).isTextblock && d > 0) {
+    d--;
   }
 
-  // const posResult = view.posAtCoords({ left: clientX, top: clientY });
-  // if (!posResult) return null;
-  // const { pos: closestPos, inside } = posResult;
-  // // TODO: Detect when before first child. inside is 0
-  // // in this case
-  // if (inside === -1) {
-  //   const $closestPos = view.state.doc.resolve(closestPos);
-  //   const to = $closestPos.before(1);
-  //   const positions: number[] = [];
-  //   view.state.doc.forEach((_node, offset) => {
-  //     positions.push(offset);
-  //   });
-  //   const indices = positions.map((_, i) => i);
-  //   const fromIndex = positions.indexOf(from);
+  const start = d === 0 ? pos : $pos.before(d);
 
-  //   if (fromIndex === -1) {
-  //     const tr = view.state.tr;
-  //     const movedNode = view.state.doc.resolve(from).nodeAfter;
-  //     if (!movedNode) return null;
+  const gap = start ? insertPoint(doc, start, nodeType) : start;
 
-  //     tr.delete(from, from + movedNode.nodeSize);
-
-  //     const newPos = tr.mapping.map(to);
-
-  //     tr.insert(tr.mapping.map(to), movedNode);
-
-  //     tr.setMeta(reactKeys().spec.key!, {
-  //       overrides: { [from]: newPos },
-  //     });
-  //     tr.setMeta(shufflePluginKey, {
-  //       type: "map",
-  //       payload: { newPos },
-  //     } satisfies ShufflePluginMeta);
-  //     tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
-
-  //     view.dispatch(tr);
-  //     return true;
-  //   }
-
-  //   const toIndex = positions.indexOf(to);
-  //   const order = [...indices];
-  //   order.splice(fromIndex, 1);
-  //   if (to > positions[positions.length - 1]!) {
-  //     order.push(fromIndex);
-  //   } else {
-  //     order.splice(fromIndex < toIndex ? toIndex - 1 : toIndex, 0, fromIndex);
-  //   }
-
-  //   reorderSiblings(0, order)(
-  //     view.state,
-  //     (tr) => {
-  //       tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
-  //       view.dispatch(tr);
-  //     },
-  //     view,
-  //   );
-  //   return true;
-  // }
-
-  return null;
+  return gap;
 }

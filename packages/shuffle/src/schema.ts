@@ -1,22 +1,22 @@
-import { Node, NodeSpec, Schema } from "prosemirror-model";
+import { Node, NodeSpec, NodeType, Schema } from "prosemirror-model";
 
-export const gridAttrs: NodeSpec["attrs"] = {
+export const shuffleAttrs: NodeSpec["attrs"] = {
   shuffleStart: {
     default: 4,
     validate(value) {
-      return typeof value === "number" && value <= 11 && value >= 1;
+      return typeof value === "number" && value <= 13 && value >= 0;
     },
   },
   shuffleEnd: {
     default: 9,
     validate(value) {
-      return typeof value === "number" && value <= 11 && value >= 1;
+      return typeof value === "number" && value <= 13 && value >= 0;
     },
   },
 };
 
 export const container: NodeSpec = {
-  attrs: gridAttrs,
+  attrs: shuffleAttrs,
   defining: true,
   isolating: true,
   parseDOM: [{ tag: 'div[data-node-type="shuffle-container"]' }],
@@ -28,12 +28,12 @@ export const container: NodeSpec = {
     ];
   },
   pitterPatter: {
-    isShuffleContainer: true,
+    shuffle: { role: "container", resizeable: true, draggable: true },
   },
 };
 
 export const row: NodeSpec = {
-  attrs: gridAttrs,
+  attrs: shuffleAttrs,
   parseDOM: [{ tag: 'div[data-node-type="shuffle-row"]' }],
   defining: true,
   isolating: true,
@@ -41,7 +41,10 @@ export const row: NodeSpec = {
     return ["div", { "data-node-type": "shuffle-row", class: "row" }, 0];
   },
   pitterPatter: {
-    isShuffleContainer: true,
+    shuffle: {
+      role: "row",
+      draggable: true,
+    },
   },
 };
 
@@ -59,11 +62,15 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
     if (node.group?.includes(group)) {
       nodes = nodes.update(name, {
         ...node,
-        attrs: { ...node.attrs, ...gridAttrs },
+        attrs: { ...node.attrs, ...shuffleAttrs },
         draggable: false,
         pitterPatter: {
           ...node.pitterPatter,
-          isShuffleBlock: true,
+          shuffle: {
+            ...node.pitterPatter?.shuffle,
+            resizeable: true,
+            draggable: true,
+          },
         },
       });
     }
@@ -75,17 +82,43 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
   });
 }
 
+interface ShuffleSpec {
+  hasDragHandle?: boolean;
+  resizeable?: boolean;
+  draggable?: boolean;
+  role?: "row" | "container";
+  containedBy?: string;
+}
+
 interface PitterPatterSpec {
-  hasShuffleDragHandle?: boolean;
-  isShuffleBlock?: boolean;
-  isShuffleContainer?: boolean;
+  shuffle?: ShuffleSpec;
 }
 
 export function supportsResize(node: Node) {
-  return !!(
-    node.type.spec.pitterPatter?.isShuffleBlock ||
-    node.type.spec.pitterPatter?.isShuffleContainer
-  );
+  return !!node.type.spec.pitterPatter?.shuffle?.resizeable;
+}
+
+export function supportsDrag(node: Node) {
+  return !!node.type.spec.pitterPatter?.shuffle?.draggable;
+}
+
+export function isShuffleRow(node: Node) {
+  return node.type.spec.pitterPatter?.shuffle?.role === "row";
+}
+
+export function isShuffleContainer(node: Node) {
+  return !!node.type.spec.pitterPatter?.shuffle?.role;
+}
+
+export function getShuffleRowType(schema: Schema) {
+  let rowType: NodeType | undefined = undefined;
+  schema.spec.nodes.forEach((nodeName, nodeSpec) => {
+    if (nodeSpec.pitterPatter?.shuffle?.role !== "row") return;
+
+    rowType = schema.nodes[nodeName];
+  });
+
+  return rowType ?? null;
 }
 
 declare module "prosemirror-model" {

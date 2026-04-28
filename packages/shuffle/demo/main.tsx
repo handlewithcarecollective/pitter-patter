@@ -46,6 +46,9 @@ const doc = schema.nodes.doc.create(null, [
       ]),
     ]),
   ]),
+  schema.nodes.image.create({
+    src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
+  }),
   schema.nodes.paragraph.create(
     null,
     schema.text("Another paragraph not in a row."),
