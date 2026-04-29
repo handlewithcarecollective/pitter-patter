@@ -28,7 +28,7 @@ export const container: NodeSpec = {
     ];
   },
   pitterPatter: {
-    shuffle: { role: "container", resizeable: true, draggable: true },
+    shuffle: { role: "container", resizable: true, draggable: true },
   },
 };
 
@@ -59,7 +59,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
   });
 
   schema.spec.nodes.forEach((name, node) => {
-    if (node.group?.includes(group)) {
+    if (node.group?.match(new RegExp(`\b${group}\b`))) {
       nodes = nodes.update(name, {
         ...node,
         attrs: { ...node.attrs, ...shuffleAttrs },
@@ -68,7 +68,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
           ...node.pitterPatter,
           shuffle: {
             ...node.pitterPatter?.shuffle,
-            resizeable: true,
+            resizable: true,
             draggable: true,
           },
         },
@@ -83,7 +83,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
 }
 
 interface ShuffleSpec {
-  resizeable?: boolean;
+  resizable?: boolean;
   draggable?: boolean;
   role?: "row" | "container";
   containedBy?: string;
@@ -94,7 +94,7 @@ interface PitterPatterSpec {
 }
 
 export function supportsResize(node: Node) {
-  return !!node.type.spec.pitterPatter?.shuffle?.resizeable;
+  return !!node.type.spec.pitterPatter?.shuffle?.resizable;
 }
 
 export function supportsDrag(node: Node) {
