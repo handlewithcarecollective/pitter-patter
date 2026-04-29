@@ -13,9 +13,7 @@ export interface PresenceState {
   indicators: Record<string, PresenceIndicator[]>;
 }
 
-export const presenceKey = new PluginKey<PresenceState>(
-  "@pitter-patter/presence-client/presence",
-);
+export const presenceKey = new PluginKey<PresenceState>("@pitter-patter/presence-client/presence");
 
 export function receivePresenceTransaction(
   editorState: EditorState,
@@ -45,9 +43,7 @@ export function presence(
 
         const nextIndicators = { ...indicators };
 
-        const incoming = tr.getMeta(presenceKey) as
-          | Record<string, PresenceIndicator>
-          | undefined;
+        const incoming = tr.getMeta(presenceKey) as Record<string, PresenceIndicator> | undefined;
 
         if (incoming) {
           for (const [clientId, indicator] of Object.entries(incoming)) {
@@ -57,9 +53,7 @@ export function presence(
               // document contents change, but a user can move their
               // cursor without updating the document.
               nextIndicators[clientId] = [
-                ...nextIndicators[clientId]!.filter(
-                  (i) => i.version !== indicator.version,
-                ),
+                ...nextIndicators[clientId]!.filter((i) => i.version !== indicator.version),
                 indicator,
               ];
             } else {
@@ -100,18 +94,10 @@ export function presence(
             continue;
           }
 
-          const mappables = confirmedMappables.concat(
-            unconfirmed.map(({ step }) => step.getMap()),
-          );
+          const mappables = confirmedMappables.concat(unconfirmed.map(({ step }) => step.getMap()));
 
-          const anchor = mappables.reduce(
-            (acc, mappable) => mappable.map(acc),
-            indicator.anchor,
-          );
-          const head = mappables.reduce(
-            (acc, mappable) => mappable.map(acc),
-            indicator.head,
-          );
+          const anchor = mappables.reduce((acc, mappable) => mappable.map(acc), indicator.anchor);
+          const head = mappables.reduce((acc, mappable) => mappable.map(acc), indicator.head);
 
           nextDecorations.push(
             Decoration.inline(Math.min(anchor, head), Math.max(anchor, head), {

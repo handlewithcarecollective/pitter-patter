@@ -125,11 +125,7 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
 
-      if (
-        animationRef.current &&
-        animationRef.current.began &&
-        !animationRef.current.completed
-      ) {
+      if (animationRef.current && animationRef.current.began && !animationRef.current.completed) {
         animationRef.current.complete();
       }
 

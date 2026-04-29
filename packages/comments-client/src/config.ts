@@ -2,10 +2,7 @@ import { PresenceIndicator } from "./PresenceIndicator";
 
 export interface PresenceClientConfig {
   userId: string;
-  sendIndicator: (
-    clientId: string,
-    indicator: PresenceIndicator,
-  ) => Promise<void>;
+  sendIndicator: (clientId: string, indicator: PresenceIndicator) => Promise<void>;
   getIndicators: (
     clientId: string,
     refs?: Record<string, string>,

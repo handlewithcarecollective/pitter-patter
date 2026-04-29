@@ -10,10 +10,7 @@ import { reposition } from "./transform/reposition";
 import { autogroup } from "./transform/autogroup";
 import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
 import { ComponentType, ForwardRefExoticComponent, RefAttributes } from "react";
-import {
-  widget,
-  WidgetViewComponentProps,
-} from "@handlewithcare/react-prosemirror";
+import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
 
 interface ShufflePluginStartMeta {
   type: "start";
@@ -51,9 +48,7 @@ export interface ShufflePluginState {
   activeNodePos: number | undefined;
 }
 
-export const shufflePluginKey = new PluginKey<ShufflePluginState>(
-  "@pitter-patter/shuffle",
-);
+export const shufflePluginKey = new PluginKey<ShufflePluginState>("@pitter-patter/shuffle");
 
 export interface ShufflePluginOptions {
   dragHandles?: Record<string, ComponentType<WidgetViewComponentProps>>;
@@ -83,10 +78,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
         const { $from, $to } = state.selection;
 
-        let d =
-          $from.parent === $to.parent
-            ? $from.depth
-            : $from.blockRange($to)?.depth;
+        let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
 
         if (d !== undefined) {
           while (d > 0) {
@@ -145,11 +137,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           const node = oldState.doc.resolve(pos).nodeAfter;
 
           if (node) {
-            const candidates = nextDeco.find(
-              pos,
-              pos,
-              (spec) => !spec.shuffleActive,
-            );
+            const candidates = nextDeco.find(pos, pos, (spec) => !spec.shuffleActive);
             const decoration = candidates.find(
               (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
             );
@@ -208,17 +196,9 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
             return true;
           }
 
-          const existing = nextDeco.find(
-            pos,
-            pos + node.nodeSize,
-            (spec) => !spec.shuffleActive,
-          );
+          const existing = nextDeco.find(pos, pos + node.nodeSize, (spec) => !spec.shuffleActive);
 
-          if (
-            existing.some(
-              (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
-            )
-          ) {
+          if (existing.some((deco) => deco.from === pos && deco.to === pos + node.nodeSize)) {
             return true;
           }
 
@@ -236,10 +216,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         );
 
         const { $from, $to } = newState.selection;
-        let d =
-          $from.parent === $to.parent
-            ? $from.depth
-            : $from.blockRange($to)?.depth;
+        let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
 
         if (d !== undefined) {
           while (d > 0) {
@@ -285,11 +262,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
       const tr = newState.tr;
 
       for (const [pos, node] of collapsibleRows) {
-        tr.replaceWith(
-          tr.mapping.map(pos),
-          tr.mapping.map(pos + node.nodeSize),
-          node.children,
-        );
+        tr.replaceWith(tr.mapping.map(pos), tr.mapping.map(pos + node.nodeSize), node.children);
       }
 
       return tr.docChanged ? tr : null;
@@ -309,8 +282,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           if (!view.editable) return false;
           if (!(event.target instanceof HTMLElement)) return false;
 
-          let dom: null | (HTMLElement & { pmViewDesc?: ViewDesc }) =
-            event.target;
+          let dom: null | (HTMLElement & { pmViewDesc?: ViewDesc }) = event.target;
 
           while (
             dom &&
@@ -343,22 +315,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
           const domRect = dom.getBoundingClientRect();
 
-          const transform = new DOMMatrixReadOnly(
-            getComputedStyle(dom).transform,
-          );
+          const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
           const originX = transform.m41;
           const originY = transform.m42;
 
           const startX = event.clientX;
           const startY = event.clientY;
 
-          const translateCalc = new TranslateCalculator(
-            originX,
-            originY,
-            startX,
-            startY,
-            domRect,
-          );
+          const translateCalc = new TranslateCalculator(originX, originY, startX, startY, domRect);
 
           let clone: HTMLElement | null = null;
           let initialStyles: InitialStyles | null = null;
@@ -382,9 +346,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
               const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
               if (!gridWrapper) return;
-              const skeleton = gridWrapper.querySelector(
-                "[data-pp-grid-skeleton]",
-              );
+              const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
               if (!skeleton) return;
 
               skeletonOn = true;
@@ -405,11 +367,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
             if (!tr) return;
 
-            if (
-              currentAnimation &&
-              currentAnimation.began &&
-              !currentAnimation.completed
-            ) {
+            if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
               currentAnimation.complete();
             }
 
@@ -417,9 +375,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
               view.dispatch(tr);
             });
 
-            const updatedBefore = shufflePluginKey.getState(
-              view.state,
-            )?.activeNodePos;
+            const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
 
             if (updatedBefore === undefined) return;
 
@@ -437,20 +393,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
             const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
             if (!gridWrapper) return;
-            const skeleton = gridWrapper.querySelector(
-              "[data-pp-grid-skeleton]",
-            );
+            const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
             if (!skeleton) return;
 
             animate(skeleton, { opacity: 0 }, { duration: 0.25 });
 
             if (!clone || !initialStyles) return;
 
-            if (
-              currentAnimation &&
-              currentAnimation.began &&
-              !currentAnimation.completed
-            ) {
+            if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
               currentAnimation.complete();
             }
 
@@ -472,10 +422,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
             const domRect = dom.getBoundingClientRect();
 
-            clone.style.transform = translateCalc.place(
-              domRect.left,
-              domRect.top,
-            );
+            clone.style.transform = translateCalc.place(domRect.left, domRect.top);
 
             setTimeout(() => {
               clone!.style.transition = "none";
@@ -557,12 +504,8 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   const initialBoxShadow = dom.style.boxShadow;
 
   clone.style.transition = "transform 0.1s ease";
-  clone.style.transform = translateCalc.slide(
-    translateCalc.startX,
-    translateCalc.startY,
-  );
-  clone.style.boxShadow =
-    "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
+  clone.style.transform = translateCalc.slide(translateCalc.startX, translateCalc.startY);
+  clone.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
   clone.style.zIndex = "100";
 
   setTimeout(() => {

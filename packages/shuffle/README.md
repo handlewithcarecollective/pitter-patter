@@ -96,12 +96,7 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { shuffle } from "@pitter-patter/shuffle";
 
-function ParagraphHandle({
-  widget,
-  ref,
-  getPos,
-  ...props
-}: WidgetViewComponentProps) {
+function ParagraphHandle({ widget, ref, getPos, ...props }: WidgetViewComponentProps) {
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
 

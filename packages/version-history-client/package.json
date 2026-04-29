@@ -1,13 +1,16 @@
 {
   "name": "@pitter-patter/version-history-client",
   "version": "0.1.0",
-  "type": "module",
-  "packageManager": "yarn@4.9.1",
-  "exports": "./src/index.ts",
   "files": [
     "./styles.css",
     "./dist"
   ],
+  "type": "module",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": "./dist/index.js"
+  },
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^"
   },
@@ -25,8 +28,5 @@
     "prosemirror-transform": "^1.0.0",
     "prosemirror-view": "^1.0.0"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": "./dist/index.js"
-  }
+  "packageManager": "yarn@4.9.1"
 }

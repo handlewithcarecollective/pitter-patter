@@ -84,8 +84,8 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["@yarnpkg/sdks", "npm:3.2.3"],\
+          ["oxfmt", "npm:0.47.0"],\
           ["pitter-patter", "workspace:."],\
-          ["prettier", "npm:3.6.2"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
         ],\
         "linkType": "SOFT"\
@@ -425,6 +425,177 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@oxc-project-types-npm-0.122.0-9b262efc0b-2c64dd0db9.zip/node_modules/@oxc-project/types/",\
         "packageDependencies": [\
           ["@oxc-project/types", "npm:0.122.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-android-arm-eabi", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-android-arm-eabi-npm-0.47.0-a84487e578/node_modules/@oxfmt/binding-android-arm-eabi/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-android-arm-eabi", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-android-arm64", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-android-arm64-npm-0.47.0-222761b781/node_modules/@oxfmt/binding-android-arm64/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-android-arm64", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-darwin-arm64", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-darwin-arm64-npm-0.47.0-add5d50a95/node_modules/@oxfmt/binding-darwin-arm64/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-darwin-arm64", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-darwin-x64", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-darwin-x64-npm-0.47.0-28bbf474ab/node_modules/@oxfmt/binding-darwin-x64/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-darwin-x64", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-freebsd-x64", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-freebsd-x64-npm-0.47.0-2f03ff4128/node_modules/@oxfmt/binding-freebsd-x64/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-freebsd-x64", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-arm-gnueabihf", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-arm-gnueabihf-npm-0.47.0-8e5dccf1cc/node_modules/@oxfmt/binding-linux-arm-gnueabihf/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-arm-gnueabihf", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-arm-musleabihf", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-arm-musleabihf-npm-0.47.0-7d08c24864/node_modules/@oxfmt/binding-linux-arm-musleabihf/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-arm-musleabihf", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-arm64-gnu", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-arm64-gnu-npm-0.47.0-35fa6f24d6/node_modules/@oxfmt/binding-linux-arm64-gnu/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-arm64-gnu", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-arm64-musl", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-arm64-musl-npm-0.47.0-251e0c3f87/node_modules/@oxfmt/binding-linux-arm64-musl/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-arm64-musl", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-ppc64-gnu", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-ppc64-gnu-npm-0.47.0-3d9ba9f908/node_modules/@oxfmt/binding-linux-ppc64-gnu/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-ppc64-gnu", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-riscv64-gnu", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-riscv64-gnu-npm-0.47.0-741da15dd6/node_modules/@oxfmt/binding-linux-riscv64-gnu/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-riscv64-gnu", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-riscv64-musl", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-riscv64-musl-npm-0.47.0-9df056538b/node_modules/@oxfmt/binding-linux-riscv64-musl/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-riscv64-musl", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-s390x-gnu", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-s390x-gnu-npm-0.47.0-84aa3d564f/node_modules/@oxfmt/binding-linux-s390x-gnu/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-s390x-gnu", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-x64-gnu", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-x64-gnu-npm-0.47.0-095a8b1854/node_modules/@oxfmt/binding-linux-x64-gnu/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-x64-gnu", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-linux-x64-musl", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-linux-x64-musl-npm-0.47.0-7704cd7fb0/node_modules/@oxfmt/binding-linux-x64-musl/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-linux-x64-musl", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-openharmony-arm64", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-openharmony-arm64-npm-0.47.0-e0b8f972c1/node_modules/@oxfmt/binding-openharmony-arm64/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-openharmony-arm64", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-win32-arm64-msvc", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-win32-arm64-msvc-npm-0.47.0-c1b41598cd/node_modules/@oxfmt/binding-win32-arm64-msvc/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-win32-arm64-msvc", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-win32-ia32-msvc", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-win32-ia32-msvc-npm-0.47.0-c634cf2c22/node_modules/@oxfmt/binding-win32-ia32-msvc/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-win32-ia32-msvc", "npm:0.47.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@oxfmt/binding-win32-x64-msvc", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/@oxfmt-binding-win32-x64-msvc-npm-0.47.0-0259dfa5fe/node_modules/@oxfmt/binding-win32-x64-msvc/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-win32-x64-msvc", "npm:0.47.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6051,6 +6222,35 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["oxfmt", [\
+      ["npm:0.47.0", {\
+        "packageLocation": "./.yarn/unplugged/oxfmt-npm-0.47.0-38d91774b8/node_modules/oxfmt/",\
+        "packageDependencies": [\
+          ["@oxfmt/binding-android-arm-eabi", "npm:0.47.0"],\
+          ["@oxfmt/binding-android-arm64", "npm:0.47.0"],\
+          ["@oxfmt/binding-darwin-arm64", "npm:0.47.0"],\
+          ["@oxfmt/binding-darwin-x64", "npm:0.47.0"],\
+          ["@oxfmt/binding-freebsd-x64", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-arm-gnueabihf", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-arm-musleabihf", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-arm64-gnu", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-arm64-musl", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-ppc64-gnu", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-riscv64-gnu", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-riscv64-musl", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-s390x-gnu", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-x64-gnu", "npm:0.47.0"],\
+          ["@oxfmt/binding-linux-x64-musl", "npm:0.47.0"],\
+          ["@oxfmt/binding-openharmony-arm64", "npm:0.47.0"],\
+          ["@oxfmt/binding-win32-arm64-msvc", "npm:0.47.0"],\
+          ["@oxfmt/binding-win32-ia32-msvc", "npm:0.47.0"],\
+          ["@oxfmt/binding-win32-x64-msvc", "npm:0.47.0"],\
+          ["oxfmt", "npm:0.47.0"],\
+          ["tinypool", "npm:2.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["p-cancelable", [\
       ["npm:2.1.1", {\
         "packageLocation": "./.yarn/cache/p-cancelable-npm-2.1.1-9388305f02-8c6dc1f8dd.zip/node_modules/p-cancelable/",\
@@ -6266,8 +6466,8 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["@yarnpkg/sdks", "npm:3.2.3"],\
+          ["oxfmt", "npm:0.47.0"],\
           ["pitter-patter", "workspace:."],\
-          ["prettier", "npm:3.6.2"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
         ],\
         "linkType": "SOFT"\
@@ -6337,13 +6537,6 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["prettier", [\
-      ["npm:3.6.2", {\
-        "packageLocation": "./.yarn/unplugged/prettier-npm-3.6.2-2668152203/node_modules/prettier/",\
-        "packageDependencies": [\
-          ["prettier", "npm:3.6.2"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
       ["npm:3.8.1", {\
         "packageLocation": "./.yarn/unplugged/prettier-npm-3.8.1-04022a855f/node_modules/prettier/",\
         "packageDependencies": [\
@@ -7370,6 +7563,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["tinypool", [\
+      ["npm:2.1.0", {\
+        "packageLocation": "./.yarn/cache/tinypool-npm-2.1.0-e68b5eb405-9fb1c76055.zip/node_modules/tinypool/",\
+        "packageDependencies": [\
+          ["tinypool", "npm:2.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["to-regex-range", [\
       ["npm:5.0.1", {\
         "packageLocation": "./.yarn/cache/to-regex-range-npm-5.0.1-f1e8263b00-487988b0a1.zip/node_modules/to-regex-range/",\
@@ -7971,16 +8173,16 @@ function convertToBigIntStats(stats) {
     if (Object.hasOwn(stats, key)) {
       const element = stats[key];
       if (typeof element === `number`) {
-        bigintStats[key] = BigInt(element);
+        bigintStats[key] = BigInt(Math.floor(element));
       } else if (nodeUtils__namespace.types.isDate(element)) {
         bigintStats[key] = new Date(element);
       }
     }
   }
-  bigintStats.atimeNs = bigintStats.atimeMs * BigInt(1e6);
-  bigintStats.mtimeNs = bigintStats.mtimeMs * BigInt(1e6);
-  bigintStats.ctimeNs = bigintStats.ctimeMs * BigInt(1e6);
-  bigintStats.birthtimeNs = bigintStats.birthtimeMs * BigInt(1e6);
+  bigintStats.atimeNs = bigintStats.atimeMs * BigInt(1e6) + BigInt(Math.floor(stats.atimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.mtimeNs = bigintStats.mtimeMs * BigInt(1e6) + BigInt(Math.floor(stats.mtimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.ctimeNs = bigintStats.ctimeMs * BigInt(1e6) + BigInt(Math.floor(stats.ctimeMs % 1 * 1e3)) * BigInt(1e3);
+  bigintStats.birthtimeNs = bigintStats.birthtimeMs * BigInt(1e6) + BigInt(Math.floor(stats.birthtimeMs % 1 * 1e3)) * BigInt(1e3);
   return bigintStats;
 }
 function areStatsEqual(a, b) {
@@ -10658,28 +10860,40 @@ class FileHandle {
   sync() {
     throw new Error(`Method not implemented.`);
   }
-  async read(bufferOrOptions, offset, length, position) {
+  async read(bufferOrOptions, offsetOrOptions, length, position) {
     try {
       this[kRef](this.read);
       let buffer;
-      if (!Buffer.isBuffer(bufferOrOptions)) {
-        bufferOrOptions ??= {};
-        buffer = bufferOrOptions.buffer ?? Buffer.alloc(16384);
-        offset = bufferOrOptions.offset || 0;
-        length = bufferOrOptions.length ?? buffer.byteLength;
-        position = bufferOrOptions.position ?? null;
+      let offset;
+      if (!ArrayBuffer.isView(bufferOrOptions)) {
+        buffer = bufferOrOptions?.buffer ?? Buffer.alloc(16384);
+        offset = bufferOrOptions?.offset ?? 0;
+        length = bufferOrOptions?.length ?? buffer.byteLength - offset;
+        position = bufferOrOptions?.position ?? null;
+      } else if (typeof offsetOrOptions === `object` && offsetOrOptions !== null) {
+        buffer = bufferOrOptions;
+        offset = offsetOrOptions?.offset ?? 0;
+        length = offsetOrOptions?.length ?? buffer.byteLength - offset;
+        position = offsetOrOptions?.position ?? null;
       } else {
         buffer = bufferOrOptions;
+        offset = offsetOrOptions ?? 0;
+        length ??= 0;
       }
-      offset ??= 0;
-      length ??= 0;
       if (length === 0) {
         return {
           bytesRead: length,
           buffer
         };
       }
-      const bytesRead = await this[kBaseFs].readPromise(this.fd, buffer, offset, length, position);
+      const bytesRead = await this[kBaseFs].readPromise(
+        this.fd,
+        // FIXME: FakeFS should support ArrayBufferViews directly
+        Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength),
+        offset,
+        length,
+        position
+      );
       return {
         bytesRead,
         buffer
@@ -13074,7 +13288,8 @@ class ZipFS extends BasePortableFakeFS {
         const entries = Array.from(directoryListing, (name) => {
           return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
             name,
-            path: PortablePath.dot
+            path: PortablePath.dot,
+            parentPath: PortablePath.dot
           });
         });
         for (const entry of entries) {
@@ -13085,7 +13300,8 @@ class ZipFS extends BasePortableFakeFS {
           for (const child of subListing) {
             entries.push(Object.assign(this.statImpl(`lstat`, ppath.join(p, subPath, child)), {
               name: child,
-              path: subPath
+              path: subPath,
+              parentPath: subPath
             }));
           }
         }
@@ -13106,7 +13322,8 @@ class ZipFS extends BasePortableFakeFS {
       return Array.from(directoryListing, (name) => {
         return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
           name,
-          path: void 0
+          path: void 0,
+          parentPath: void 0
         });
       });
     } else {
@@ -13581,6 +13798,7 @@ function applyPatch(pnpapi, opts) {
       const optionNames = new Set(Object.keys(options));
       optionNames.delete(`paths`);
       optionNames.delete(`plugnplay`);
+      optionNames.delete(`conditions`);
       if (optionNames.size > 0) {
         throw makeError(
           ErrorCode.UNSUPPORTED,
@@ -13609,11 +13827,15 @@ function applyPatch(pnpapi, opts) {
       const issuerApi = apiPath !== null ? opts.manager.getApiEntry(apiPath, true).instance : null;
       try {
         if (issuerApi !== null) {
-          resolution = issuerApi.resolveRequest(request, path !== null ? `${path}/` : null);
+          resolution = issuerApi.resolveRequest(request, path !== null ? `${path}/` : null, {
+            conditions: options?.conditions
+          });
         } else {
           if (path === null)
             throw new Error(`Assertion failed: Expected the path to be set`);
-          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain);
+          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain, {
+            conditions: options?.conditions
+          });
         }
       } catch (error) {
         firstError = firstError || error;

@@ -21,11 +21,7 @@ export const container: NodeSpec = {
   isolating: true,
   parseDOM: [{ tag: 'div[data-node-type="shuffle-container"]' }],
   toDOM() {
-    return [
-      "div",
-      { "data-node-type": "shuffle-container", class: "container" },
-      0,
-    ];
+    return ["div", { "data-node-type": "shuffle-container", class: "container" }, 0];
   },
   pitterPatter: {
     shuffle: { role: "container", resizable: true, draggable: true },

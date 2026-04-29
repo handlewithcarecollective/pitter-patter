@@ -21,19 +21,11 @@ export interface PresenceIndicator {
 
 export interface PresenceAuthorityConfig {
   persistenceManager: {
-    saveIndicator: (
-      docId: string,
-      indicator: PresenceIndicator,
-    ) => Promise<void>;
-    getIndicators: (
-      docId: string,
-    ) => Promise<Record<string, PresenceIndicator>>;
+    saveIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
+    getIndicators: (docId: string) => Promise<Record<string, PresenceIndicator>>;
   };
   broadcastManager: {
-    broadcastIndicator: (
-      docId: string,
-      indicator: PresenceIndicator,
-    ) => Promise<void>;
+    broadcastIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
     listenForPresence: (
       docId: string,
       clientId: string,
@@ -64,22 +56,17 @@ export class PresenceAuthority {
     const prePresence = await this.persistenceManager.getIndicators(docId);
     const upToDate = Object.values(prePresence).every(
       (indicator) =>
-        indicator.clientId === excludeClientId ||
-        refs[indicator.clientId] === indicator.ref,
+        indicator.clientId === excludeClientId || refs[indicator.clientId] === indicator.ref,
     );
     if (!upToDate) {
       return Object.fromEntries(
-        Object.entries(prePresence).filter(
-          ([clientId]) => clientId !== excludeClientId,
-        ),
+        Object.entries(prePresence).filter(([clientId]) => clientId !== excludeClientId),
       );
     }
     await this.broadcastManager.listenForPresence(docId, excludeClientId, refs);
     const postPresence = await this.persistenceManager.getIndicators(docId);
     return Object.fromEntries(
-      Object.entries(postPresence).filter(
-        ([clientId]) => clientId !== excludeClientId,
-      ),
+      Object.entries(postPresence).filter(([clientId]) => clientId !== excludeClientId),
     );
   }
 }
@@ -107,17 +94,14 @@ export class RedisPresencePersistenceManager {
       indicator.clientId,
       JSON.stringify(indicator),
     );
-    await this.kv.hExpire(
-      `pitter-patter:presence:${docId}`,
-      indicator.clientId,
-      30,
-    );
+    await this.kv.hExpire(`pitter-patter:presence:${docId}`, indicator.clientId, 30);
   }
 
   async getIndicators(docId: string) {
-    const result = (await this.kv.hGetAll(
-      `pitter-patter:presence:${docId}`,
-    )) as Record<string, string>;
+    const result = (await this.kv.hGetAll(`pitter-patter:presence:${docId}`)) as Record<
+      string,
+      string
+    >;
 
     return Object.fromEntries(
       Object.entries(result).map(([clientId, indicatorString]) => [
@@ -159,11 +143,7 @@ export class RedisPresenceBroadcastManager {
     );
   }
 
-  async listenForPresence(
-    docId: string,
-    excludeClientId: string,
-    refs: Record<string, string>,
-  ) {
+  async listenForPresence(docId: string, excludeClientId: string, refs: Record<string, string>) {
     const { promise, resolve } = PromiseWithResolvers<void>();
 
     function listener(message: string) {
@@ -185,10 +165,7 @@ export class RedisPresenceBroadcastManager {
         setTimeout(resolve, this.timeout);
       }),
     ]).finally(async () => {
-      await this.sub.unsubscribe(
-        `pitter-patter:persistence:${docId}`,
-        listener,
-      );
+      await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
     });
   }
 }

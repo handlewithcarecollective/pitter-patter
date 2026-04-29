@@ -24,10 +24,8 @@ export function defaultShouldCreateSnapshot(
   lastUpdatedTimestamp: number,
   latestVersionCreatedTimestamp: number,
 ): boolean {
-  const fiveMinutesPause =
-    currentTimestamp - lastUpdatedTimestamp > 5 * 60 * 1_000;
-  const fifteenMinutesEditing =
-    currentTimestamp - latestVersionCreatedTimestamp > 15 * 60 * 1_000;
+  const fiveMinutesPause = currentTimestamp - lastUpdatedTimestamp > 5 * 60 * 1_000;
+  const fifteenMinutesEditing = currentTimestamp - latestVersionCreatedTimestamp > 15 * 60 * 1_000;
   return fiveMinutesPause || fifteenMinutesEditing;
 }
 
@@ -38,30 +36,14 @@ export function withVersionHistory<Transaction>(
   return {
     ...collabAuthorityConfig,
     async saveDoc(tr, docId, docJSON, version, lastUpdatedTimestamp) {
-      await collabAuthorityConfig.saveDoc(
-        tr,
-        docId,
-        docJSON,
-        version,
-        lastUpdatedTimestamp,
-      );
+      await collabAuthorityConfig.saveDoc(tr, docId, docJSON, version, lastUpdatedTimestamp);
 
-      const latestVersion = await versionHistoryConfig.getLatestSnapshot(
-        tr,
-        docId,
-      );
+      const latestVersion = await versionHistoryConfig.getLatestSnapshot(tr, docId);
 
       const shouldCreateVersion =
-        versionHistoryConfig.shouldCreateSnapshot ??
-        defaultShouldCreateSnapshot;
+        versionHistoryConfig.shouldCreateSnapshot ?? defaultShouldCreateSnapshot;
 
-      if (
-        !shouldCreateVersion(
-          Date.now(),
-          lastUpdatedTimestamp,
-          latestVersion.createdAt,
-        )
-      ) {
+      if (!shouldCreateVersion(Date.now(), lastUpdatedTimestamp, latestVersion.createdAt)) {
         return;
       }
 

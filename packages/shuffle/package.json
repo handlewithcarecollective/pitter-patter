@@ -1,16 +1,22 @@
 {
   "name": "@pitter-patter/shuffle",
   "version": "0.1.0",
-  "type": "module",
-  "packageManager": "yarn@4.9.1",
-  "exports": {
-    ".": "./src/index.ts",
-    "./styles.css": "./styles.css"
-  },
   "files": [
     "./styles.css",
     "./dist"
   ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./styles.css"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./styles.css": "./styles.css"
+    }
+  },
   "scripts": {
     "demo": "yarn vite"
   },
@@ -50,11 +56,5 @@
     "prosemirror-transform": "^1.0.0",
     "prosemirror-view": "^1.0.0"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": {
-      ".": "./dist/index.js",
-      "./styles.css": "./styles.css"
-    }
-  }
+  "packageManager": "yarn@4.9.1"
 }

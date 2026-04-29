@@ -1,6 +1,26 @@
 [[language]]
 name = "typescript"
-formatter = { command = "yarn", args = ["prettier", "--stdin-filepath", "%{buffer_name}"] }
+formatter = { command = "yarn", args = ["oxfmt", "--stdin-filepath", "%{buffer_name}"] }
+
+[[language]]
+name = "tsx"
+formatter = { command = "yarn", args = ["oxfmt", "--stdin-filepath", "%{buffer_name}"] }
+
+[[language]]
+name = "javascript"
+formatter = { command = "yarn", args = ["oxfmt", "--stdin-filepath", "%{buffer_name}"] }
+
+[[language]]
+name = "jsx"
+formatter = { command = "yarn", args = ["oxfmt", "--stdin-filepath", "%{buffer_name}"] }
+
+[[language]]
+name = "json"
+formatter = { command = "yarn", args = ["oxfmt", "--stdin-filepath", "%{buffer_name}"] }
+
+[[language]]
+name = "markdown"
+formatter = { command = "yarn", args = ["oxfmt", "--stdin-filepath", "%{buffer_name}"] }
 
 [language-server.typescript-language-server.config]
 hostInfo = "helix"

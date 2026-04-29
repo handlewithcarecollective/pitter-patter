@@ -2,8 +2,11 @@
   "name": "@pitter-patter/comments-server",
   "version": "0.1.0",
   "type": "module",
-  "packageManager": "yarn@4.9.1",
   "exports": "./src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": "./dist/index.js"
+  },
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^",
     "prosemirror-model": "^1.25.4",
@@ -14,8 +17,5 @@
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": "./dist/index.js"
-  }
+  "packageManager": "yarn@4.9.1"
 }

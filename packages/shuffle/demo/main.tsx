@@ -42,21 +42,14 @@ const doc = schema.nodes.doc.create(null, [
     }),
     schema.nodes.container.create({ shuffleStart: 7, shuffleEnd: 12 }, [
       // schema.nodes.container.create({}, [
-      schema.nodes.paragraph.create(null, [
-        schema.text("This is some sample text"),
-      ]),
-      schema.nodes.paragraph.create(null, [
-        schema.text("This is some more sample text"),
-      ]),
+      schema.nodes.paragraph.create(null, [schema.text("This is some sample text")]),
+      schema.nodes.paragraph.create(null, [schema.text("This is some more sample text")]),
     ]),
   ]),
   schema.nodes.image.create({
     src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
   }),
-  schema.nodes.paragraph.create(
-    null,
-    schema.text("Another paragraph not in a row."),
-  ),
+  schema.nodes.paragraph.create(null, schema.text("Another paragraph not in a row.")),
 ]);
 
 function Image({ nodeProps, children, ref, ...props }: NodeViewComponentProps) {
@@ -80,12 +73,7 @@ const nodeViewComponents = {
 };
 
 function createHandle(name: string) {
-  const Handle = ({
-    widget,
-    ref,
-    getPos,
-    ...props
-  }: WidgetViewComponentProps) => {
+  const Handle = ({ widget, ref, getPos, ...props }: WidgetViewComponentProps) => {
     const [top, setTop] = useState(0);
     const [left, setLeft] = useState(0);
 
@@ -137,10 +125,7 @@ const editorState = EditorState.create({
 
 function Editor() {
   return (
-    <ProseMirror
-      defaultState={editorState}
-      nodeViewComponents={nodeViewComponents}
-    >
+    <ProseMirror defaultState={editorState} nodeViewComponents={nodeViewComponents}>
       <GridSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />

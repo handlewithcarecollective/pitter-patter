@@ -1,9 +1,4 @@
-import {
-  CamelCasePlugin,
-  Kysely,
-  ParseJSONResultsPlugin,
-  SqliteDialect,
-} from "kysely";
+import { CamelCasePlugin, Kysely, ParseJSONResultsPlugin, SqliteDialect } from "kysely";
 
 import { DB } from "./schema";
 

@@ -1,55 +1,55 @@
 .pitter-patter-presence-anchor {
-    position: absolute;
+  position: absolute;
 
-    display: inline-flex;
+  display: inline-flex;
 
-    width: 1rem;
-    height: 1.6em;
+  width: 1rem;
+  height: 1.6em;
 
-    transform: translateX(-0.5rem);
+  transform: translateX(-0.5rem);
 
-    flex-direction: column;
-    align-items: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pitter-patter-presence-anchor-head {
-    display: flex;
+  display: flex;
 
-    width: 0.25rem;
-    height: 0.25rem;
+  width: 0.25rem;
+  height: 0.25rem;
 
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
 }
 
 .pitter-patter-presence-anchor:hover .pitter-patter-presence-anchor-head {
-    position: absolute;
-    top: -0.75rem;
+  position: absolute;
+  top: -0.75rem;
 
-    height: 1rem;
+  height: 1rem;
 
-    width: max-content;
+  width: max-content;
 
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 
 .pitter-patter-presence-anchor-user-id {
-    display: none;
+  display: none;
 
-    font-size: 0.5rem;
-    line-height: 0.5rem;
+  font-size: 0.5rem;
+  line-height: 0.5rem;
 
-    color: white;
+  color: white;
 }
 
 .pitter-patter-presence-anchor:hover .pitter-patter-presence-anchor-user-id {
-    display: inline;
+  display: inline;
 }
 
 .pitter-patter-presence-anchor-body {
-    width: 2px;
+  width: 2px;
 
-    flex-grow: 1;
+  flex-grow: 1;
 }

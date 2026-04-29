@@ -2,10 +2,7 @@ import { Insertable, Transaction } from "kysely";
 import { getDb } from "./db";
 import { DB } from "./schema";
 
-export async function getLatestSnapshot(
-  tr: Transaction<DB> | null,
-  docId: string,
-) {
+export async function getLatestSnapshot(tr: Transaction<DB> | null, docId: string) {
   const db = tr ?? (await getDb());
   return await db
     .selectFrom("snapshot")
@@ -31,10 +28,7 @@ export async function getSnapshots(
     .execute();
 }
 
-export async function createSnapshot(
-  tr: Transaction<DB> | null,
-  doc: Insertable<DB["snapshot"]>,
-) {
+export async function createSnapshot(tr: Transaction<DB> | null, doc: Insertable<DB["snapshot"]>) {
   const db = tr ?? (await getDb());
   return await db.insertInto("snapshot").values(doc).execute();
 }

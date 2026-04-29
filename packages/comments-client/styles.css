@@ -1,3 +1,4 @@
-[data-active-comment-thread], [data-new-comment-thread] {
-    background-color: lightyellow;
+[data-active-comment-thread],
+[data-new-comment-thread] {
+  background-color: lightyellow;
 }

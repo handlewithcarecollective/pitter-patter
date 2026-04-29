@@ -1,19 +1,19 @@
 {
   "name": "@pitter-patter/refs",
   "version": "0.1.0",
-  "type": "module",
-  "packageManager": "yarn@4.9.1",
-  "exports": "./src/index.ts",
   "files": [
     "./styles.css",
     "./dist"
   ],
+  "type": "module",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": "./dist/index.js"
+  },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5",
     "typescript": "^5.9.3"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": "./dist/index.js"
-  }
+  "packageManager": "yarn@4.9.1"
 }
