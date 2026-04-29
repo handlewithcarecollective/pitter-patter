@@ -5,6 +5,12 @@
     "sortSideEffects": true,
     "customGroups": [
       {
+        "modifiers": ["side_effect"],
+        "selector": "style",
+        "groupName": "workspace_side_effect_style",
+        "elementNamePattern": ["@pitter-patter/**"]
+      },
+      {
         "groupName": "workspace",
         "elementNamePattern": ["@pitter-patter/**"]
       }
@@ -19,7 +25,7 @@
       "sibling",
       "import",
       "unknown",
-      "side_effect_style"
+      ["workspace_side_effect_style", "side_effect_style"]
     ]
   }
 }

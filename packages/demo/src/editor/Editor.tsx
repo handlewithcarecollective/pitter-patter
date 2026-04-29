@@ -21,7 +21,6 @@ import {
   LongPollListener as PresenceListener,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
-import "@pitter-patter/presence-client/styles.css";
 import {
   Snapshot,
   VersionHistoryClient,
@@ -30,6 +29,7 @@ import {
 
 import { DB } from "../database/schema";
 
+import "@pitter-patter/presence-client/styles.css";
 import "prosemirror-view/style/prosemirror.css";
 
 interface Props {

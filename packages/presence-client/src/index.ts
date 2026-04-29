@@ -95,7 +95,7 @@ export class PresenceClient {
 
 export interface LongPollListenerOptions {
   timeout?: number;
-  headers?: HeadersInit;
+  headers?: Record<string, string>;
   fetch?: typeof globalThis.fetch;
 }
 

@@ -20,7 +20,7 @@ interface Commit {
   updatedAt: Generated<string>;
 }
 
-interface Commit {
+interface Comment {
   id: string;
   docId: string;
   ref: string;
@@ -42,5 +42,6 @@ interface Snapshot {
 export interface DB {
   doc: Doc;
   commit: Commit;
+  comment: Comment;
   snapshot: Snapshot;
 }
