@@ -1,0 +1,143 @@
+---
+title: Collab
+---
+
+Pitter Patter Collab adds collaborative editing to your existing prosemirror editor.
+It is designed to plug into your existing system design using your server and database for an
+so you can add collaborative editing to your product, while storing all state in a database you own
+with your preferred data model. 
+
+We assume you have
+
+1. A frontend application with a ProseMirror editor
+2. A backend. This can be an actual server or a serverless deployment like Lambda or Cloud Functions.
+3. A database. Any database with ACID transactions should be compatible with Pitter Patter Collab. At this time,
+we have confirmed compatibility with Postgres, MySql, and Sqlite. If you are not using one of these databases,
+and still want to support collaborative editing, come talk to us.
+
+## The database
+
+You control the datastore that holds all editor state, and you can add whatever you want to your data model. We assume several
+pieces of data are associated with each other
+
+Documents
+  The latest committed version of the prosemirror editor state for a document
+  This must be associated with a:
+    - docId: a unique identifier for the document. Your define this identifier. We recommend using a UUID v4 as a best 
+    practice, but this is not strictly required
+    - version: an integer version number for the document. We provide the version number anytime the document is updated.
+
+-- Todo: Should we use Id and ref consistently (ie. pick one or the other)
+Commits
+  The set of changes committed to the document that
+  Each commit must be associated with a:
+    - docId: The id of the document the commit is applied to
+    - commitRef: A unique string identifier for the commit. We create this ref and give it to you when you save the 
+      commit to your database
+    - versionNumber: an integer version for the commit. We provide the version anytime a commit is saved
+
+## Collab Components
+
+CollabAuthority
+CollabClient
+
+## The backend
+
+Most of the collaborative editing logic lives inside of the CollabAuthority. In your server you will create a CollabAuthority,
+provide it with functions that tell it how to read and write the data it needs from your database, and provide endpoints that the
+frontend CollabClient will call to communicate with the CollabAuthority. CollabAuthority is stateless, so you can create a new one
+for every replica or function invocation your backend uses.
+
+To create a CollabAuthority, you have to define several functions. The CollabAuthority uses these functions to read and write to
+your database.
+
+runWithTransaction:
+
+  runWithTransaction receives a callback function that takes a transaction to your database
+    starts a transaction on your database, executes the callback with it, and commits the transaction
+
+    runWithTransaction: <Result>(
+      callback: (tr: Transaction) => Promise<Result>,
+    ) => Promise<Result>;
+  
+  saveDoc:
+    Saves a document along with its docId, version, and lastUpdatedTimestamp to your database.
+
+    If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
+    database operations in this function should still be performed as an atomic unit.
+
+    saveDoc: (
+      tr: Transaction | null,
+      docId: string,
+      docJSON: NodeJSON,
+      version: number,
+      lastUpdatedTimestamp: number,
+    ) => Promise<void>;
+
+  --Todo: clarify lastUpdatedTimestamp
+  getDoc:
+    Retrieves a document from your database by docId. In addition to the document itself, the function returns the version number
+    and lastUpdateTimestamp for the document.
+
+    If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
+    database operations in this function should still be performed as an atomic unit.
+
+    getDoc: (
+      tr: Transaction | null,
+      docId: string,
+    ) => Promise<{
+      docJSON: NodeJSON;
+      version: number;
+      lastUpdatedTimestamp: number;
+    }>;
+
+  saveCommit:
+    Saves a commit along with its version and ref to your database
+
+    If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
+    database operations in this function should still be performed as an atomic unit.
+
+  -- Todo: Split CommitJSON into version, ref, steps
+    saveCommit: (
+      tr: Transaction | null,
+      docId: string,
+      commitJSON: CommitJSON,
+    ) => Promise<void>;
+
+  getCommit: 
+    Given a docId and commitRef, retrieves associated commit's steps and version from your database and returns a joined CommitJSON.
+
+    If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
+    database operations in this function should still be performed as an atomic unit.
+
+    getCommit: (
+      tr: Transaction | null,
+      docId: string,
+      commitRef: string,
+    ) => Promise<CommitJSON | null>;
+
+  getCommits:
+    For the provided docId, retrieves all commits from the database with a version number greater than, `>`, the provided `version`
+    getCommits: (
+      tr: Transaction | null,
+      docId: string,
+      version: number,
+    ) => Promise<CommitJSON[]>;
+  
+
+  schema: your prosemirror schema
+  broadcastManager: {
+    broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
+    listenForCommit: (docId: string, version: number) => Promise<void>;
+  };
+
+Recommended Indexes
+
+
+
+Server Side functions to implement
+
+Server endpoints to implement
+
+Client side config
+
