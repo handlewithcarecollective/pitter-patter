@@ -1,4 +1,5 @@
 import { EditorView } from "prosemirror-view";
+
 import { setShuffleColumns } from "../commands";
 
 export function resize(
@@ -40,17 +41,9 @@ export function resize(
 
   if (side === "start") {
     const newStart = Math.max(0, closestBar + 1);
-    return setShuffleColumns(
-      pos,
-      newStart,
-      shuffleEnd,
-    )(view.state, view.dispatch);
+    return setShuffleColumns(pos, newStart, shuffleEnd)(view.state, view.dispatch);
   }
 
   const newEnd = Math.max(0, closestBar);
-  return setShuffleColumns(
-    pos,
-    shuffleStart,
-    newEnd,
-  )(view.state, view.dispatch);
+  return setShuffleColumns(pos, shuffleStart, newEnd)(view.state, view.dispatch);
 }

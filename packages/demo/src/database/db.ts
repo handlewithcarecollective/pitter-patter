@@ -1,9 +1,4 @@
-import {
-  CamelCasePlugin,
-  Kysely,
-  ParseJSONResultsPlugin,
-  SqliteDialect,
-} from "kysely";
+import { CamelCasePlugin, Kysely, ParseJSONResultsPlugin, SqliteDialect } from "kysely";
 
 import { DB } from "./schema";
 
@@ -15,6 +10,7 @@ async function initializeDb(): Promise<Kysely<DB>> {
   }
 
   // Gross hack so that parcel doesn't try to bundle better-sqlite3
+  // oxlint-disable-next-line no-eval
   const Database = eval("require")("better-sqlite3");
   const database = new Database(process.env["DATABASE_PATH"] ?? ":memory:");
 

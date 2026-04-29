@@ -1,38 +1,32 @@
-import express from "express";
 import { renderRequest } from "@parcel/rsc/node";
-import { EditorPage } from "./editor/EditorPage.js";
-import type { CommitJSON, NodeJSON } from "@pitter-patter/collab-client";
+import express from "express";
+import { Migrator, Transaction } from "kysely";
+import { TSFileMigrationProvider } from "kysely-ctl";
+import { schema } from "prosemirror-schema-basic";
+import { ComponentType } from "react";
+import { v7 as uuid } from "uuid";
+
+import { type CommitJSON, type NodeJSON } from "@pitter-patter/collab-client";
+import {
+  CollabAuthority,
+  RedisBroadcastManager,
+  TooMuchContentionError,
+} from "@pitter-patter/collab-server";
 import {
   PresenceAuthority,
   PresenceIndicator,
   RedisPresenceBroadcastManager,
   RedisPresencePersistenceManager,
 } from "@pitter-patter/presence-server";
-import {
-  CollabAuthority,
-  RedisBroadcastManager,
-  TooMuchContentionError,
-} from "@pitter-patter/collab-server";
 import { withVersionHistory } from "@pitter-patter/version-history-server";
-import { schema } from "prosemirror-schema-basic";
-import { Migrator, Transaction } from "kysely";
-import { TSFileMigrationProvider } from "kysely-ctl";
-import { v7 as uuid } from "uuid";
+
+import { createCommit, getCommitByRef, getCommitsAfter } from "./database/commits.js";
 import { getDb } from "./database/db.js";
 import { createDoc, getDoc, updateDoc } from "./database/docs.js";
-import { HomePage } from "./home/HomePage.js";
-import { ComponentType } from "react";
-import {
-  createCommit,
-  getCommitByRef,
-  getCommitsAfter,
-} from "./database/commits.js";
 import { DB } from "./database/schema.js";
-import {
-  createSnapshot,
-  getLatestSnapshot,
-  getSnapshots,
-} from "./database/snapshots.js";
+import { createSnapshot, getLatestSnapshot, getSnapshots } from "./database/snapshots.js";
+import { EditorPage } from "./editor/EditorPage.js";
+import { HomePage } from "./home/HomePage.js";
 
 const app = express();
 app.use("/client", express.static("dist/client"));
@@ -84,9 +78,7 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
       saveCommit: async (tr, docId, commitJSON) => {
         await createCommit(tr, {
           ...commitJSON,
-          steps: JSON.stringify(
-            commitJSON.steps,
-          ) as unknown as CommitJSON["steps"],
+          steps: JSON.stringify(commitJSON.steps) as unknown as CommitJSON["steps"],
           docId,
           id: uuid(),
         });
@@ -115,10 +107,8 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
         lastUpdatedTimestamp,
         latestVersionCreatedTimestamp,
       ) => {
-        const fifteenSecondsPause =
-          currentTimestamp - lastUpdatedTimestamp > 15 * 1_000;
-        const thirtySecondsEditing =
-          currentTimestamp - latestVersionCreatedTimestamp > 30 * 1_000;
+        const fifteenSecondsPause = currentTimestamp - lastUpdatedTimestamp > 15 * 1_000;
+        const thirtySecondsEditing = currentTimestamp - latestVersionCreatedTimestamp > 30 * 1_000;
         return fifteenSecondsPause || thirtySecondsEditing;
       },
     },
@@ -140,9 +130,7 @@ const presenceAuthority = new PresenceAuthority({
 
 app.post("/api/docs", async (_, res) => {
   const docId = uuid();
-  const content = JSON.stringify(
-    schema.nodes.doc.createAndFill()!.toJSON(),
-  ) as unknown as NodeJSON;
+  const content = JSON.stringify(schema.nodes.doc.createAndFill()!.toJSON()) as unknown as NodeJSON;
   await createDoc(null, {
     id: docId,
     version: 0,
@@ -172,11 +160,7 @@ app.post("/api/docs/:docId/presence", async (req, res) => {
     clientId: string;
   };
 
-  const presence = await presenceAuthority.listenForPresence(
-    req.params.docId,
-    clientId,
-    refs,
-  );
+  const presence = await presenceAuthority.listenForPresence(req.params.docId, clientId, refs);
 
   res.status(200).send(presence);
 });
@@ -190,7 +174,7 @@ app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
 
 app.post("/api/docs/:docId/commits", async (req, res) => {
   try {
-    collabAuthority.receiveCommit(req.params.docId, req.body);
+    await collabAuthority.receiveCommit(req.params.docId, req.body);
   } catch (e) {
     if (e instanceof TooMuchContentionError) {
       res.status(409).send(null);
@@ -202,9 +186,7 @@ app.post("/api/docs/:docId/commits", async (req, res) => {
 });
 
 app.get("/api/docs/:docId/snapshots", async (req, res) => {
-  const version = req.query["version"]
-    ? parseInt(req.query["version"] as string, 10)
-    : undefined;
+  const version = req.query["version"] ? parseInt(req.query["version"] as string, 10) : undefined;
   const snapshots = await getSnapshots(null, req.params.docId, version);
 
   res.status(200).send(

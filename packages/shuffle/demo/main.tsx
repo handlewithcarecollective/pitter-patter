@@ -4,24 +4,24 @@ import {
   ProseMirrorDoc,
   reactKeys,
   useEditorEffect,
-  useEditorState,
   useSelectNode,
   WidgetViewComponentProps,
 } from "@handlewithcare/react-prosemirror";
-import { schema as basic } from "prosemirror-schema-basic";
 import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
+import { schema as basic } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { addShuffleNodes } from "../src/schema.ts";
-import { shuffle } from "../src/plugin.ts";
 import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
 import { ResizeHandles } from "../src/components/ResizeHandles.tsx";
+import { shuffle } from "../src/plugin.ts";
+import { addShuffleNodes } from "../src/schema.ts";
+
 import "../src/styles.css";
 import "./styles.css";
 import "prosemirror-view/style/prosemirror.css";
-import { useState } from "react";
 
 const imageSpec = basic.spec.nodes.get("image");
 
@@ -42,24 +42,17 @@ const doc = schema.nodes.doc.create(null, [
     }),
     schema.nodes.container.create({ shuffleStart: 7, shuffleEnd: 12 }, [
       // schema.nodes.container.create({}, [
-      schema.nodes.paragraph.create(null, [
-        schema.text("This is some sample text"),
-      ]),
-      schema.nodes.paragraph.create(null, [
-        schema.text("This is some more sample text"),
-      ]),
+      schema.nodes.paragraph.create(null, [schema.text("This is some sample text")]),
+      schema.nodes.paragraph.create(null, [schema.text("This is some more sample text")]),
     ]),
   ]),
   schema.nodes.image.create({
     src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
   }),
-  schema.nodes.paragraph.create(
-    null,
-    schema.text("Another paragraph not in a row."),
-  ),
+  schema.nodes.paragraph.create(null, schema.text("Another paragraph not in a row.")),
 ]);
 
-function Image({ nodeProps, children, ref, ...props }: NodeViewComponentProps) {
+function Image({ nodeProps, ref, children: _, ...props }: NodeViewComponentProps) {
   useSelectNode(() => {});
 
   return (
@@ -69,9 +62,7 @@ function Image({ nodeProps, children, ref, ...props }: NodeViewComponentProps) {
       src={nodeProps.node.attrs.src}
       draggable={false}
       style={{ touchAction: "none", userSelect: "none" }}
-    >
-      {children}
-    </img>
+    ></img>
   );
 }
 
@@ -80,12 +71,7 @@ const nodeViewComponents = {
 };
 
 function createHandle(name: string) {
-  const Handle = ({
-    widget,
-    ref,
-    getPos,
-    ...props
-  }: WidgetViewComponentProps) => {
+  const Handle = ({ widget, ref, getPos: _, ...props }: WidgetViewComponentProps) => {
     const [top, setTop] = useState(0);
     const [left, setLeft] = useState(0);
 
@@ -137,10 +123,7 @@ const editorState = EditorState.create({
 
 function Editor() {
   return (
-    <ProseMirror
-      defaultState={editorState}
-      nodeViewComponents={nodeViewComponents}
-    >
+    <ProseMirror defaultState={editorState} nodeViewComponents={nodeViewComponents}>
       <GridSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />

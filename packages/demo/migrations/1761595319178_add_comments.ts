@@ -4,9 +4,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
   await db.schema
     .createTable("comment")
     .addColumn("id", "text", (col) => col.primaryKey().notNull())
-    .addColumn("doc_id", "text", (col) =>
-      col.notNull().references("doc.id").onDelete("cascade"),
-    )
+    .addColumn("doc_id", "text", (col) => col.notNull().references("doc.id").onDelete("cascade"))
     .addColumn("user_id", "text", (col) => col.notNull())
     .addColumn("content", "text", (col) => col.notNull())
     .addColumn("ref", "text", (col) => col.notNull())
@@ -15,12 +13,8 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     // IMPORTANT: We rely on this constraint to prevent simultaneous
     // writes from producing commits with the same version
     .addUniqueConstraint("comment_version_doc_unique", ["doc_id", "version"])
-    .addColumn("created_at", "text", (col) =>
-      col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
-    )
-    .addColumn("updated_at", "text", (col) =>
-      col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
-    )
+    .addColumn("created_at", "text", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+    .addColumn("updated_at", "text", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
     .execute();
 
   await sql`CREATE TRIGGER comment_trigger AFTER

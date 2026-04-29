@@ -1,8 +1,10 @@
-import { collabKey } from "@pitter-patter/collab-client";
 import { EditorState } from "prosemirror-state";
-import { type PresenceIndicator } from "./PresenceIndicator";
-import { type PresenceClientConfig } from "./config";
+
+import { collabKey } from "@pitter-patter/collab-client";
 import { randomRef } from "@pitter-patter/refs";
+
+import { type PresenceClientConfig } from "./config";
+import { type PresenceIndicator } from "./PresenceIndicator";
 
 export { presence, presenceKey, receivePresenceTransaction } from "./plugin";
 
@@ -30,9 +32,7 @@ export class PresenceClient {
     const state = collabKey.getState(editorState);
 
     if (!state) {
-      throw new Error(
-        "EditorState is missing the collab plugin, unable to listen for changes",
-      );
+      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
     }
 
     const { unconfirmed, version } = state;
@@ -73,17 +73,10 @@ export class PresenceClient {
         });
 
         const newRefs = Object.fromEntries(
-          Object.entries(indicators).map(([clientId, indicator]) => [
-            clientId,
-            indicator.ref,
-          ]),
+          Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
         );
 
-        if (
-          Object.entries(newRefs).every(
-            ([clientId, ref]) => this.refs[clientId] === ref,
-          )
-        ) {
+        if (Object.entries(newRefs).every(([clientId, ref]) => this.refs[clientId] === ref)) {
           continue;
         }
 
@@ -102,12 +95,12 @@ export class PresenceClient {
 
 export interface LongPollListenerOptions {
   timeout?: number;
-  headers?: HeadersInit;
+  headers?: Record<string, string>;
   fetch?: typeof globalThis.fetch;
 }
 
 export class LongPollListener {
-  private headers: HeadersInit;
+  private headers: Record<string, string>;
   private fetch: typeof globalThis.fetch;
 
   constructor(
@@ -131,9 +124,7 @@ export class LongPollListener {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get commits. ${response.status}: ${response.statusText}`,
-      );
+      throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
     }
 
     return (await response.json()) as Record<string, PresenceIndicator>;

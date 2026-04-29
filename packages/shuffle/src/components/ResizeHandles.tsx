@@ -3,13 +3,14 @@ import {
   useEditorEventCallback,
   useEditorState,
 } from "@handlewithcare/react-prosemirror";
+import { createLayout, Timeline } from "animejs";
+import { animate } from "motion/mini";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
 import { useMemo, useRef, useState } from "react";
-import { supportsResize } from "../schema";
-import { animate } from "motion/mini";
-import { createLayout, Timeline } from "animejs";
+
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
+import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
 
 export function ResizeHandles() {
@@ -125,11 +126,7 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
 
-      if (
-        animationRef.current &&
-        animationRef.current.began &&
-        !animationRef.current.completed
-      ) {
+      if (animationRef.current && animationRef.current.began && !animationRef.current.completed) {
         animationRef.current.complete();
       }
 

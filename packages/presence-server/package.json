@@ -2,16 +2,17 @@
   "name": "@pitter-patter/presence-server",
   "version": "0.1.0",
   "type": "module",
-  "packageManager": "yarn@4.9.1",
   "exports": "./src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": "./dist/index.js"
+  },
   "dependencies": {
     "redis": "^5.8.2"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "^2.0.5"
+    "@tsconfig/strictest": "^2.0.5",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": "./dist/index.js"
-  }
+  "packageManager": "yarn@4.9.1"
 }

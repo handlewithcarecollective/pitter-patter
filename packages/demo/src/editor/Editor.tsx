@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { EditorState, Transaction } from "prosemirror-state";
-import { schema } from "prosemirror-schema-basic";
-
 import { ProseMirror, ProseMirrorDoc } from "@handlewithcare/react-prosemirror";
+import { Selectable } from "kysely";
+import { Node } from "prosemirror-model";
+import { schema } from "prosemirror-schema-basic";
+import { EditorState, Transaction } from "prosemirror-state";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   LongPollListener,
@@ -25,12 +26,11 @@ import {
   VersionHistoryClient,
   VersionHistoryClientConfig,
 } from "@pitter-patter/version-history-client";
-import { DB } from "../database/schema";
-import { Node } from "prosemirror-model";
 
-import "prosemirror-view/style/prosemirror.css";
+import { DB } from "../database/schema";
+
 import "@pitter-patter/presence-client/styles.css";
-import { Selectable } from "kysely";
+import "prosemirror-view/style/prosemirror.css";
 
 interface Props {
   doc: Selectable<DB["doc"]>;
@@ -65,9 +65,7 @@ export function Editor({ doc }: Props) {
       new LongPollListener(
         new URL(
           `/api/docs/${doc.id}/commits`,
-          typeof window !== "undefined"
-            ? window.location.href
-            : "http://localhost:3000",
+          typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
         ),
       ),
   );
@@ -81,17 +79,14 @@ export function Editor({ doc }: Props) {
           body: JSON.stringify(commit.toJSON()),
         });
       },
-      getCommits: listener.getCommits,
+      getCommits: listener.getCommits.bind(listener),
       receiveCommits: (commits) => {
         setState((prev) =>
-          commits.reduce(
-            (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
-            prev,
-          ),
+          commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev),
         );
       },
     }),
-    [listener],
+    [listener, doc.id],
   );
 
   const [presenceListener] = useState(
@@ -99,9 +94,7 @@ export function Editor({ doc }: Props) {
       new PresenceListener(
         new URL(
           `/api/docs/${doc.id}/presence`,
-          typeof window !== "undefined"
-            ? window.location.href
-            : "http://localhost:3000",
+          typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
         ),
       ),
   );
@@ -116,23 +109,18 @@ export function Editor({ doc }: Props) {
           body: JSON.stringify(indicator),
         });
       },
-      getIndicators: presenceListener.getIndicators,
+      getIndicators: presenceListener.getIndicators.bind(presenceListener),
       receiveIndicators: (indicators) => {
-        setState((prev) =>
-          prev.apply(receivePresenceTransaction(prev, indicators)),
-        );
+        setState((prev) => prev.apply(receivePresenceTransaction(prev, indicators)));
       },
     }),
-    [presenceListener],
+    [presenceListener, doc.id],
   );
 
   const versionHistoryConfig = useMemo<VersionHistoryClientConfig>(
     () => ({
       getSnapshots: async (version?: number) => {
-        const url = new URL(
-          `/api/docs/${doc.id}/snapshots`,
-          window.location.href,
-        );
+        const url = new URL(`/api/docs/${doc.id}/snapshots`, window.location.href);
         if (version !== undefined) {
           url.searchParams.append("version", version.toString());
         }
@@ -145,12 +133,10 @@ export function Editor({ doc }: Props) {
       },
       pollDuration: 5 * 1_000,
     }),
-    [],
+    [doc.id],
   );
 
-  const [versionHistoryClient] = useState(
-    () => new VersionHistoryClient(versionHistoryConfig),
-  );
+  const [versionHistoryClient] = useState(() => new VersionHistoryClient(versionHistoryConfig));
 
   const [presenceClient] = useState(() => new PresenceClient(presenceConfig));
 
@@ -161,16 +147,16 @@ export function Editor({ doc }: Props) {
   }, []);
 
   useEffect(() => {
-    collabClient.send(state);
+    collabClient.send(state).catch((e) => console.error(e));
   }, [collabClient, state]);
 
   useEffect(() => {
-    presenceClient.send(state);
+    presenceClient.send(state).catch((e) => console.error(e));
   }, [presenceClient, state]);
 
   useEffect(() => {
     const abortController = new AbortController();
-    collabClient?.listen(initialState, abortController.signal);
+    collabClient?.listen(initialState, abortController.signal).catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
@@ -179,7 +165,7 @@ export function Editor({ doc }: Props) {
 
   useEffect(() => {
     const abortController = new AbortController();
-    presenceClient.listen(abortController.signal);
+    presenceClient.listen(abortController.signal).catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
@@ -188,12 +174,12 @@ export function Editor({ doc }: Props) {
 
   useEffect(() => {
     const abortController = new AbortController();
-    versionHistoryClient.poll(abortController.signal);
+    versionHistoryClient.poll(abortController.signal).catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, [versionHistoryClient]);
 
   return (
     <div>

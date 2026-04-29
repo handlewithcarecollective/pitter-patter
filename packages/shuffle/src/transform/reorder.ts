@@ -1,10 +1,10 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
-import { Transaction } from "prosemirror-state";
-import { EditorView } from "prosemirror-view";
-import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
-import { isShuffleContainer } from "../schema";
-import { insertPoint } from "prosemirror-transform";
 import { Node, NodeType } from "prosemirror-model";
+import { Transaction } from "prosemirror-state";
+import { insertPoint } from "prosemirror-transform";
+import { EditorView } from "prosemirror-view";
+
+import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 
 export function reorder(
   view: EditorView,

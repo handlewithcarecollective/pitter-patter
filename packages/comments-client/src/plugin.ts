@@ -1,16 +1,14 @@
+import { toggleMark } from "prosemirror-commands";
+import { MarkType, type Node } from "prosemirror-model";
 import { PluginKey, Plugin, EditorState } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
-import { MarkType, type Node } from "prosemirror-model";
-import { toggleMark } from "prosemirror-commands";
 
 export interface CommentsState {
   newThreadVisible: boolean;
   activeThreadId: string | null;
 }
 
-export const commentsKey = new PluginKey<CommentsState>(
-  "@pitter-patter/presence-client/presence",
-);
+export const commentsKey = new PluginKey<CommentsState>("@pitter-patter/presence-client/presence");
 
 function threadRanges(commentMark: MarkType, doc: Node, threadId: string) {
   const mark = commentMark.create({ threadId });
@@ -28,10 +26,7 @@ function threadRanges(commentMark: MarkType, doc: Node, threadId: string) {
 
 export const commentPluginKey = new PluginKey<CommentsState>();
 
-export function createCommentThreadMark(
-  commentMarkType: MarkType,
-  threadId: string,
-) {
+export function createCommentThreadMark(commentMarkType: MarkType, threadId: string) {
   return toggleMark(
     commentMarkType,
     { threadId },
@@ -43,20 +38,13 @@ export function createCommentThreadMark(
   );
 }
 
-export function removeCommentThreadMarks(
-  commentMarkType: MarkType,
-  threadId: string,
-) {
+export function removeCommentThreadMarks(commentMarkType: MarkType, threadId: string) {
   return function removeCommentThreadMarksCommand(
     state: EditorState,
     dispatch?: EditorView["dispatch"],
   ) {
     dispatch?.(
-      state.tr.removeMark(
-        0,
-        state.doc.content.size,
-        commentMarkType.create({ threadId }),
-      ),
+      state.tr.removeMark(0, state.doc.content.size, commentMarkType.create({ threadId })),
     );
 
     return true;
@@ -85,12 +73,9 @@ export function comments({ commentMarkType }: { commentMarkType: MarkType }) {
         const comments =
           state.selection.$from
             .marksAcross(state.selection.$to)
-            ?.filter((mark) => mark.type === state.schema.marks["comment"]) ??
-          [];
+            ?.filter((mark) => mark.type === state.schema.marks["comment"]) ?? [];
 
-        const allRanges = comments.reduce<
-          Record<string, { from: number; to: number }[]>
-        >(
+        const allRanges = comments.reduce<Record<string, { from: number; to: number }[]>>(
           (acc, comment) => ({
             ...acc,
             [comment.attrs["threadId"]]: threadRanges(
@@ -106,9 +91,7 @@ export function comments({ commentMarkType }: { commentMarkType: MarkType }) {
           Object.entries(allRanges).map(([threadId, ranges]) => [
             threadId,
             ranges.find(
-              (range) =>
-                range.from <= state.selection.from &&
-                range.to >= state.selection.to,
+              (range) => range.from <= state.selection.from && range.to >= state.selection.to,
             )!,
           ]),
         );
@@ -132,8 +115,7 @@ export function comments({ commentMarkType }: { commentMarkType: MarkType }) {
       decorations(state) {
         const decorations: Decoration[] = [];
 
-        const { newThreadVisible, activeThreadId } =
-          commentPluginKey.getState(state)!;
+        const { newThreadVisible, activeThreadId } = commentPluginKey.getState(state)!;
 
         if (newThreadVisible) {
           decorations.push(
@@ -147,12 +129,9 @@ export function comments({ commentMarkType }: { commentMarkType: MarkType }) {
           const comments =
             state.selection.$from
               .marksAcross(state.selection.$to)
-              ?.filter((mark) => mark.type === state.schema.marks["comment"]) ??
-            [];
+              ?.filter((mark) => mark.type === state.schema.marks["comment"]) ?? [];
 
-          const allRanges = comments.reduce<
-            Record<string, { from: number; to: number }[]>
-          >(
+          const allRanges = comments.reduce<Record<string, { from: number; to: number }[]>>(
             (acc, comment) => ({
               ...acc,
               [comment.attrs["threadId"]]: threadRanges(

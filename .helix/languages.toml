@@ -1,11 +1,46 @@
+[language-server.oxfmt]
+command = "yarn"
+args = ["oxfmt", "--lsp"]
+provideFormatter = true
+
+[language-server.oxlint]
+command = "yarn"
+args = ["oxlint", "--lsp"]
+
+[language-server.typescript-language-server]
+command = "yarn"
+args = ["tsgo", "--lsp", "--stdio"]
+
+[language-server.typescript-language-server.config.typescript]
+updateImportsOnFileMove.enabled = "always"
+suggest.completeFunctionCalls = true
+tsserver.enableTracing = true
+format.enable = false
+preferences.importModuleSpecifier = "non-relative"
+preferences.importModuleSpecifierEnding = "js"
+tsserver.experimental.enableProjectDiagnostics = true
+
 [[language]]
 name = "typescript"
-formatter = { command = "yarn", args = ["prettier", "--stdin-filepath", "%{buffer_name}"] }
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
 
-[language-server.typescript-language-server.config]
-hostInfo = "helix"
-vtsls.autoUseWorkspaceTsdk = true
-typescript.updateImportsOnFileMove.enabled = "always"
-typescript.preferences.importModuleSpecifier = "non-relative"
-typescript.preferences.importModuleSpecifierEnding = "auto"
-typescript.tsdk = "./.yarn/sdks/typescript/lib"
+[[language]]
+name = "tsx"
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
+
+[[language]]
+name = "javascript"
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
+
+[[language]]
+name = "jsx"
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
+
+[[language]]
+name = "json"
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
+
+[[language]]
+name = "markdown"
+language-servers = ["oxfmt", "oxlint"]
+

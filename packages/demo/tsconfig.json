@@ -5,6 +5,7 @@
     "emitDeclarationOnly": true,
     "outDir": "dist",
     "rootDir": "src",
+    "noUncheckedSideEffectImports": false,
     "moduleResolution": "bundler",
     "module": "ESNext",
     "jsx": "react-jsx",

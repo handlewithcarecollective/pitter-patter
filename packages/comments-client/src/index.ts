@@ -1,12 +1,7 @@
 import { type NodeJSON } from "@pitter-patter/collab-client";
 import { randomRef } from "@pitter-patter/refs";
 
-export {
-  comments,
-  commentsKey,
-  createCommentThreadMark,
-  removeCommentThreadMarks,
-} from "./plugin";
+export { comments, commentsKey, createCommentThreadMark, removeCommentThreadMarks } from "./plugin";
 
 export { comment } from "./schema";
 
@@ -25,10 +20,7 @@ export interface NewComment {
 
 export interface CommentsClientConfig {
   sendComment: (comment: NewComment & { ref: string }) => Promise<void>;
-  getComments: (
-    version: number | null,
-    options?: { signal?: AbortSignal },
-  ) => Promise<Comment[]>;
+  getComments: (version: number | null, options?: { signal?: AbortSignal }) => Promise<Comment[]>;
   receiveComments: (comments: Comment[]) => void;
 }
 
@@ -64,9 +56,7 @@ export class CommentsClient {
     while (!signal.aborted) {
       try {
         const comments = await this.getComments(this.version, { signal });
-        const newComments = comments.filter(
-          (comment) => !this.seen.has(comment.ref),
-        );
+        const newComments = comments.filter((comment) => !this.seen.has(comment.ref));
         const lastComment = newComments[newComments.length - 1];
         if (!lastComment) continue;
         this.version = lastComment.version;
@@ -112,9 +102,7 @@ export class LongPollListener {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get comments. ${response.status}: ${response.statusText}`,
-      );
+      throw new Error(`Failed to get comments. ${response.status}: ${response.statusText}`);
     }
 
     const comments = (await response.json()) as Comment[];
