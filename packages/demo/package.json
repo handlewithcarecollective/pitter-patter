@@ -14,7 +14,7 @@
     "build": "parcel build"
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^2.5.4",
+    "@handlewithcare/react-prosemirror": "^3.0.1",
     "@parcel/rsc": "^2.16.0",
     "@parcel/runtime-rsc": "^2.16.0",
     "@pitter-patter/collab-client": "workspace:*",
@@ -32,7 +32,7 @@
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.39.2",
+    "prosemirror-view": "1.41.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-reconciler": "^0.32.0",
