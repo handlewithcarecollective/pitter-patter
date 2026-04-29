@@ -6,6 +6,9 @@
   "exports": "./src/index.ts",
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^",
+    "prosemirror-model": "^1.25.4",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-transform": "^1.12.0",
     "redis": "^5.8.2"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@
     "./dist"
   ],
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^2.5.4",
+    "@handlewithcare/react-prosemirror": "^3.0.1",
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/refs": "workspace:^",
     "classnames": "^2.5.1",
@@ -28,7 +28,7 @@
     "prosemirror-model": "^1.25.3",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.39.2",
+    "prosemirror-view": "1.41.7",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
