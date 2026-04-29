@@ -98,7 +98,7 @@ export interface LongPollListenerOptions {
 }
 
 export class LongPollListener {
-  private headers: HeadersInit;
+  private headers: Record<string, string>;
   private fetch: typeof globalThis.fetch;
 
   constructor(

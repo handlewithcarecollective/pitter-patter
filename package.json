@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "check:format": "yarn oxfmt --check",
-    "check:lint": "yarn oxlint",
+    "check:lint": "yarn oxlint **/*.ts **/*.tsx",
     "fix:format": "yarn oxfmt",
     "fix:lint": "yarn oxlint --fix"
   },

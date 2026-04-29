@@ -13,11 +13,7 @@ export async function getLatestSnapshot(tr: Transaction<DB> | null, docId: strin
     .executeTakeFirstOrThrow();
 }
 
-export async function getSnapshots(
-  tr: Transaction<DB> | null,
-  docId: string,
-  version?: number | undefined,
-) {
+export async function getSnapshots(tr: Transaction<DB> | null, docId: string, version?: number) {
   const db = tr ?? (await getDb());
   return await db
     .selectFrom("snapshot")

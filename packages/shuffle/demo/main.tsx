@@ -4,7 +4,6 @@ import {
   ProseMirrorDoc,
   reactKeys,
   useEditorEffect,
-  useEditorState,
   useSelectNode,
   WidgetViewComponentProps,
 } from "@handlewithcare/react-prosemirror";
@@ -52,7 +51,7 @@ const doc = schema.nodes.doc.create(null, [
   schema.nodes.paragraph.create(null, schema.text("Another paragraph not in a row.")),
 ]);
 
-function Image({ nodeProps, children, ref, ...props }: NodeViewComponentProps) {
+function Image({ nodeProps, ref, children: _, ...props }: NodeViewComponentProps) {
   useSelectNode(() => {});
 
   return (
@@ -62,9 +61,7 @@ function Image({ nodeProps, children, ref, ...props }: NodeViewComponentProps) {
       src={nodeProps.node.attrs.src}
       draggable={false}
       style={{ touchAction: "none", userSelect: "none" }}
-    >
-      {children}
-    </img>
+    ></img>
   );
 }
 
@@ -73,7 +70,7 @@ const nodeViewComponents = {
 };
 
 function createHandle(name: string) {
-  const Handle = ({ widget, ref, getPos, ...props }: WidgetViewComponentProps) => {
+  const Handle = ({ widget, ref, getPos: _, ...props }: WidgetViewComponentProps) => {
     const [top, setTop] = useState(0);
     const [left, setLeft] = useState(0);
 

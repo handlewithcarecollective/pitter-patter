@@ -172,7 +172,7 @@ app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
 
 app.post("/api/docs/:docId/commits", async (req, res) => {
   try {
-    collabAuthority.receiveCommit(req.params.docId, req.body);
+    await collabAuthority.receiveCommit(req.params.docId, req.body);
   } catch (e) {
     if (e instanceof TooMuchContentionError) {
       res.status(409).send(null);

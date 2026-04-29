@@ -7,25 +7,38 @@ provideFormatter = true
 command = "yarn"
 args = ["oxlint", "--lsp"]
 
+[language-server.typescript-language-server]
+command = "yarn"
+args = ["tsgo", "--lsp", "--stdio"]
+
+[language-server.typescript-language-server.config.typescript]
+updateImportsOnFileMove.enabled = "always"
+suggest.completeFunctionCalls = true
+tsserver.enableTracing = true
+format.enable = false
+preferences.importModuleSpecifier = "non-relative"
+preferences.importModuleSpecifierEnding = "js"
+tsserver.experimental.enableProjectDiagnostics = true
+
 [[language]]
 name = "typescript"
-language-servers = ["oxfmt", "oxlint"]
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
 
 [[language]]
 name = "tsx"
-language-servers = ["oxfmt", "oxlint"]
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
 
 [[language]]
 name = "javascript"
-language-servers = ["oxfmt", "oxlint"]
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
 
 [[language]]
 name = "jsx"
-language-servers = ["oxfmt", "oxlint"]
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
 
 [[language]]
 name = "json"
-language-servers = ["oxfmt", "oxlint"]
+language-servers = ["oxfmt", "oxlint", "typescript-language-server"]
 
 [[language]]
 name = "markdown"
