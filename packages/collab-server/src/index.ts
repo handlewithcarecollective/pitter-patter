@@ -49,7 +49,15 @@ export interface CollabAuthorityConfig<Transaction> {
     version: number,
     lastUpdatedTimestamp: number,
   ) => Promise<void>;
-  saveCommit: (tr: Transaction | null, docId: string, commitJSON: CommitJSON) => Promise<void>;
+  saveCommit: (
+    tr: Transaction | null,
+    docId: string,
+    ref: string,
+    version: number,
+    steps: {
+      [key: string]: unknown;
+    }[],
+  ) => Promise<void>;
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
     createCommitListener: (docId: string, version: number) => Promise<CommitListener>;
@@ -108,7 +116,13 @@ export class CollabAuthority<Transaction> {
         commitJSON,
       );
 
-      await this.saveCommit(tr, docId, appliedCommitJSON);
+      await this.saveCommit(
+          tr,
+          docId,
+          appliedCommitJSON.ref,
+          appliedCommitJSON.version,
+          appliedCommitJSON.steps,
+        );
       await this.saveDoc(
         tr,
         docId,
