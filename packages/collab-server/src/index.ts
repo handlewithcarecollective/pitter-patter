@@ -23,9 +23,9 @@ export class TooMuchContentionError extends Error {
   }
 }
 
-export interface CreateCommitListenerResult {
-  listenForCommit: () => Promise<boolean>;
-  abortListener: () => Promise<void>;
+export interface CommitListener {
+  listen: () => Promise<boolean>;
+  abort: () => Promise<void>;
 }
 
 export interface CollabAuthorityConfig<Transaction> {
@@ -68,7 +68,7 @@ export interface CollabAuthorityConfig<Transaction> {
     createCommitListener: (
       docId: string,
       version: number,
-    ) => Promise<CreateCommitListenerResult>;
+    ) => Promise<CommitListener>;
   };
 }
 
@@ -148,21 +148,23 @@ export class CollabAuthority<Transaction> {
   }
 
   async listenForCommit(docId: string, version: number) {
-    // Create listner to notify if commits are made. After this await, the listener is registered with 
+    // Create listner to notify if commits are made. After this await, the listener is registered with
     // the notification service and will be notified if a commit is made.
-    const { listenForCommit, abortListener } =
-      await this.broadcastManager.createCommitListener(docId, version);
+    const { listen, abort } = await this.broadcastManager.createCommitListener(
+      docId,
+      version,
+    );
 
     // Check if any commits were made between the last time this function was called and the
     // new commit listener being registered
     const preCommits = await this.getCommits(null, docId, version);
     if (preCommits.length) {
-      await abortListener();
+      await abort();
       return preCommits;
     }
 
     // Await and return any incoming commits
-    let commitsFound = await listenForCommit();
+    let commitsFound = await listen();
     if (commitsFound) {
       const postCommits = await this.getCommits(null, docId, version);
       return postCommits;
@@ -212,7 +214,7 @@ export class RedisBroadcastManager {
     }
     await this.sub.subscribe(`pitter-patter:collab:${docId}`, listener);
 
-    let listenForCommit = async () => {
+    const listen = async () => {
       return await Promise.race([
         promise,
         new Promise<boolean>((resolve) => {
@@ -223,10 +225,10 @@ export class RedisBroadcastManager {
       });
     };
 
-    let abortListener = async () => {
+    const abort = async () => {
       await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
     };
 
-    return { listenForCommit, abortListener };
+    return { listen, abort };
   }
 }
