@@ -75,10 +75,11 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
           version,
         });
       },
-      saveCommit: async (tr, docId, commitJSON) => {
+      saveCommit: async (tr, docId, commitRef, commitVersion, commitSteps) => {
         await createCommit(tr, {
-          ...commitJSON,
-          steps: JSON.stringify(commitJSON.steps) as unknown as CommitJSON["steps"],
+          ref: commitRef,
+          version: commitVersion,
+          steps: JSON.stringify(commitSteps) as unknown as CommitJSON["steps"],
           docId,
           id: uuid(),
         });
