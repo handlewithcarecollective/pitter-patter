@@ -1,5 +1,6 @@
-import { type NodeJSON } from "@pitter-patter/collab-client";
 import { createClient, RedisClientType } from "redis";
+
+import { type NodeJSON } from "@pitter-patter/collab-client";
 
 function PromiseWithResolvers<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
@@ -34,24 +35,14 @@ export interface NewComment {
 }
 
 export interface CollabAuthorityConfig<Transaction> {
-  runWithTransaction: <Result>(
-    callback: (tr: Transaction) => Promise<Result>,
-  ) => Promise<Result>;
+  runWithTransaction: <Result>(callback: (tr: Transaction) => Promise<Result>) => Promise<Result>;
   getComment: (
     tr: Transaction | null,
     docId: string,
     commentRef: string,
   ) => Promise<Comment | null>;
-  getComments: (
-    tr: Transaction | null,
-    docId: string,
-    version: number,
-  ) => Promise<Comment[]>;
-  saveComment: (
-    tr: Transaction | null,
-    docId: string,
-    comment: NewComment,
-  ) => Promise<void>;
+  getComments: (tr: Transaction | null, docId: string, version: number) => Promise<Comment[]>;
+  saveComment: (tr: Transaction | null, docId: string, comment: NewComment) => Promise<void>;
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
     listenForCommit: (docId: string, version: number) => Promise<void>;
@@ -94,39 +85,33 @@ export class CollabAuthority<Transaction> {
   }
 
   async receiveCommit(docId: string, commitJSON: CommitJSON) {
-    const appliedCommitJSON = await this.runWithTransactionRetries(
-      async (tr) => {
-        // If we've already received this commit, skip it
-        if (await this.getCommit(tr, docId, commitJSON.ref)) {
-          return null;
-        }
-        const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(
-          tr,
-          docId,
-        );
-        const newCommits = await this.getCommits(tr, docId, commitJSON.version);
+    const appliedCommitJSON = await this.runWithTransactionRetries(async (tr) => {
+      // If we've already received this commit, skip it
+      if (await this.getCommit(tr, docId, commitJSON.ref)) {
+        return null;
+      }
+      const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(tr, docId);
+      const newCommits = await this.getCommits(tr, docId, commitJSON.version);
 
-        const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } =
-          applyCommitJSON(
-            version,
-            this.schema,
-            docJSON,
-            newCommits,
-            commitJSON,
-          );
+      const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } = applyCommitJSON(
+        version,
+        this.schema,
+        docJSON,
+        newCommits,
+        commitJSON,
+      );
 
-        await this.saveCommit(tr, docId, appliedCommitJSON);
-        await this.saveDoc(
-          tr,
-          docId,
-          appliedDocJSON,
-          appliedCommitJSON.version,
-          lastUpdatedTimestamp,
-        );
+      await this.saveCommit(tr, docId, appliedCommitJSON);
+      await this.saveDoc(
+        tr,
+        docId,
+        appliedDocJSON,
+        appliedCommitJSON.version,
+        lastUpdatedTimestamp,
+      );
 
-        return appliedCommitJSON;
-      },
-    );
+      return appliedCommitJSON;
+    });
 
     if (!appliedCommitJSON) return;
 
@@ -170,10 +155,7 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.pub.publish(
-      `pitter-patter:collab:${docId}`,
-      commitJSON.version.toString(),
-    );
+    await this.pub.publish(`pitter-patter:collab:${docId}`, commitJSON.version.toString());
   }
 
   async listenForCommit(docId: string, version: number) {

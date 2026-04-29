@@ -1,5 +1,6 @@
-import { NodeJSON, CommitJSON } from "@pitter-patter/collab-client";
 import { Generated } from "kysely";
+
+import { NodeJSON, CommitJSON } from "@pitter-patter/collab-client";
 
 interface Doc {
   id: string;
@@ -19,7 +20,7 @@ interface Commit {
   updatedAt: Generated<string>;
 }
 
-interface Commit {
+interface Comment {
   id: string;
   docId: string;
   ref: string;
@@ -41,5 +42,6 @@ interface Snapshot {
 export interface DB {
   doc: Doc;
   commit: Commit;
+  comment: Comment;
   snapshot: Snapshot;
 }

@@ -1,0 +1,31 @@
+{
+  "ignorePatterns": [".yarn", ".pnp.*"],
+  "proseWrap": "always",
+  "sortImports": {
+    "sortSideEffects": true,
+    "customGroups": [
+      {
+        "modifiers": ["side_effect"],
+        "selector": "style",
+        "groupName": "workspace_side_effect_style",
+        "elementNamePattern": ["@pitter-patter/**"]
+      },
+      {
+        "groupName": "workspace",
+        "elementNamePattern": ["@pitter-patter/**"]
+      }
+    ],
+    "groups": [
+      "side_effect",
+      "builtin",
+      "external",
+      "workspace",
+      "internal",
+      "parent",
+      "sibling",
+      "import",
+      "unknown",
+      ["workspace_side_effect_style", "side_effect_style"]
+    ]
+  }
+}

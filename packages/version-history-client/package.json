@@ -1,23 +1,26 @@
 {
   "name": "@pitter-patter/version-history-client",
   "version": "0.1.0",
-  "type": "module",
-  "packageManager": "yarn@4.9.1",
-  "exports": "./src/index.ts",
   "files": [
     "./styles.css",
     "./dist"
   ],
+  "type": "module",
+  "exports": "./src/index.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": "./dist/index.js"
+  },
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "prosemirror-model": "^1.25.3",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.41.7",
-    "typescript": "^5.9.3"
+    "prosemirror-view": "1.41.7"
   },
   "peerDependencies": {
     "prosemirror-model": "^1.0.0",
@@ -25,8 +28,5 @@
     "prosemirror-transform": "^1.0.0",
     "prosemirror-view": "^1.0.0"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": "./dist/index.js"
-  }
+  "packageManager": "yarn@4.9.1"
 }

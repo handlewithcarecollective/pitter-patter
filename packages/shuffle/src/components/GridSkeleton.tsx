@@ -6,10 +6,7 @@ interface Props {
 export function GridSkeleton({ children }: Props) {
   return (
     <div data-pp-grid-wrapper className="grid-wrapper">
-      <div
-        data-pp-grid-skeleton
-        className="grid-skeleton pp-shuffle-block row start-1 end-12"
-      >
+      <div data-pp-grid-skeleton className="grid-skeleton pp-shuffle-block row start-1 end-12">
         <div
           data-pp-grid-skeleton-bar="1"
           className="grid-skeleton-bar pp-shuffle-block start-1 end-1"

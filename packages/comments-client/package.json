@@ -1,16 +1,22 @@
 {
   "name": "@pitter-patter/comments-client",
   "version": "0.1.0",
-  "type": "module",
-  "packageManager": "yarn@4.9.1",
-  "exports": {
-    ".": "./src/index.ts",
-    "./styles.css": "./styles.css"
-  },
   "files": [
     "./styles.css",
     "./dist"
   ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./styles.css"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./styles.css": "./styles.css"
+    }
+  },
   "dependencies": {
     "@handlewithcare/react-prosemirror": "^3.0.1",
     "@pitter-patter/collab-client": "workspace:^",
@@ -26,11 +32,11 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/react-reconciler": "^0.32.2",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "prosemirror-model": "^1.25.3",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.41.7",
-    "typescript": "^5.9.3"
+    "prosemirror-view": "1.41.7"
   },
   "peerDependencies": {
     "prosemirror-model": "^1.0.0",
@@ -38,11 +44,5 @@
     "prosemirror-transform": "^1.0.0",
     "prosemirror-view": "^1.0.0"
   },
-  "publishConfig": {
-    "access": "public",
-    "exports": {
-      ".": "./dist/index.js",
-      "./styles.css": "./styles.css"
-    }
-  }
+  "packageManager": "yarn@4.9.1"
 }

@@ -3,16 +3,12 @@ import { sql, type Kysely } from "kysely";
 export async function up(db: Kysely<unknown>): Promise<void> {
   await db.schema
     .alterTable("doc")
-    .addColumn("created_at", "text", (col) =>
-      col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
-    )
+    .addColumn("created_at", "text", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
     .execute();
 
   await db.schema
     .alterTable("doc")
-    .addColumn("updated_at", "text", (col) =>
-      col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
-    )
+    .addColumn("updated_at", "text", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
     .execute();
 
   await sql`CREATE TRIGGER doc_trigger AFTER
@@ -27,16 +23,12 @@ END;
 
   await db.schema
     .alterTable("commit")
-    .addColumn("created_at", "text", (col) =>
-      col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
-    )
+    .addColumn("created_at", "text", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
     .execute();
 
   await db.schema
     .alterTable("commit")
-    .addColumn("updated_at", "text", (col) =>
-      col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
-    )
+    .addColumn("updated_at", "text", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
     .execute();
 
   await sql`CREATE TRIGGER commit_trigger AFTER

@@ -1,8 +1,9 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
 import { Transaction } from "prosemirror-state";
-import { EditorView } from "prosemirror-view";
-import { shufflePluginKey, ShufflePluginMeta, ViewDesc } from "../plugin";
 import { findWrapping } from "prosemirror-transform";
+import { EditorView } from "prosemirror-view";
+
+import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { getShuffleRowType, isShuffleRow } from "../schema";
 
 export function autogroup(
@@ -17,14 +18,11 @@ export function autogroup(
   const node = view.state.doc.resolve(from).nodeAfter;
   if (!node) return null;
 
-  const adjacentElements = findAdjacentElements(
-    clientY,
-    view.dom.getBoundingClientRect(),
-  ).filter((el) => !el.dataset["shuffleActive"] && el !== view.dom);
+  const adjacentElements = findAdjacentElements(clientY, view.dom.getBoundingClientRect()).filter(
+    (el) => !el.dataset["shuffleActive"] && el !== view.dom,
+  );
 
-  const adjacentPmDoms = adjacentElements
-    .reverse()
-    .filter((el) => "pmViewDesc" in el);
+  const adjacentPmDoms = adjacentElements.reverse().filter((el) => "pmViewDesc" in el);
 
   if (!adjacentPmDoms.length) return null;
 
@@ -34,10 +32,7 @@ export function autogroup(
   const outsidePmDoms = adjacentPmDoms.filter((el) => {
     const rect = el.getBoundingClientRect();
     return (
-      clientX < rect.left ||
-      clientX > rect.right ||
-      clientY < rect.top ||
-      clientY > rect.bottom
+      clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom
     );
   });
 
@@ -54,9 +49,7 @@ export function autogroup(
     const adjacentNode = $pos.nodeAfter;
     if (!adjacentNode || isShuffleRow(adjacentNode)) return null;
 
-    const blockRange = $pos.blockRange(
-      view.state.doc.resolve($pos.pos + adjacentNode.nodeSize),
-    );
+    const blockRange = $pos.blockRange(view.state.doc.resolve($pos.pos + adjacentNode.nodeSize));
 
     if (!blockRange) continue;
 

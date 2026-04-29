@@ -8,22 +8,13 @@ import {
 } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { EditorState } from "prosemirror-state";
 
-export {
-  receiveCommitTransaction,
-  getVersion,
-  Commit,
-  type CommitJSON,
-  type NodeJSON,
-};
+export { receiveCommitTransaction, getVersion, Commit, type CommitJSON, type NodeJSON };
 
 export { collab, collabKey } from "./plugin";
 
 export interface CollabClientConfig {
   sendCommit: (commit: Commit) => Promise<void>;
-  getCommits: (
-    version: number,
-    options?: { signal?: AbortSignal },
-  ) => Promise<CommitJSON[]>;
+  getCommits: (version: number, options?: { signal?: AbortSignal }) => Promise<CommitJSON[]>;
   receiveCommits: (commits: Commit[]) => void;
 }
 
@@ -65,22 +56,16 @@ export class CollabClient {
     this.version = getVersion(editorState);
 
     if (this.version === undefined) {
-      throw new Error(
-        "EditorState is missing the collab plugin, unable to listen for changes",
-      );
+      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
     }
 
     while (!signal.aborted) {
       try {
         const commitJSONs = await this.getCommits(this.version, { signal });
-        const commits = commitJSONs.map((json) =>
-          Commit.FromJSON(editorState.schema, json),
-        );
+        const commits = commitJSONs.map((json) => Commit.FromJSON(editorState.schema, json));
 
         // Ensure that we don't process the same commit multiple times
-        const newCommits = commits.filter(
-          (commit) => !this.seen.has(commit.ref),
-        );
+        const newCommits = commits.filter((commit) => !this.seen.has(commit.ref));
         const lastCommit = newCommits[newCommits.length - 1];
         if (!lastCommit) continue;
         this.version = lastCommit.version;
@@ -126,9 +111,7 @@ export class LongPollListener {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to get commits. ${response.status}: ${response.statusText}`,
-      );
+      throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
     }
 
     const commitJSONs = (await response.json()) as CommitJSON[];

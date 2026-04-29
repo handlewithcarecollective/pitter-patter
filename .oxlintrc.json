@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react", "react-perf", "import", "promise"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "import/consistent-type-specifier-style": ["error", "prefer-inline"]
+  },
+  "env": {
+    "builtin": true
+  },
+  "options": {
+    "typeAware": true
+  },
+  "ignorePatterns": ["**/dist/**", "**/node_modules/**"]
+}

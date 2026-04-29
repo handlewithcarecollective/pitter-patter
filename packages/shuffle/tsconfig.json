@@ -7,15 +7,10 @@
     "rootDir": "src",
     "moduleResolution": "bundler",
     "module": "ESNext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "jsx": "react-jsx"
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "references": [
     {
       "path": "../refs"

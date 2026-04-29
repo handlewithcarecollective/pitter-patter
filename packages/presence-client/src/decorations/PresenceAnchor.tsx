@@ -1,4 +1,5 @@
 import { type WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
+
 import { PresenceIndicator } from "../PresenceIndicator";
 
 // Taken from https://www.tableau.com/blog/colors-upgrade-tableau-10-56782
@@ -23,11 +24,7 @@ export function getPresenceColor(userId: string) {
   return PRESENCE_COLORS[index % PRESENCE_COLORS.length]!;
 }
 
-export function PresenceAnchor({
-  widget,
-  getPos: _,
-  ...props
-}: WidgetViewComponentProps) {
+export function PresenceAnchor({ widget, getPos: _, ...props }: WidgetViewComponentProps) {
   const indicator = widget.type.spec["indicator"] as PresenceIndicator;
   const userId = indicator.userId;
   const presenceColor = getPresenceColor(userId);
