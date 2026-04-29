@@ -40,6 +40,7 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/react-reconciler": "^0.32.2",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "kysely-codegen": "^0.18.5",
     "kysely-ctl": "^0.19.0",
     "parcel": "^2.15.4"

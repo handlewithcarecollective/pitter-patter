@@ -38,6 +38,7 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/react-reconciler": "^0.32.2",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@vitejs/plugin-react": "^6.0.1",
     "prettier": "^3.8.1",
     "prosemirror-commands": "^1.7.1",
@@ -47,7 +48,6 @@
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
     "prosemirror-view": "1.41.7",
-    "typescript": "^5.9.3",
     "vite": "^8.0.5"
   },
   "peerDependencies": {

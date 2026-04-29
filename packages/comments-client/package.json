@@ -32,11 +32,11 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/react-reconciler": "^0.32.2",
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "prosemirror-model": "^1.25.3",
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.41.7",
-    "typescript": "^5.9.3"
+    "prosemirror-view": "1.41.7"
   },
   "peerDependencies": {
     "prosemirror-model": "^1.0.0",

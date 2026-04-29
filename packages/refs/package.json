@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5",
-    "typescript": "^5.9.3"
+    "@typescript/native-preview": "7.0.0-dev.20260421.2"
   },
   "packageManager": "yarn@4.9.1"
 }

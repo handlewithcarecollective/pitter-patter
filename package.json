@@ -7,12 +7,16 @@
   "type": "module",
   "scripts": {
     "check:format": "yarn oxfmt --check",
-    "fix:format": "yarn oxfmt"
+    "check:lint": "yarn oxlint",
+    "fix:format": "yarn oxfmt",
+    "fix:lint": "yarn oxlint --fix"
   },
   "devDependencies": {
+    "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@yarnpkg/sdks": "^3.2.3",
     "oxfmt": "^0.47.0",
-    "typescript": "^5.9.3"
+    "oxlint": "^1.62.0",
+    "oxlint-tsgolint": "^0.22.1"
   },
   "resolutions": {
     "prosemirror-view@npm:^1.27.0": "1.41.7",
