@@ -83,7 +83,6 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
 }
 
 interface ShuffleSpec {
-  hasDragHandle?: boolean;
   resizeable?: boolean;
   draggable?: boolean;
   role?: "row" | "container";

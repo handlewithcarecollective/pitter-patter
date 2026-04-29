@@ -8,7 +8,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) repeat(12, minmax(0, var(--column-width))) minmax(0, 1fr);
   column-gap: var(--gutter-width);
-  position: relative;
 }
 
 .ProseMirror {
@@ -28,7 +27,6 @@
   grid-column-start: 1;
   grid-column-end: 15;
   row-gap: 1.5rem;
-  position: relative;
 }
 
 .row>* {
@@ -39,55 +37,55 @@
   width: 100%;
 }
 
-.pp-shuffle-block:nth-child(1) {
+.pp-shuffle-block:nth-child(1 of .pp-shuffle-block) {
   grid-row: 1;
 }
 
-.pp-shuffle-block:nth-child(2) {
+.pp-shuffle-block:nth-child(2 of .pp-shuffle-block) {
   grid-row: 2;
 }
 
-.pp-shuffle-block:nth-child(3) {
+.pp-shuffle-block:nth-child(3 of .pp-shuffle-block) {
   grid-row: 3;
 }
 
-.pp-shuffle-block:nth-child(4) {
+.pp-shuffle-block:nth-child(4 of .pp-shuffle-block) {
   grid-row: 4;
 }
 
-.pp-shuffle-block:nth-child(5) {
+.pp-shuffle-block:nth-child(5 of .pp-shuffle-block) {
   grid-row: 5;
 }
 
-.pp-shuffle-block:nth-child(6) {
+.pp-shuffle-block:nth-child(6 of .pp-shuffle-block) {
   grid-row: 6;
 }
 
-.pp-shuffle-block:nth-child(7) {
+.pp-shuffle-block:nth-child(7 of .pp-shuffle-block) {
   grid-row: 7;
 }
 
-.pp-shuffle-block:nth-child(8) {
+.pp-shuffle-block:nth-child(8 of .pp-shuffle-block) {
   grid-row: 8;
 }
 
-.pp-shuffle-block:nth-child(9) {
+.pp-shuffle-block:nth-child(9 of .pp-shuffle-block) {
   grid-row: 9;
 }
 
-.pp-shuffle-block:nth-child(10) {
+.pp-shuffle-block:nth-child(1 of .pp-shuffle-block0) {
   grid-row: 10;
 }
 
-.pp-shuffle-block:nth-child(11) {
+.pp-shuffle-block:nth-child(1 of .pp-shuffle-block1) {
   grid-row: 11;
 }
 
-.pp-shuffle-block:nth-child(12) {
+.pp-shuffle-block:nth-child(1 of .pp-shuffle-block2) {
   grid-row: 12;
 }
 
-.pp-shuffle-block:nth-child(13) {
+.pp-shuffle-block:nth-child(1 of .pp-shuffle-block3) {
   grid-row: 13;
 }
 

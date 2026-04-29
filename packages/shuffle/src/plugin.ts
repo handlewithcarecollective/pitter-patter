@@ -9,6 +9,11 @@ import { reorder } from "./transform/reorder";
 import { reposition } from "./transform/reposition";
 import { autogroup } from "./transform/autogroup";
 import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
+import { ComponentType, ForwardRefExoticComponent, RefAttributes } from "react";
+import {
+  widget,
+  WidgetViewComponentProps,
+} from "@handlewithcare/react-prosemirror";
 
 interface ShufflePluginStartMeta {
   type: "start";
@@ -50,7 +55,11 @@ export const shufflePluginKey = new PluginKey<ShufflePluginState>(
   "@pitter-patter/shuffle",
 );
 
-export function shuffle() {
+export interface ShufflePluginOptions {
+  dragHandles?: Record<string, ComponentType<WidgetViewComponentProps>>;
+}
+
+export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
   return new Plugin<ShufflePluginState>({
     key: shufflePluginKey,
     state: {
@@ -71,6 +80,39 @@ export function shuffle() {
 
           return true;
         });
+
+        const { $from, $to } = state.selection;
+
+        let d =
+          $from.parent === $to.parent
+            ? $from.depth
+            : $from.blockRange($to)?.depth;
+
+        if (d !== undefined) {
+          while (d > 0) {
+            const before = $from.before(d);
+            const node = $from.node(d);
+            const handle = dragHandles?.[node.type.name];
+            if (handle) {
+              decorations.push(
+                widget(
+                  before,
+                  handle as ForwardRefExoticComponent<
+                    RefAttributes<HTMLElement> & WidgetViewComponentProps
+                  >,
+                  {
+                    key: `drag-handle-${d}`,
+                    nodePos: before,
+                    nodeDepth: d,
+                    isDragHandle: true,
+                    side: -1,
+                  },
+                ),
+              );
+            }
+            d--;
+          }
+        }
 
         return {
           deco: DecorationSet.create(state.doc, decorations),
@@ -189,6 +231,42 @@ export function shuffle() {
           return true;
         });
 
+        nextDeco = nextDeco.remove(
+          nextDeco.find(undefined, undefined, (spec) => spec.isDragHandle),
+        );
+
+        const { $from, $to } = newState.selection;
+        let d =
+          $from.parent === $to.parent
+            ? $from.depth
+            : $from.blockRange($to)?.depth;
+
+        if (d !== undefined) {
+          while (d > 0) {
+            const before = $from.before(d);
+            const node = $from.node(d);
+            const handle = dragHandles?.[node.type.name];
+            if (handle) {
+              decorations.push(
+                widget(
+                  before,
+                  handle as ForwardRefExoticComponent<
+                    RefAttributes<HTMLElement> & WidgetViewComponentProps
+                  >,
+                  {
+                    key: `drag-handle-${d}`,
+                    nodePos: before,
+                    nodeDepth: d,
+                    isDragHandle: true,
+                    side: -1,
+                  },
+                ),
+              );
+            }
+            d--;
+          }
+        }
+
         return {
           deco: nextDeco.add(tr.doc, decorations),
           comp: nextComp,
@@ -231,27 +309,31 @@ export function shuffle() {
           if (!view.editable) return false;
           if (!(event.target instanceof HTMLElement)) return false;
 
-          let dom: null | HTMLElement = event.target;
+          let dom: null | (HTMLElement & { pmViewDesc?: ViewDesc }) =
+            event.target;
+
           while (
             dom &&
             dom !== view.dom &&
             "pmViewDesc" in dom &&
-            !supportsResize(
-              (dom as HTMLElement & { pmViewDesc: ViewDesc }).pmViewDesc.node,
-            ) &&
-            !supportsDrag(
-              (dom as HTMLElement & { pmViewDesc: ViewDesc }).pmViewDesc.node,
-            )
+            !dom.pmViewDesc.widget?.spec.isDragHandle &&
+            dom.pmViewDesc.node &&
+            !supportsResize(dom.pmViewDesc.node) &&
+            !supportsDrag(dom.pmViewDesc.node)
           ) {
             dom = dom.parentElement;
           }
 
           if (!dom || dom === view.dom) return false;
 
-          const viewDesc = (dom as HTMLElement & { pmViewDesc: ViewDesc })
-            .pmViewDesc;
+          if (dom.pmViewDesc?.widget) {
+            const domPos = dom.pmViewDesc.widget.spec.nodePos;
+            dom = view.nodeDOM(domPos) as HTMLElement;
+          }
 
-          if (viewDesc.contentDOM?.contains(event.target)) return false;
+          const viewDesc = dom.pmViewDesc;
+
+          if (viewDesc?.contentDOM?.contains(event.target)) return false;
 
           view.dispatch(
             view.state.tr.setMeta(shufflePluginKey, {
@@ -291,7 +373,7 @@ export function shuffle() {
               view.dispatch(
                 view.state.tr.setMeta(shufflePluginKey, {
                   type: "map",
-                  payload: { newPos: viewDesc.posBefore },
+                  payload: { newPos: viewDesc?.posBefore },
                 }),
               );
 
@@ -414,13 +496,18 @@ export function shuffle() {
   });
 }
 
-export interface ViewDesc {
+interface WidgetViewDesc {
+  widget: Decoration;
+}
+
+interface NodeViewDesc {
   node: PmNode;
   dom: HTMLElement;
   contentDOM?: HTMLElement;
   posBefore: number;
 }
 
+export type ViewDesc = NodeViewDesc & WidgetViewDesc;
 const LIFT_AMOUNT = 24;
 
 class TranslateCalculator {

@@ -3,7 +3,10 @@ import {
   ProseMirror,
   ProseMirrorDoc,
   reactKeys,
+  useEditorEffect,
+  useEditorState,
   useSelectNode,
+  WidgetViewComponentProps,
 } from "@handlewithcare/react-prosemirror";
 import { schema as basic } from "prosemirror-schema-basic";
 import { baseKeymap } from "prosemirror-commands";
@@ -18,6 +21,7 @@ import { ResizeHandles } from "../src/components/ResizeHandles.tsx";
 import "../src/styles.css";
 import "./styles.css";
 import "prosemirror-view/style/prosemirror.css";
+import { useState } from "react";
 
 const imageSpec = basic.spec.nodes.get("image");
 
@@ -75,9 +79,60 @@ const nodeViewComponents = {
   image: Image,
 };
 
+function createHandle(name: string) {
+  const Handle = ({
+    widget,
+    ref,
+    getPos,
+    ...props
+  }: WidgetViewComponentProps) => {
+    const [top, setTop] = useState(0);
+    const [left, setLeft] = useState(0);
+
+    useEditorEffect(
+      (view) => {
+        const viewRect = view.dom.getBoundingClientRect();
+        const coords = view.coordsAtPos(widget.spec.nodePos, 1);
+        setTop(coords.top - viewRect.top);
+        setLeft(coords.left - viewRect.left + (widget.spec.nodeDepth - 1) * 24);
+      },
+      [widget.spec.nodePos, widget.spec.nodeDepth],
+    );
+
+    return (
+      <div
+        ref={ref}
+        {...props}
+        contentEditable={false}
+        style={{
+          position: "absolute",
+          backgroundColor: "lightblue",
+          transform: "translateY(-1.5rem)",
+          top,
+          left,
+        }}
+      >
+        {name}
+      </div>
+    );
+  };
+  Handle.displayName = `${name}Handle`;
+  return Handle;
+}
+
 const editorState = EditorState.create({
   doc,
-  plugins: [reactKeys(), shuffle(), keymap(baseKeymap)],
+  plugins: [
+    reactKeys(),
+    shuffle({
+      dragHandles: {
+        paragraph: createHandle("Paragraph"),
+        container: createHandle("Container"),
+        row: createHandle("Row"),
+      },
+    }),
+    keymap(baseKeymap),
+  ],
 });
 
 function Editor() {
