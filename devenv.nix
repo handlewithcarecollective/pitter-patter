@@ -19,6 +19,7 @@
     redis = {
       enable = true;
       extraConfig = "save \"\"";
+      port = 6379;
     };
   };
 
