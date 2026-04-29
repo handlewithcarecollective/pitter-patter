@@ -1,8 +1,10 @@
-import { collabKey } from "@pitter-patter/collab-client";
 import { EditorState } from "prosemirror-state";
-import { type PresenceIndicator } from "./PresenceIndicator";
-import { type PresenceClientConfig } from "./config";
+
+import { collabKey } from "@pitter-patter/collab-client";
 import { randomRef } from "@pitter-patter/refs";
+
+import { type PresenceClientConfig } from "./config";
+import { type PresenceIndicator } from "./PresenceIndicator";
 
 export { presence, presenceKey, receivePresenceTransaction } from "./plugin";
 

@@ -1,7 +1,9 @@
 import { widget } from "@handlewithcare/react-prosemirror";
-import { collabKey } from "@pitter-patter/collab-client";
 import { PluginKey, Plugin, EditorState } from "prosemirror-state";
 import { DecorationSet, Decoration } from "prosemirror-view";
+
+import { collabKey } from "@pitter-patter/collab-client";
+
 import {
   PresenceAnchor,
   getPresenceColor as defaultGetPresenceColor,

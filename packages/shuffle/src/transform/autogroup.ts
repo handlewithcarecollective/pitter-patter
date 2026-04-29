@@ -1,8 +1,9 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
 import { Transaction } from "prosemirror-state";
-import { EditorView } from "prosemirror-view";
-import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { findWrapping } from "prosemirror-transform";
+import { EditorView } from "prosemirror-view";
+
+import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { getShuffleRowType, isShuffleRow } from "../schema";
 
 export function autogroup(

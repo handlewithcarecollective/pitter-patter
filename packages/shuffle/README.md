@@ -4,7 +4,8 @@ A grid-based drag-and-drop library for React ProseMirror.
 
 ## What is this?
 
-Shuffle is a ProseMirror plugin that supports smooth, beautiful, grid-based reordering, auto-grouping, repositioning, and resizing.
+Shuffle is a ProseMirror plugin that supports smooth, beautiful, grid-based reordering,
+auto-grouping, repositioning, and resizing.
 
 ## Installation
 
@@ -16,7 +17,8 @@ yarn add @pitter-patter/shuffle prosemirror-view@1.47.1
 
 ### Update your schema
 
-Shuffle can automatically extend your schema for you, or you can modify your schema yourself to add Shuffle support.
+Shuffle can automatically extend your schema for you, or you can modify your schema yourself to add
+Shuffle support.
 
 To extend your schema automatically:
 
@@ -73,7 +75,8 @@ const schema = new Schema({
 
 ### Add the plugin
 
-Most of Shuffle’s logic lives in the `shuffle()` ProseMirror plugin. This should be added to your EditorState:
+Most of Shuffle’s logic lives in the `shuffle()` ProseMirror plugin. This should be added to your
+EditorState:
 
 ```ts
 import { reactKeys } from "@handlewithcare/react-prosemirror";
@@ -86,7 +89,8 @@ const editorState = EditorState.create({
 });
 ```
 
-The plugin can be passed a record of drag handle components. These should be React ProseMirror widget components.
+The plugin can be passed a record of drag handle components. These should be React ProseMirror
+widget components.
 
 ```tsx
 import {
@@ -144,7 +148,8 @@ const editorState = EditorState.create({
 
 ### Wrap your ProseMirror component with the GridSkeleton
 
-Shuffle provides a `GridSkeleton` component that you can wrap your `ProseMirrorDoc` with, as well as a `ResizeHandles` component:
+Shuffle provides a `GridSkeleton` component that you can wrap your `ProseMirrorDoc` with, as well as
+a `ResizeHandles` component:
 
 ```tsx
 function Editor() {

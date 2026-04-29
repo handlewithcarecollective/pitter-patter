@@ -1,3 +1,25 @@
 {
-  "ignorePatterns": [".yarn", ".pnp.*"]
+  "ignorePatterns": [".yarn", ".pnp.*"],
+  "proseWrap": "always",
+  "sortImports": {
+    "sortSideEffects": true,
+    "customGroups": [
+      {
+        "groupName": "workspace",
+        "elementNamePattern": ["@pitter-patter/**"]
+      }
+    ],
+    "groups": [
+      "side_effect",
+      "builtin",
+      "external",
+      "workspace",
+      "internal",
+      "parent",
+      "sibling",
+      "import",
+      "unknown",
+      "side_effect_style"
+    ]
+  }
 }

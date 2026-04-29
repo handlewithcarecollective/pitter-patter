@@ -1,4 +1,5 @@
 import { type WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
+
 import { PresenceIndicator } from "../PresenceIndicator";
 
 // Taken from https://www.tableau.com/blog/colors-upgrade-tableau-10-56782

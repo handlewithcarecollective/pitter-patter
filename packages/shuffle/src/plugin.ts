@@ -1,16 +1,18 @@
-import { randomRef } from "@pitter-patter/refs";
-import throttle from "raf-throttle";
+import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
 import { createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
+import throttle from "raf-throttle";
+import { ComponentType, ForwardRefExoticComponent, RefAttributes } from "react";
+
+import { randomRef } from "@pitter-patter/refs";
+
+import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
+import { autogroup } from "./transform/autogroup";
 import { reorder } from "./transform/reorder";
 import { reposition } from "./transform/reposition";
-import { autogroup } from "./transform/autogroup";
-import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
-import { ComponentType, ForwardRefExoticComponent, RefAttributes } from "react";
-import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
 
 interface ShufflePluginStartMeta {
   type: "start";

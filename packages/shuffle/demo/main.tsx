@@ -7,20 +7,21 @@ import {
   useSelectNode,
   WidgetViewComponentProps,
 } from "@handlewithcare/react-prosemirror";
-import { schema as basic } from "prosemirror-schema-basic";
 import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
+import { schema as basic } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { addShuffleNodes } from "../src/schema.ts";
-import { shuffle } from "../src/plugin.ts";
 import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
 import { ResizeHandles } from "../src/components/ResizeHandles.tsx";
+import { shuffle } from "../src/plugin.ts";
+import { addShuffleNodes } from "../src/schema.ts";
+
 import "../src/styles.css";
 import "./styles.css";
 import "prosemirror-view/style/prosemirror.css";
-import { useState } from "react";
 
 const imageSpec = basic.spec.nodes.get("image");
 

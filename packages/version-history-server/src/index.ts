@@ -1,5 +1,6 @@
-import { CollabAuthorityConfig } from "@pitter-patter/collab-server";
 import { NodeJSON } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
+
+import { CollabAuthorityConfig } from "@pitter-patter/collab-server";
 
 export interface VersionHistoryConfig<Transaction> {
   getLatestSnapshot: (

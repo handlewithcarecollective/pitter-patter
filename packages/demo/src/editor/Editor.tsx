@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { EditorState, Transaction } from "prosemirror-state";
-import { schema } from "prosemirror-schema-basic";
-
 import { ProseMirror, ProseMirrorDoc } from "@handlewithcare/react-prosemirror";
+import { Selectable } from "kysely";
+import { Node } from "prosemirror-model";
+import { schema } from "prosemirror-schema-basic";
+import { EditorState, Transaction } from "prosemirror-state";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   LongPollListener,
@@ -20,17 +21,16 @@ import {
   LongPollListener as PresenceListener,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
+import "@pitter-patter/presence-client/styles.css";
 import {
   Snapshot,
   VersionHistoryClient,
   VersionHistoryClientConfig,
 } from "@pitter-patter/version-history-client";
+
 import { DB } from "../database/schema";
-import { Node } from "prosemirror-model";
 
 import "prosemirror-view/style/prosemirror.css";
-import "@pitter-patter/presence-client/styles.css";
-import { Selectable } from "kysely";
 
 interface Props {
   doc: Selectable<DB["doc"]>;

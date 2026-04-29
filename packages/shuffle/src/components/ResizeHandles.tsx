@@ -3,13 +3,14 @@ import {
   useEditorEventCallback,
   useEditorState,
 } from "@handlewithcare/react-prosemirror";
+import { createLayout, Timeline } from "animejs";
+import { animate } from "motion/mini";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
 import { useMemo, useRef, useState } from "react";
-import { supportsResize } from "../schema";
-import { animate } from "motion/mini";
-import { createLayout, Timeline } from "animejs";
+
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
+import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
 
 export function ResizeHandles() {

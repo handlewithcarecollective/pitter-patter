@@ -1,4 +1,5 @@
 import { EditorView } from "prosemirror-view";
+
 import { setShuffleColumns } from "../commands";
 
 export function resize(

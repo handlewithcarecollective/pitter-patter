@@ -1,5 +1,6 @@
-import { NodeJSON, CommitJSON } from "@pitter-patter/collab-client";
 import { Generated } from "kysely";
+
+import { NodeJSON, CommitJSON } from "@pitter-patter/collab-client";
 
 interface Doc {
   id: string;

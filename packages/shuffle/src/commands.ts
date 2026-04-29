@@ -1,5 +1,6 @@
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+
 import { shufflePluginKey, ShufflePluginMeta } from "./plugin";
 
 export function setShuffleColumns(pos: number, start: number, end: number) {

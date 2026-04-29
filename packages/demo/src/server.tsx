@@ -1,30 +1,32 @@
-import express from "express";
 import { renderRequest } from "@parcel/rsc/node";
-import { EditorPage } from "./editor/EditorPage.js";
-import type { CommitJSON, NodeJSON } from "@pitter-patter/collab-client";
+import express from "express";
+import { Migrator, Transaction } from "kysely";
+import { TSFileMigrationProvider } from "kysely-ctl";
+import { schema } from "prosemirror-schema-basic";
+import { ComponentType } from "react";
+import { v7 as uuid } from "uuid";
+
+import { type CommitJSON, type NodeJSON } from "@pitter-patter/collab-client";
+import {
+  CollabAuthority,
+  RedisBroadcastManager,
+  TooMuchContentionError,
+} from "@pitter-patter/collab-server";
 import {
   PresenceAuthority,
   PresenceIndicator,
   RedisPresenceBroadcastManager,
   RedisPresencePersistenceManager,
 } from "@pitter-patter/presence-server";
-import {
-  CollabAuthority,
-  RedisBroadcastManager,
-  TooMuchContentionError,
-} from "@pitter-patter/collab-server";
 import { withVersionHistory } from "@pitter-patter/version-history-server";
-import { schema } from "prosemirror-schema-basic";
-import { Migrator, Transaction } from "kysely";
-import { TSFileMigrationProvider } from "kysely-ctl";
-import { v7 as uuid } from "uuid";
+
+import { createCommit, getCommitByRef, getCommitsAfter } from "./database/commits.js";
 import { getDb } from "./database/db.js";
 import { createDoc, getDoc, updateDoc } from "./database/docs.js";
-import { HomePage } from "./home/HomePage.js";
-import { ComponentType } from "react";
-import { createCommit, getCommitByRef, getCommitsAfter } from "./database/commits.js";
 import { DB } from "./database/schema.js";
 import { createSnapshot, getLatestSnapshot, getSnapshots } from "./database/snapshots.js";
+import { EditorPage } from "./editor/EditorPage.js";
+import { HomePage } from "./home/HomePage.js";
 
 const app = express();
 app.use("/client", express.static("dist/client"));

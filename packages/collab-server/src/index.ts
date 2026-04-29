@@ -1,5 +1,5 @@
-import { CommitJSON, NodeJSON } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { applyCommitJSON } from "@stepwisehq/prosemirror-collab-commit/apply-commit";
+import { CommitJSON, NodeJSON } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { Schema } from "prosemirror-model";
 import { createClient, RedisClientType } from "redis";
 

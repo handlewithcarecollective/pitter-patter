@@ -1,5 +1,6 @@
-import { type NodeJSON } from "@pitter-patter/collab-client";
 import { createClient, RedisClientType } from "redis";
+
+import { type NodeJSON } from "@pitter-patter/collab-client";
 
 function PromiseWithResolvers<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;

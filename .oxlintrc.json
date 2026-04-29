@@ -4,7 +4,9 @@
   "categories": {
     "correctness": "error"
   },
-  "rules": {},
+  "rules": {
+    "import/consistent-type-specifier-style": ["error", "prefer-inline"]
+  },
   "env": {
     "builtin": true
   },

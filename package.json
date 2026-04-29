@@ -9,7 +9,7 @@
     "check:format": "yarn oxfmt --check",
     "check:lint": "yarn oxlint **/*.ts **/*.tsx",
     "fix:format": "yarn oxfmt",
-    "fix:lint": "yarn oxlint --fix"
+    "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx"
   },
   "devDependencies": {
     "@typescript/native-preview": "7.0.0-dev.20260421.2",

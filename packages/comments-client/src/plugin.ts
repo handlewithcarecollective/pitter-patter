@@ -1,7 +1,7 @@
+import { toggleMark } from "prosemirror-commands";
+import { MarkType, type Node } from "prosemirror-model";
 import { PluginKey, Plugin, EditorState } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
-import { MarkType, type Node } from "prosemirror-model";
-import { toggleMark } from "prosemirror-commands";
 
 export interface CommentsState {
   newThreadVisible: boolean;
