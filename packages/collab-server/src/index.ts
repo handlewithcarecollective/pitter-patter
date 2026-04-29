@@ -23,6 +23,11 @@ export class TooMuchContentionError extends Error {
   }
 }
 
+export interface CommitListener {
+  listen: () => Promise<boolean>;
+  abort: () => Promise<void>;
+}
+
 export interface CollabAuthorityConfig<Transaction> {
   schema: Schema;
   runWithTransaction: <Result>(
@@ -60,7 +65,10 @@ export interface CollabAuthorityConfig<Transaction> {
   ) => Promise<void>;
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
-    listenForCommit: (docId: string, version: number) => Promise<void>;
+    createCommitListener: (
+      docId: string,
+      version: number,
+    ) => Promise<CommitListener>;
   };
 }
 
@@ -140,11 +148,28 @@ export class CollabAuthority<Transaction> {
   }
 
   async listenForCommit(docId: string, version: number) {
+    // Create listner to notify if commits are made. After this await, the listener is registered with
+    // the notification service and will be notified if a commit is made.
+    const { listen, abort } = await this.broadcastManager.createCommitListener(
+      docId,
+      version,
+    );
+
+    // Check if any commits were made between the last time this function was called and the
+    // new commit listener being registered
     const preCommits = await this.getCommits(null, docId, version);
-    if (preCommits.length) return preCommits;
-    await this.broadcastManager.listenForCommit(docId, version);
-    const postCommits = await this.getCommits(null, docId, version);
-    return postCommits;
+    if (preCommits.length) {
+      await abort();
+      return preCommits;
+    }
+
+    // Await and return any incoming commits
+    let commitsFound = await listen();
+    if (commitsFound) {
+      const postCommits = await this.getCommits(null, docId, version);
+      return postCommits;
+    }
+    return [];
   }
 }
 
@@ -182,22 +207,28 @@ export class RedisBroadcastManager {
     );
   }
 
-  async listenForCommit(docId: string, version: number) {
-    const { promise, resolve } = PromiseWithResolvers<void>();
-
+  async createCommitListener(docId: string, version: number) {
+    const { promise, resolve } = PromiseWithResolvers<boolean>();
     function listener(message: string) {
-      if (parseInt(message, 10) >= version) resolve();
+      if (parseInt(message, 10) >= version) resolve(true);
     }
-
     await this.sub.subscribe(`pitter-patter:collab:${docId}`, listener);
 
-    return await Promise.race([
-      promise,
-      new Promise<void>((resolve) => {
-        setTimeout(resolve, this.timeout);
-      }),
-    ]).finally(async () => {
+    const listen = async () => {
+      return await Promise.race([
+        promise,
+        new Promise<boolean>((resolve) => {
+          setTimeout(() => resolve(false), this.timeout);
+        }),
+      ]).finally(async () => {
+        await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
+      });
+    };
+
+    const abort = async () => {
       await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
-    });
+    };
+
+    return { listen, abort };
   }
 }
