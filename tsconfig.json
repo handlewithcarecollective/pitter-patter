@@ -1,5 +1,5 @@
 {
-  "include": [],
+  "include": ["scripts/*.mts"],
   "references": [
     {
       "path": "packages/collab-client"

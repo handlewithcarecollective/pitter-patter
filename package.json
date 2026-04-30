@@ -8,11 +8,18 @@
   "scripts": {
     "check:format": "yarn oxfmt --check",
     "check:lint": "yarn oxlint **/*.ts **/*.tsx",
+    "check:types": "yarn tsgo --build .",
     "fix:format": "yarn oxfmt",
     "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
+    "@yarnpkg/cli": "^4.14.1",
+    "@yarnpkg/core": "^4.7.0",
+    "@yarnpkg/fslib": "^3.1.5",
+    "@yarnpkg/plugin-git": "^3.2.0",
+    "@yarnpkg/plugin-version": "^4.2.0",
     "@yarnpkg/sdks": "^3.2.3",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
