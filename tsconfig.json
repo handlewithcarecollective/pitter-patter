@@ -1,5 +1,8 @@
 {
   "include": ["scripts/*.mts"],
+  "compilerOptions": {
+    "noEmit": true
+  },
   "references": [
     {
       "path": "packages/collab-client"

@@ -21,7 +21,7 @@ for (const workspace of versionFile.changedWorkspaces) {
   const diff = execSync(`git diff origin/main -- ${join(workspace.relativeCwd, "package.json")}`, {
     encoding: "utf-8",
   });
-  const hasBeenUpgraded = !!diff.match(/^\+\s*"version":/gm);
+  const hasBeenUpgraded = /^\+\s*"version":/gm.test(diff);
   if (!hasBeenUpgraded) unreleasedWorkspaces.push(workspace);
 }
 

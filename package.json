@@ -7,10 +7,10 @@
   "type": "module",
   "scripts": {
     "check:format": "yarn oxfmt --check",
-    "check:lint": "yarn oxlint **/*.ts **/*.tsx",
+    "check:lint": "yarn oxlint **/*.ts **/*.tsx **/*.mts",
     "check:types": "yarn tsgo --build .",
     "fix:format": "yarn oxfmt",
-    "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx"
+    "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx **/*.mts"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
