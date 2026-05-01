@@ -18,7 +18,9 @@
     }
   },
   "scripts": {
-    "demo": "yarn vite"
+    "demo": "yarn vite",
+    "prepack": "yarn check:types",
+    "prepublish": "yarn check:format && yarn check:lint"
   },
   "dependencies": {
     "@handlewithcare/react-prosemirror": "^3.0.1",
