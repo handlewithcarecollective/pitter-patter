@@ -7,11 +7,12 @@ import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
-import { useMemo, useState } from "react";
+import { PointerEvent as ReactPointerEvent, useMemo, useState } from "react";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
+import { TranslateCalculator } from "../translation.js";
 
 export function ResizeHandles() {
   const { selection } = useEditorState();
@@ -109,8 +110,22 @@ export function RightResizeHandle({ pos }: ResizeHandleProps) {
 }
 
 function useHandlePointerDown(pos: number, side: "start" | "end") {
-  return useEditorEventCallback((view) => {
+  return useEditorEventCallback((view, event: ReactPointerEvent<HTMLButtonElement>) => {
     if (!view.editable) return;
+
+    const dom = event.target;
+    if (!(dom instanceof HTMLElement)) return;
+
+    const domRect = dom.getBoundingClientRect();
+
+    const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
+    const originX = transform.m41;
+    const originY = transform.m42;
+
+    const startX = event.clientX;
+    const startY = event.clientY;
+
+    const translateCalc = new TranslateCalculator(originX, originY, startX, startY, domRect, 0);
 
     let layout: AutoLayout | null = null;
     let currentAnimation: Timeline | null = null;
@@ -127,12 +142,18 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
 
+      dom.style.transform = translateCalc.slide(e.clientX, e.clientY);
+
+      const tr = resize(view, pos, side, e.clientX);
+
+      if (!tr) return;
+
       if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
         currentAnimation.complete();
       }
 
       currentAnimation = layout.update(() => {
-        resize(view, pos, side, e.clientX);
+        view.dispatch(tr);
       });
     });
 

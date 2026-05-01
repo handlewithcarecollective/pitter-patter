@@ -85,7 +85,6 @@ function createHandle(name: string) {
         if (!(nodeDOM instanceof HTMLElement)) return;
         const { offsetParent } = nodeDOM;
         const coords = nodeDOM.getBoundingClientRect();
-        console.log(name, coords);
         const offsetCoords = offsetParent?.getBoundingClientRect();
         const offsetTop = offsetCoords?.top ?? 0;
         const offsetLeft = offsetCoords?.left ?? 0;
