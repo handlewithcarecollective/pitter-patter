@@ -38,9 +38,25 @@ language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "o
 
 [[language]]
 name = "json"
-language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "oxlint"]
+language-servers = ["oxfmt"]
+
+[[language]]
+name = "toml"
+language-servers = ["oxfmt"]
+auto-format = true
 
 [[language]]
 name = "markdown"
-language-servers = ["oxfmt", "oxlint"]
+language-servers = [
+  { name = "markdown-oxide", except-features = [
+    "format",
+  ] },
+  "oxfmt",
+  "ltex-ls-plus",
+]
+
+[[language]]
+name = "css"
+language-servers = ["oxfmt"]
+auto-format = true
 
