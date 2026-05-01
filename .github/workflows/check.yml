@@ -60,6 +60,12 @@ jobs:
         with:
           node-version: 24.x
 
+      - name: Install corepack
+        run: npm i -g corepack
+
+      - name: Install dependencies
+        run: yarn
+
       - name: Check for version bump
         run: yarn node scripts/bumpVersions.mts
         env:
