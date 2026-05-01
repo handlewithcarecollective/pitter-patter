@@ -22,7 +22,9 @@ export function autogroup(
     (el) => !el.dataset["shuffleActive"] && el !== view.dom,
   );
 
-  const adjacentPmDoms = adjacentElements.reverse().filter((el) => "pmViewDesc" in el);
+  const adjacentPmDoms = adjacentElements
+    .reverse()
+    .filter((el) => "pmViewDesc" in el && el !== view.dom);
 
   if (!adjacentPmDoms.length) return null;
 

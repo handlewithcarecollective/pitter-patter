@@ -3,11 +3,11 @@ import {
   useEditorEventCallback,
   useEditorState,
 } from "@handlewithcare/react-prosemirror";
-import { createLayout, Timeline } from "animejs";
+import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { supportsResize } from "../schema";
@@ -109,29 +109,29 @@ export function RightResizeHandle({ pos }: ResizeHandleProps) {
 }
 
 function useHandlePointerDown(pos: number, side: "start" | "end") {
-  const animationRef = useRef<Timeline | null>(null);
-
   return useEditorEventCallback((view) => {
     if (!view.editable) return;
 
+    let layout: AutoLayout | null = null;
+    let currentAnimation: Timeline | null = null;
     let skeletonOn = false;
     const handleMove = throttle(function handleMove(e: PointerEvent) {
-      if (!skeletonOn) {
+      if (!skeletonOn || !layout) {
         const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
         if (!gridWrapper) return;
         const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
         if (!skeleton) return;
 
         skeletonOn = true;
+        layout = createLayout(view.dom);
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
 
-      if (animationRef.current && animationRef.current.began && !animationRef.current.completed) {
-        animationRef.current.complete();
+      if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
+        currentAnimation.complete();
       }
 
-      const layout = createLayout(view.dom);
-      animationRef.current = layout.update(() => {
+      currentAnimation = layout.update(() => {
         resize(view, pos, side, e.clientX);
       });
     });

@@ -4,6 +4,7 @@ import {
   ProseMirrorDoc,
   reactKeys,
   useEditorEffect,
+  useEditorState,
   useSelectNode,
   WidgetViewComponentProps,
 } from "@handlewithcare/react-prosemirror";
@@ -72,17 +73,26 @@ const nodeViewComponents = {
 
 function createHandle(name: string) {
   const Handle = ({ widget, ref, getPos: _, ...props }: WidgetViewComponentProps) => {
+    const editorState = useEditorState();
+    const node = editorState.doc.resolve(widget.spec.nodePos).nodeAfter;
+
     const [top, setTop] = useState(0);
     const [left, setLeft] = useState(0);
 
     useEditorEffect(
       (view) => {
-        const viewRect = view.dom.getBoundingClientRect();
-        const coords = view.coordsAtPos(widget.spec.nodePos, 1);
-        setTop(coords.top - viewRect.top);
-        setLeft(coords.left - viewRect.left + (widget.spec.nodeDepth - 1) * 24);
+        const nodeDOM = view.nodeDOM(widget.spec.nodePos);
+        if (!(nodeDOM instanceof HTMLElement)) return;
+        const { offsetParent } = nodeDOM;
+        const coords = nodeDOM.getBoundingClientRect();
+        console.log(name, coords);
+        const offsetCoords = offsetParent?.getBoundingClientRect();
+        const offsetTop = offsetCoords?.top ?? 0;
+        const offsetLeft = offsetCoords?.left ?? 0;
+        setTop(coords.top - offsetTop);
+        setLeft(coords.left - offsetLeft + (widget.spec.nodeDepth - 1) * 24);
       },
-      [widget.spec.nodePos, widget.spec.nodeDepth],
+      [node, widget.spec.nodePos, widget.spec.nodeDepth],
     );
 
     return (
