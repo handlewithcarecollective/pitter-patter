@@ -55,7 +55,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
   });
 
   schema.spec.nodes.forEach((name, node) => {
-    if (node.group?.match(new RegExp(`\b${group}\b`))) {
+    if (new RegExp(`\\b${group}\\b`).test(node.group ?? "")) {
       nodes = nodes.update(name, {
         ...node,
         attrs: { ...node.attrs, ...shuffleAttrs },

@@ -64,6 +64,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         const decorations: Decoration[] = [];
         state.doc.descendants((node, pos) => {
           const { shuffleStart, shuffleEnd } = node.attrs;
+          console.log(node.type.name, shuffleStart, shuffleEnd);
 
           if (shuffleStart === undefined || shuffleEnd === undefined) {
             return true;
@@ -274,7 +275,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         return shufflePluginKey.getState(state)?.deco;
       },
       attributes: {
-        class: "pp-shuffle-block  start-left end-right",
+        class: "pp-shuffle-block start-left end-right",
       },
       handleDOMEvents: {
         dragstart(_, event) {

@@ -10,7 +10,9 @@
     "check:lint": "yarn oxlint **/*.ts **/*.tsx **/*.mts",
     "check:types": "yarn tsgo --build .",
     "fix:format": "yarn oxfmt",
-    "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx **/*.mts"
+    "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx **/*.mts",
+    "demo:full": "yarn check:types && yarn workspace @pitter-patter/demo start",
+    "demo:shuffle": "yarn workspace @pitter-patter/shuffle demo"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
