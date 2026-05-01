@@ -117,12 +117,12 @@ export class CollabAuthority<Transaction> {
       );
 
       await this.saveCommit(
-          tr,
-          docId,
-          appliedCommitJSON.ref,
-          appliedCommitJSON.version,
-          appliedCommitJSON.steps,
-        );
+        tr,
+        docId,
+        appliedCommitJSON.ref,
+        appliedCommitJSON.version,
+        appliedCommitJSON.steps,
+      );
       await this.saveDoc(
         tr,
         docId,

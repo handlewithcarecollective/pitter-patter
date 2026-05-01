@@ -1,0 +1,91 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*-v*.*.*"
+
+jobs:
+  release:
+    permissions:
+      contents: write
+      id-token: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Parse tag
+        id: tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          PACKAGE="${TAG%-v*}"
+          VERSION="${TAG#"${PACKAGE}-"}"
+          echo "package=${PACKAGE}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Find previous release tag for this package
+        id: prev_tag
+        run: |
+          PREV=$(git tag --list "${{ steps.tag.outputs.package }}-v*" \
+            --sort=-version:refname \
+            | grep -v "^${GITHUB_REF_NAME}$" \
+            | head -1)
+          echo "tag=${PREV}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+
+      - name: Generate release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE: ${{ steps.tag.outputs.package }}
+          CURRENT_TAG: ${{ github.ref_name }}
+          PREV_TAG: ${{ steps.prev_tag.outputs.tag }}
+          REPO: ${{ github.repository }}
+          OUTPUT_FILE: release_notes.md
+        run: node scripts/generate-release-notes.mjs
+
+      - name: Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: "@pitter-patter/${{ steps.tag.outputs.package }} ${{ steps.tag.outputs.version }}"
+          body_path: release_notes.md
+          tag_name: ${{ github.ref_name }}
+
+  publish:
+    permissions:
+      contents: read
+      id-token: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Parse tag
+        id: tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          PACKAGE="${TAG%-v*}"
+          echo "package=${PACKAGE}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: yarn
+
+      - name: Install corepack
+        run: npm i -g corepack
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Publish to npm
+        run: yarn workspace @pitter-patter/${{ steps.tag.outputs.package }} npm publish

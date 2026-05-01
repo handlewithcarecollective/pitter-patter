@@ -1,0 +1,64 @@
+name: check
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches: -- "**"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: yarn
+
+      - name: Install corepack
+        run: npm i -g corepack
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Format
+        run: yarn check:format
+
+      - name: Types
+        run: yarn check:types
+
+      - name: Lint
+        run: yarn check:lint
+
+      - name: Versions
+        run: yarn node scripts/checkVersions.mts
+
+  bump-version:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.ref == 'refs/heads/main' }}
+
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+
+      - name: Check for version bump
+        run: yarn node scripts/bumpVersions.mts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
