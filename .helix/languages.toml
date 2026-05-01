@@ -22,23 +22,23 @@ tsserver.experimental.enableProjectDiagnostics = true
 
 [[language]]
 name = "typescript"
-language-servers = [{ name = "tsgo", except-features = [ "format" ] }, "oxfmt", "oxlint"]
+language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "oxlint"]
 
 [[language]]
 name = "tsx"
-language-servers = [{ name = "tsgo", except-features = [ "format" ] }, "oxfmt", "oxlint"]
+language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "oxlint"]
 
 [[language]]
 name = "javascript"
-language-servers = [{ name = "tsgo", except-features = [ "format" ] }, "oxfmt", "oxlint"]
+language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "oxlint"]
 
 [[language]]
 name = "jsx"
-language-servers = [{ name = "tsgo", except-features = [ "format" ] }, "oxfmt", "oxlint"]
+language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "oxlint"]
 
 [[language]]
 name = "json"
-language-servers = [{ name = "tsgo", except-features = [ "format" ] }, "oxfmt", "oxlint"]
+language-servers = [{ name = "tsgo", except-features = ["format"] }, "oxfmt", "oxlint"]
 
 [[language]]
 name = "markdown"

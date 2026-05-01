@@ -9,8 +9,10 @@
     "check:format": "yarn oxfmt --check",
     "check:lint": "yarn oxlint **/*.ts **/*.tsx **/*.mts",
     "check:types": "yarn tsgo --build .",
+    "check": "yarn check:format && yarn check:types && yarn check:lint",
     "fix:format": "yarn oxfmt",
     "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx **/*.mts",
+    "fix": "yarn fix:format && yarn fix:lint",
     "demo:full": "yarn check:types && yarn workspace @pitter-patter/demo start",
     "demo:shuffle": "yarn workspace @pitter-patter/shuffle demo"
   },
