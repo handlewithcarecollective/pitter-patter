@@ -89,11 +89,13 @@ interface PitterPatterSpec {
   shuffle?: ShuffleSpec;
 }
 
-export function supportsResize(node: Node) {
+export function supportsResize(node: Node | undefined) {
+  if (!node) return false;
   return !!node.type.spec.pitterPatter?.shuffle?.resizable;
 }
 
-export function supportsDrag(node: Node) {
+export function supportsDrag(node: Node | undefined) {
+  if (!node) return false;
   return !!node.type.spec.pitterPatter?.shuffle?.draggable;
 }
 

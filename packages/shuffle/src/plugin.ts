@@ -1,5 +1,5 @@
 import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
-import { createLayout, Timeline } from "animejs";
+import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
@@ -64,7 +64,6 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         const decorations: Decoration[] = [];
         state.doc.descendants((node, pos) => {
           const { shuffleStart, shuffleEnd } = node.attrs;
-          console.log(node.type.name, shuffleStart, shuffleEnd);
 
           if (shuffleStart === undefined || shuffleEnd === undefined) {
             return true;
@@ -290,11 +289,9 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           while (
             dom &&
             dom !== view.dom &&
-            "pmViewDesc" in dom &&
-            !dom.pmViewDesc.widget?.spec.isDragHandle &&
-            dom.pmViewDesc.node &&
-            !supportsResize(dom.pmViewDesc.node) &&
-            !supportsDrag(dom.pmViewDesc.node)
+            !dom.pmViewDesc?.widget?.spec.isDragHandle &&
+            !supportsResize(dom.pmViewDesc?.node) &&
+            !supportsDrag(dom.pmViewDesc?.node)
           ) {
             dom = dom.parentElement;
           }
@@ -304,6 +301,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           if (dom.pmViewDesc?.widget) {
             const domPos = dom.pmViewDesc.widget.spec.nodePos;
             dom = view.nodeDOM(domPos) as HTMLElement;
+            console.log("widget");
           }
 
           const viewDesc = dom.pmViewDesc;
@@ -330,11 +328,11 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           let clone: HTMLElement | null = null;
           let initialStyles: InitialStyles | null = null;
 
-          const layout = createLayout(view.dom);
+          let layout: AutoLayout | null = null;
           let currentAnimation: Timeline | null = null;
           let skeletonOn = false;
           const onMove = throttle(function onMove(e: PointerEvent) {
-            if (!skeletonOn || !clone || !initialStyles) {
+            if (!skeletonOn || !clone || !initialStyles || !layout) {
               const startResult = startDrag(dom!, translateCalc);
 
               view.dispatch(
@@ -354,6 +352,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
               skeletonOn = true;
               animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
+              layout = createLayout(view.dom);
             }
             if (!(dom instanceof HTMLElement)) return;
 

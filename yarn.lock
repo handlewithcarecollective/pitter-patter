@@ -183,9 +183,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@handlewithcare/react-prosemirror@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "@handlewithcare/react-prosemirror@npm:3.0.1"
+"@handlewithcare/react-prosemirror@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "@handlewithcare/react-prosemirror@npm:3.0.5"
   dependencies:
     classnames: "npm:^2.5.1"
   peerDependencies:
@@ -195,7 +195,7 @@ __metadata:
     react: ">=17 <20"
     react-dom: ">=17 <20"
     react-reconciler: ">=0.26.1 <=0.33.0"
-  checksum: 10c0/33cf0c3ccc8771d8e2adec9f14e557b8bf1c687a9c57042eba5bcaa670e8026622625a3cd98d2f886775f2263eed3d4ddb45899872db46d81ed6e1520fe6b3ec
+  checksum: 10c0/d2d94a436a2b9b1436b702535a2c80941929663b0d0e854890bdbc404ee6c36e97945935923a10d0e92c52729bf186492f673409f442480099669af06255f2a2
   languageName: node
   linkType: hard
 
@@ -2088,7 +2088,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/comments-client@workspace:packages/comments-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.5"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
@@ -2131,7 +2131,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/demo@workspace:packages/demo"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.5"
     "@parcel/rsc": "npm:^2.16.0"
     "@parcel/runtime-react-refresh": "npm:^2.13.3"
     "@parcel/runtime-rsc": "npm:^2.16.0"
@@ -2175,7 +2175,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/presence-client@workspace:packages/presence-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.5"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
@@ -2222,7 +2222,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/shuffle@workspace:packages/shuffle"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.1"
+    "@handlewithcare/react-prosemirror": "npm:^3.0.5"
     "@pitter-patter/refs": "workspace:*"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/react": "npm:^19.2.2"
