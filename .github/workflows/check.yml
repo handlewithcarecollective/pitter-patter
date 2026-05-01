@@ -6,7 +6,8 @@ on:
       - main
 
   pull_request:
-    branches: -- "**"
+    branches:
+      - "**"
 
 jobs:
   check:
@@ -16,11 +17,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          lfs: true
 
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
-          cache: yarn
 
       - name: Install corepack
         run: npm i -g corepack
@@ -53,6 +54,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          lfs: true
 
       - uses: actions/setup-node@v6
         with:
