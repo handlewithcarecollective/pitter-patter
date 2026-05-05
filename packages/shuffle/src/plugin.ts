@@ -63,16 +63,19 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
     state: {
       init(_, state) {
         const decorations: Decoration[] = [];
-        state.doc.descendants((node, pos) => {
+        state.doc.descendants((node, pos, _parent, index) => {
           const { shuffleStart, shuffleEnd } = node.attrs;
 
-          if (shuffleStart === undefined || shuffleEnd === undefined) {
+          if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
           }
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `pp-shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              ...(!isShuffleRow(node) && {
+                class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              }),
+              style: `grid-row: ${index + 1}`,
             }),
           );
 
@@ -115,7 +118,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           activeNodePos: undefined,
         };
       },
-      apply(tr, value, oldState, newState) {
+      apply(tr, value, _oldState, newState) {
         const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
         let nextComp = value.comp;
 
@@ -133,90 +136,40 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           nextActiveNodePos = tr.mapping.map(nextActiveNodePos);
         }
 
-        let nextDeco = value.deco.map(tr.mapping, tr.doc);
-        if (meta?.type === "resize") {
-          const { pos, start, end } = meta.payload;
-
-          const node = oldState.doc.resolve(pos).nodeAfter;
-
-          if (node) {
-            const candidates = nextDeco.find(pos, pos, (spec) => !spec.shuffleActive);
-            const decoration = candidates.find(
-              (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
-            );
-            if (decoration) {
-              nextDeco = nextDeco.remove([decoration]).add(tr.doc, [
-                Decoration.node(pos, pos + node.nodeSize, {
-                  class: `pp-shuffle-block start-${getShuffleGridClass(start)} end-${getShuffleGridClass(end)}`,
-                }),
-              ]);
-            }
-          }
-        }
-
-        if (nextActiveNodePos !== value.activeNodePos) {
-          if (value.activeNodePos !== undefined) {
-            const node = oldState.doc.resolve(value.activeNodePos).nodeAfter;
-
-            if (node) {
-              const candidates = nextDeco.find(
-                value.activeNodePos,
-                value.activeNodePos,
-                (spec) => spec.shuffleActive,
-              );
-              const decoration = candidates.find(
-                (deco) =>
-                  deco.from === value.activeNodePos &&
-                  deco.to === value.activeNodePos + node.nodeSize,
-              );
-              if (decoration) {
-                nextDeco = nextDeco.remove([decoration]);
-              }
-            }
-          }
-          if (nextActiveNodePos !== undefined) {
-            const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
-
-            if (node) {
-              nextDeco = nextDeco.add(newState.doc, [
-                Decoration.node(
-                  nextActiveNodePos,
-                  nextActiveNodePos + node.nodeSize,
-                  { style: "opacity: 0.4" },
-                  { shuffleActive: true },
-                ),
-              ]);
-            }
-          }
-        }
-
         const decorations: Decoration[] = [];
-
-        tr.doc.descendants((node, pos) => {
+        tr.doc.descendants((node, pos, _parent, index) => {
           const { shuffleStart, shuffleEnd } = node.attrs;
 
-          if (shuffleStart === undefined || shuffleEnd === undefined) {
-            return true;
-          }
-
-          const existing = nextDeco.find(pos, pos + node.nodeSize, (spec) => !spec.shuffleActive);
-
-          if (existing.some((deco) => deco.from === pos && deco.to === pos + node.nodeSize)) {
+          if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
           }
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `pp-shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              ...(!isShuffleRow(node) && {
+                class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              }),
+              style: `grid-row: ${index + 1}`,
             }),
           );
 
           return true;
         });
 
-        nextDeco = nextDeco.remove(
-          nextDeco.find(undefined, undefined, (spec) => spec.isDragHandle),
-        );
+        if (nextActiveNodePos !== undefined) {
+          const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
+
+          if (node) {
+            decorations.push(
+              Decoration.node(
+                nextActiveNodePos,
+                nextActiveNodePos + node.nodeSize,
+                { style: "opacity: 0.4" },
+                { shuffleActive: true },
+              ),
+            );
+          }
+        }
 
         const { $from, $to } = newState.selection;
         let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
@@ -248,13 +201,20 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         }
 
         return {
-          deco: nextDeco.add(tr.doc, decorations),
+          deco: DecorationSet.create(tr.doc, decorations),
           comp: nextComp,
           activeNodePos: nextActiveNodePos,
         };
       },
     },
-    appendTransaction(_transactions, _oldState, newState) {
+    appendTransaction(transactions, _oldState, newState) {
+      if (
+        !transactions.some(
+          (tr) => (tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined)?.type === "end",
+        )
+      ) {
+        return null;
+      }
       const collapsibleRows: [number, Node][] = [];
       newState.doc.descendants((node, pos) => {
         if (isShuffleRow(node) && node.childCount <= 1) {
@@ -275,7 +235,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         return shufflePluginKey.getState(state)?.deco;
       },
       attributes: {
-        class: "pp-shuffle-block start-left end-right",
+        class: "shuffle-block start-left end-right",
       },
       handleDOMEvents: {
         dragstart(_, event) {
@@ -302,7 +262,6 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           if (dom.pmViewDesc?.widget) {
             const domPos = dom.pmViewDesc.widget.spec.nodePos;
             dom = view.nodeDOM(domPos) as HTMLElement;
-            console.log("widget");
           }
 
           const viewDesc = dom.pmViewDesc;
@@ -351,16 +310,17 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
               );
 
               clone = startResult.clone;
+              clone.dataset["shuffleClone"] = "true";
               initialStyles = startResult.initialStyles;
 
-              const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+              const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
               if (!gridWrapper) return;
-              const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
+              const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
               if (!skeleton) return;
 
               skeletonOn = true;
               animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
-              layout = createLayout(view.dom);
+              layout = createLayout(view.dom, { duration: 150 });
             }
             if (!(dom instanceof HTMLElement)) return;
 
@@ -370,16 +330,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
             if (before === undefined) return;
 
+            if (currentAnimation?.began && !currentAnimation.completed) return;
+
             const tr =
               autogroup(view, before, e.clientX, e.clientY) ??
               reorder(view, before, e.clientX, e.clientY) ??
               reposition(view, before, clone!.getBoundingClientRect());
 
             if (!tr) return;
-
-            if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
-              currentAnimation.complete();
-            }
 
             currentAnimation = layout.update(() => {
               view.dispatch(tr);
@@ -398,12 +356,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           });
 
           function onUp() {
+            document.removeEventListener("mousedown", preventSelection);
+            document.removeEventListener("mousedown", preventSelection);
             document.removeEventListener("pointermove", onMove);
             document.removeEventListener("pointerup", onUp);
 
-            const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+            const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
             if (!gridWrapper) return;
-            const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
+            const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
             if (!skeleton) return;
 
             animate(skeleton, { opacity: 0 }, { duration: 0.25 });
@@ -443,8 +403,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
             return;
           }
 
+          const preventSelection = (e: MouseEvent) => {
+            e.preventDefault();
+          };
+
           document.addEventListener("pointermove", onMove);
           document.addEventListener("pointerup", onUp);
+          document.addEventListener("mousedown", preventSelection);
+          document.addEventListener("mousemove", preventSelection);
 
           return true;
         },

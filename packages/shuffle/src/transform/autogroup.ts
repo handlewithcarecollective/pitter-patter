@@ -24,7 +24,15 @@ export function autogroup(
 
   const adjacentPmDoms = adjacentElements
     .reverse()
-    .filter((el) => "pmViewDesc" in el && el !== view.dom);
+    .filter(
+      (el) =>
+        "pmViewDesc" in el &&
+        typeof el.pmViewDesc === "object" &&
+        el.pmViewDesc &&
+        "node" in el.pmViewDesc &&
+        el.pmViewDesc.node &&
+        el !== view.dom,
+    );
 
   if (!adjacentPmDoms.length) return null;
 
@@ -38,7 +46,7 @@ export function autogroup(
     );
   });
 
-  const outsidePositions = outsidePmDoms.map((el) => view.posAtDOM(el, 0));
+  const outsidePositions = outsidePmDoms.map((el) => view.posAtDOM(el, 0, 1));
 
   const $outsidePositions = outsidePositions
     .map((pos) => view.state.doc.resolve(pos - 1))

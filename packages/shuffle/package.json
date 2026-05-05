@@ -1,24 +1,29 @@
 {
   "name": "@pitter-patter/shuffle",
   "version": "0.1.0",
+  "license": "MIT",
   "files": [
-    "./styles.css",
+    "./style/shuffle.css",
     "./dist"
   ],
   "type": "module",
+  "sideEffects": [
+    "./style/shuffle.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
-    "./styles.css": "./styles.css"
+    "./style/shuffle.css": "./style/shuffle.css"
   },
   "publishConfig": {
     "access": "public",
     "exports": {
       ".": "./dist/index.js",
-      "./styles.css": "./styles.css"
+      "./style/shuffle.css": "./style/shuffle.css"
     }
   },
   "scripts": {
     "demo": "yarn vite",
+    "fix:toc": "markdown-toc --bullets='-' -i README.md",
     "prepack": "yarn check:types",
     "prepublish": "yarn check:format && yarn check:lint"
   },
@@ -42,6 +47,7 @@
     "@types/react-reconciler": "^0.32.2",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@vitejs/plugin-react": "^6.0.1",
+    "markdown-toc": "^1.2.0",
     "prettier": "^3.8.1",
     "prosemirror-commands": "^1.7.1",
     "prosemirror-keymap": "^1.2.3",

@@ -1,4 +1,11 @@
-export { addShuffleNodes, row, container, shuffleAttrs } from "./schema.js";
+export {
+  addShuffleNodes,
+  row,
+  container,
+  shuffleAttrs,
+  supportsResize,
+  supportsDrag,
+} from "./schema.js";
 export {
   shuffle,
   type ShufflePluginMeta,
@@ -6,5 +13,5 @@ export {
   type ShufflePluginState,
   shufflePluginKey,
 } from "./plugin.js";
-export { GridSkeleton } from "./components/GridSkeleton.js";
-export { ResizeHandles } from "./components/ResizeHandles.js";
+export { ShuffleSkeleton } from "./components/Skeleton.js";
+export { ResizeHandles, useResizeHandlePointerDown } from "./components/ResizeHandles.js";
