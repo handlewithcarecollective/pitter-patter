@@ -129,17 +129,15 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         if (!skeleton) return;
 
         skeletonOn = true;
-        layout = createLayout(view.dom);
+        layout = createLayout(view.dom, { duration: 150 });
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
+
+      if (currentAnimation?.began && !currentAnimation.completed) return;
 
       const tr = resize(view, pos, side, e.clientX);
 
       if (!tr) return;
-
-      if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
-        currentAnimation.complete();
-      }
 
       // This doesn't do anything, at the moment?
       currentAnimation = layout.update(() => {

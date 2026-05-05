@@ -367,7 +367,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
               skeletonOn = true;
               animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
-              layout = createLayout(view.dom);
+              layout = createLayout(view.dom, { duration: 150 });
             }
             if (!(dom instanceof HTMLElement)) return;
 
@@ -377,16 +377,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
             if (before === undefined) return;
 
+            if (currentAnimation?.began && !currentAnimation.completed) return;
+
             const tr =
               autogroup(view, before, e.clientX, e.clientY) ??
               reorder(view, before, e.clientX, e.clientY) ??
               reposition(view, before, clone!.getBoundingClientRect());
 
             if (!tr) return;
-
-            if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
-              currentAnimation.complete();
-            }
 
             currentAnimation = layout.update(() => {
               view.dispatch(tr);

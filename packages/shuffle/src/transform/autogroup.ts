@@ -30,6 +30,7 @@ export function autogroup(
         typeof el.pmViewDesc === "object" &&
         el.pmViewDesc &&
         "node" in el.pmViewDesc &&
+        el.pmViewDesc.node &&
         el !== view.dom,
     );
 
