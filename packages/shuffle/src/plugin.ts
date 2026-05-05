@@ -254,7 +254,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         };
       },
     },
-    appendTransaction(_transactions, _oldState, newState) {
+    appendTransaction(transactions, _oldState, newState) {
+      if (
+        !transactions.some(
+          (tr) => (tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined)?.type === "end",
+        )
+      ) {
+        return null;
+      }
       const collapsibleRows: [number, Node][] = [];
       newState.doc.descendants((node, pos) => {
         if (isShuffleRow(node) && node.childCount <= 1) {
@@ -302,7 +309,6 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           if (dom.pmViewDesc?.widget) {
             const domPos = dom.pmViewDesc.widget.spec.nodePos;
             dom = view.nodeDOM(domPos) as HTMLElement;
-            console.log("widget");
           }
 
           const viewDesc = dom.pmViewDesc;
