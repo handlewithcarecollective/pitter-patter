@@ -1,3 +1,4 @@
+import { Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 import { setShuffleColumns } from "../commands";
@@ -7,9 +8,9 @@ export function resize(
   pos: number,
   side: "start" | "end",
   clientX: number,
-): boolean {
+): Transaction | null {
   const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
-  if (!gridWrapper) return false;
+  if (!gridWrapper) return null;
 
   const bars = gridWrapper.querySelectorAll("[data-pp-grid-skeleton-bar]");
 
@@ -29,21 +30,37 @@ export function resize(
       closestDistance = distance;
     }
   }
-  if (closestBar === null) return false;
+  if (closestBar === null) return null;
   const $before = view.state.doc.resolve(pos);
   const node = $before.nodeAfter;
-  if (!node) return false;
+  if (!node) return null;
 
   const { shuffleStart, shuffleEnd } = node.attrs;
   if (typeof shuffleStart !== "number" || typeof shuffleEnd !== "number") {
-    return false;
+    return null;
   }
+
+  let transaction!: Transaction;
 
   if (side === "start") {
     const newStart = Math.max(0, closestBar + 1);
-    return setShuffleColumns(pos, newStart, shuffleEnd)(view.state, view.dispatch);
+    setShuffleColumns(
+      pos,
+      newStart,
+      shuffleEnd,
+    )(view.state, (tr) => {
+      transaction = tr;
+    });
+    return transaction;
   }
 
   const newEnd = Math.max(0, closestBar);
-  return setShuffleColumns(pos, shuffleStart, newEnd)(view.state, view.dispatch);
+  setShuffleColumns(
+    pos,
+    shuffleStart,
+    newEnd,
+  )(view.state, (tr) => {
+    transaction = tr;
+  });
+  return transaction;
 }

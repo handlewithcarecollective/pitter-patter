@@ -55,7 +55,7 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
   });
 
   schema.spec.nodes.forEach((name, node) => {
-    if (node.group?.match(new RegExp(`\b${group}\b`))) {
+    if (new RegExp(`\\b${group}\\b`).test(node.group ?? "")) {
       nodes = nodes.update(name, {
         ...node,
         attrs: { ...node.attrs, ...shuffleAttrs },
@@ -89,11 +89,13 @@ interface PitterPatterSpec {
   shuffle?: ShuffleSpec;
 }
 
-export function supportsResize(node: Node) {
+export function supportsResize(node: Node | undefined) {
+  if (!node) return false;
   return !!node.type.spec.pitterPatter?.shuffle?.resizable;
 }
 
-export function supportsDrag(node: Node) {
+export function supportsDrag(node: Node | undefined) {
+  if (!node) return false;
   return !!node.type.spec.pitterPatter?.shuffle?.draggable;
 }
 

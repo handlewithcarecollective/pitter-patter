@@ -6,7 +6,7 @@
     "build": "parcel build"
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.1",
+    "@handlewithcare/react-prosemirror": "^3.0.5",
     "@parcel/rsc": "^2.16.0",
     "@parcel/runtime-rsc": "^2.16.0",
     "@pitter-patter/collab-client": "workspace:*",

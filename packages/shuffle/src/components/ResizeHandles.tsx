@@ -3,22 +3,23 @@ import {
   useEditorEventCallback,
   useEditorState,
 } from "@handlewithcare/react-prosemirror";
-import { createLayout, Timeline } from "animejs";
+import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
+import { Node } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
 
 export function ResizeHandles() {
-  const { selection } = useEditorState();
+  const { doc, selection } = useEditorState();
 
   const firstSelectedShuffleBlock = useMemo(() => {
     if (selection instanceof NodeSelection) {
-      return selection.from;
+      return { pos: selection.from, node: selection.node };
     }
 
     const blockRange = selection.$from.blockRange(selection.$to);
@@ -33,39 +34,44 @@ export function ResizeHandles() {
     }
 
     if (supportsResize(node)) {
-      return blockRange.$from.before(depth);
+      const pos = blockRange.$from.before(depth);
+      return { pos, node: doc.resolve(pos).nodeAfter! };
     }
 
     return null;
-  }, [selection]);
+  }, [selection, doc]);
 
   if (firstSelectedShuffleBlock === null) return null;
 
   return (
     <>
-      <LeftResizeHandle pos={firstSelectedShuffleBlock} />
-      <RightResizeHandle pos={firstSelectedShuffleBlock} />
+      <LeftResizeHandle pos={firstSelectedShuffleBlock.pos} node={firstSelectedShuffleBlock.node} />
+      <RightResizeHandle
+        pos={firstSelectedShuffleBlock?.pos}
+        node={firstSelectedShuffleBlock.node}
+      />
     </>
   );
 }
 
 interface ResizeHandleProps {
   pos: number;
+  node: Node;
 }
 
-export function LeftResizeHandle({ pos }: ResizeHandleProps) {
+export function LeftResizeHandle({ pos, node }: ResizeHandleProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
   useEditorEffect(
     (view) => {
-      const node = view.nodeDOM(pos);
-      if (!(node instanceof HTMLElement)) return;
-      const rect = node.getBoundingClientRect();
+      const dom = view.nodeDOM(pos);
+      if (!(dom instanceof HTMLElement)) return;
+      const rect = dom.getBoundingClientRect();
       setLeft(rect.left - 8);
       setTop((rect.bottom + rect.top) / 2);
     },
-    [pos],
+    [pos, node],
   );
 
   const handlePointerDown = useHandlePointerDown(pos, "start");
@@ -81,19 +87,19 @@ export function LeftResizeHandle({ pos }: ResizeHandleProps) {
   );
 }
 
-export function RightResizeHandle({ pos }: ResizeHandleProps) {
+export function RightResizeHandle({ pos, node }: ResizeHandleProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
   useEditorEffect(
     (view) => {
-      const node = view.nodeDOM(pos);
-      if (!(node instanceof HTMLElement)) return;
-      const rect = node.getBoundingClientRect();
+      const dom = view.nodeDOM(pos);
+      if (!(dom instanceof HTMLElement)) return;
+      const rect = dom.getBoundingClientRect();
       setLeft(rect.right + 8);
       setTop((rect.top + rect.bottom) / 2);
     },
-    [pos],
+    [pos, node],
   );
   const handlePointerDown = useHandlePointerDown(pos, "end");
 
@@ -109,30 +115,35 @@ export function RightResizeHandle({ pos }: ResizeHandleProps) {
 }
 
 function useHandlePointerDown(pos: number, side: "start" | "end") {
-  const animationRef = useRef<Timeline | null>(null);
-
   return useEditorEventCallback((view) => {
     if (!view.editable) return;
 
+    let layout: AutoLayout | null = null;
+    let currentAnimation: Timeline | null = null;
     let skeletonOn = false;
     const handleMove = throttle(function handleMove(e: PointerEvent) {
-      if (!skeletonOn) {
+      if (!skeletonOn || !layout) {
         const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
         if (!gridWrapper) return;
         const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
         if (!skeleton) return;
 
         skeletonOn = true;
+        layout = createLayout(view.dom);
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
 
-      if (animationRef.current && animationRef.current.began && !animationRef.current.completed) {
-        animationRef.current.complete();
+      const tr = resize(view, pos, side, e.clientX);
+
+      if (!tr) return;
+
+      if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
+        currentAnimation.complete();
       }
 
-      const layout = createLayout(view.dom);
-      animationRef.current = layout.update(() => {
-        resize(view, pos, side, e.clientX);
+      // This doesn't do anything, at the moment?
+      currentAnimation = layout.update(() => {
+        view.dispatch(tr);
       });
     });
 

@@ -1,0 +1,4 @@
+declined:
+  - "@pitter-patter/comments-client"
+  - "@pitter-patter/presence-client"
+  - "@pitter-patter/shuffle"
