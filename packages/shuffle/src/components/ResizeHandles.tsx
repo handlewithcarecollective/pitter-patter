@@ -5,21 +5,21 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
+import { Node } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
-import { PointerEvent as ReactPointerEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
-import { TranslateCalculator } from "../translation.js";
 
 export function ResizeHandles() {
-  const { selection } = useEditorState();
+  const { doc, selection } = useEditorState();
 
   const firstSelectedShuffleBlock = useMemo(() => {
     if (selection instanceof NodeSelection) {
-      return selection.from;
+      return { pos: selection.from, node: selection.node };
     }
 
     const blockRange = selection.$from.blockRange(selection.$to);
@@ -34,39 +34,44 @@ export function ResizeHandles() {
     }
 
     if (supportsResize(node)) {
-      return blockRange.$from.before(depth);
+      const pos = blockRange.$from.before(depth);
+      return { pos, node: doc.resolve(pos).nodeAfter! };
     }
 
     return null;
-  }, [selection]);
+  }, [selection, doc]);
 
   if (firstSelectedShuffleBlock === null) return null;
 
   return (
     <>
-      <LeftResizeHandle pos={firstSelectedShuffleBlock} />
-      <RightResizeHandle pos={firstSelectedShuffleBlock} />
+      <LeftResizeHandle pos={firstSelectedShuffleBlock.pos} node={firstSelectedShuffleBlock.node} />
+      <RightResizeHandle
+        pos={firstSelectedShuffleBlock?.pos}
+        node={firstSelectedShuffleBlock.node}
+      />
     </>
   );
 }
 
 interface ResizeHandleProps {
   pos: number;
+  node: Node;
 }
 
-export function LeftResizeHandle({ pos }: ResizeHandleProps) {
+export function LeftResizeHandle({ pos, node }: ResizeHandleProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
   useEditorEffect(
     (view) => {
-      const node = view.nodeDOM(pos);
-      if (!(node instanceof HTMLElement)) return;
-      const rect = node.getBoundingClientRect();
+      const dom = view.nodeDOM(pos);
+      if (!(dom instanceof HTMLElement)) return;
+      const rect = dom.getBoundingClientRect();
       setLeft(rect.left - 8);
       setTop((rect.bottom + rect.top) / 2);
     },
-    [pos],
+    [pos, node],
   );
 
   const handlePointerDown = useHandlePointerDown(pos, "start");
@@ -82,19 +87,19 @@ export function LeftResizeHandle({ pos }: ResizeHandleProps) {
   );
 }
 
-export function RightResizeHandle({ pos }: ResizeHandleProps) {
+export function RightResizeHandle({ pos, node }: ResizeHandleProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
   useEditorEffect(
     (view) => {
-      const node = view.nodeDOM(pos);
-      if (!(node instanceof HTMLElement)) return;
-      const rect = node.getBoundingClientRect();
+      const dom = view.nodeDOM(pos);
+      if (!(dom instanceof HTMLElement)) return;
+      const rect = dom.getBoundingClientRect();
       setLeft(rect.right + 8);
       setTop((rect.top + rect.bottom) / 2);
     },
-    [pos],
+    [pos, node],
   );
   const handlePointerDown = useHandlePointerDown(pos, "end");
 
@@ -110,22 +115,8 @@ export function RightResizeHandle({ pos }: ResizeHandleProps) {
 }
 
 function useHandlePointerDown(pos: number, side: "start" | "end") {
-  return useEditorEventCallback((view, event: ReactPointerEvent<HTMLButtonElement>) => {
+  return useEditorEventCallback((view) => {
     if (!view.editable) return;
-
-    const dom = event.target;
-    if (!(dom instanceof HTMLElement)) return;
-
-    const domRect = dom.getBoundingClientRect();
-
-    const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
-    const originX = transform.m41;
-    const originY = transform.m42;
-
-    const startX = event.clientX;
-    const startY = event.clientY;
-
-    const translateCalc = new TranslateCalculator(originX, originY, startX, startY, domRect, 0);
 
     let layout: AutoLayout | null = null;
     let currentAnimation: Timeline | null = null;
@@ -142,8 +133,6 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       }
 
-      dom.style.transform = translateCalc.slide(e.clientX, e.clientY);
-
       const tr = resize(view, pos, side, e.clientX);
 
       if (!tr) return;
@@ -152,6 +141,7 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
         currentAnimation.complete();
       }
 
+      // This doesn't do anything, at the moment?
       currentAnimation = layout.update(() => {
         view.dispatch(tr);
       });
