@@ -16,8 +16,8 @@ import { EditorState } from "prosemirror-state";
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
 import { ResizeHandles } from "../src/components/ResizeHandles.tsx";
+import { ShuffleSkeleton } from "../src/components/Skeleton.tsx";
 import { shuffle } from "../src/plugin.ts";
 import { addShuffleNodes } from "../src/schema.ts";
 
@@ -54,7 +54,6 @@ const doc = schema.nodes.doc.create(null, [
       src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
     }),
     schema.nodes.container.create({ shuffleStart: 7, shuffleEnd: 12 }, [
-      // schema.nodes.container.create({}, [
       schema.nodes.paragraph.create(null, [schema.text("This is some sample text")]),
       schema.nodes.paragraph.create(null, [schema.text("This is some more sample text")]),
     ]),
@@ -145,10 +144,10 @@ const editorState = EditorState.create({
 function Editor() {
   return (
     <ProseMirror defaultState={editorState} nodeViewComponents={nodeViewComponents}>
-      <GridSkeleton>
+      <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />
-      </GridSkeleton>
+      </ShuffleSkeleton>
     </ProseMirror>
   );
 }

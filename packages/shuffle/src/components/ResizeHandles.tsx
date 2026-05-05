@@ -8,13 +8,26 @@ import { animate } from "motion/mini";
 import { Node } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import throttle from "raf-throttle";
-import { useMemo, useState } from "react";
+import {
+  ComponentType,
+  EventHandler,
+  PointerEvent as SyntheticPointerEvent,
+  useMemo,
+  useState,
+} from "react";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
 
-export function ResizeHandles() {
+interface Props {
+  handleComponent?: ComponentType<{
+    style: { top: number; left: number };
+    onPointerDown: EventHandler<SyntheticPointerEvent>;
+  }>;
+}
+
+export function ResizeHandles({ handleComponent }: Props) {
   const { doc, selection } = useEditorState();
 
   const firstSelectedShuffleBlock = useMemo(() => {
@@ -45,10 +58,15 @@ export function ResizeHandles() {
 
   return (
     <>
-      <LeftResizeHandle pos={firstSelectedShuffleBlock.pos} node={firstSelectedShuffleBlock.node} />
+      <LeftResizeHandle
+        pos={firstSelectedShuffleBlock.pos}
+        node={firstSelectedShuffleBlock.node}
+        handleComponent={handleComponent}
+      />
       <RightResizeHandle
         pos={firstSelectedShuffleBlock?.pos}
         node={firstSelectedShuffleBlock.node}
+        handleComponent={handleComponent}
       />
     </>
   );
@@ -57,9 +75,10 @@ export function ResizeHandles() {
 interface ResizeHandleProps {
   pos: number;
   node: Node;
+  handleComponent?: Props["handleComponent"];
 }
 
-export function LeftResizeHandle({ pos, node }: ResizeHandleProps) {
+export function LeftResizeHandle({ pos, node, handleComponent: Handle }: ResizeHandleProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
@@ -74,12 +93,16 @@ export function LeftResizeHandle({ pos, node }: ResizeHandleProps) {
     [pos, node],
   );
 
-  const handlePointerDown = useHandlePointerDown(pos, "start");
+  const handlePointerDown = useResizeHandlePointerDown(pos, "start");
+
+  if (Handle) {
+    return <Handle style={{ top, left }} onPointerDown={handlePointerDown} />;
+  }
 
   return (
     <button
       type="button"
-      className="left-resize-handle"
+      className="shuffle-left-resize-handle"
       style={{ left, top }}
       onPointerDown={handlePointerDown}
       draggable="false"
@@ -87,7 +110,7 @@ export function LeftResizeHandle({ pos, node }: ResizeHandleProps) {
   );
 }
 
-export function RightResizeHandle({ pos, node }: ResizeHandleProps) {
+export function RightResizeHandle({ pos, node, handleComponent: Handle }: ResizeHandleProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
@@ -101,12 +124,16 @@ export function RightResizeHandle({ pos, node }: ResizeHandleProps) {
     },
     [pos, node],
   );
-  const handlePointerDown = useHandlePointerDown(pos, "end");
+  const handlePointerDown = useResizeHandlePointerDown(pos, "end");
+
+  if (Handle) {
+    return <Handle style={{ top, left }} onPointerDown={handlePointerDown} />;
+  }
 
   return (
     <button
       type="button"
-      className="right-resize-handle"
+      className="shuffle-right-resize-handle"
       style={{ left, top }}
       onPointerDown={handlePointerDown}
       draggable="false"
@@ -114,7 +141,7 @@ export function RightResizeHandle({ pos, node }: ResizeHandleProps) {
   );
 }
 
-function useHandlePointerDown(pos: number, side: "start" | "end") {
+export function useResizeHandlePointerDown(pos: number, side: "start" | "end") {
   return useEditorEventCallback((view) => {
     if (!view.editable) return;
 
@@ -123,9 +150,9 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
     let skeletonOn = false;
     const handleMove = throttle(function handleMove(e: PointerEvent) {
       if (!skeletonOn || !layout) {
-        const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+        const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
         if (!gridWrapper) return;
-        const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
+        const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
         if (!skeleton) return;
 
         skeletonOn = true;
@@ -149,9 +176,9 @@ function useHandlePointerDown(pos: number, side: "start" | "end") {
       document.removeEventListener("pointermove", handleMove);
       document.removeEventListener("pointerup", handleUp);
 
-      const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+      const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
       if (!gridWrapper) return;
-      const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
+      const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
       if (!skeleton) return;
 
       animate(skeleton, { opacity: 0 }, { duration: 0.25 });

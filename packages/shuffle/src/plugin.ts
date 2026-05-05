@@ -72,7 +72,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `pp-shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
             }),
           );
 
@@ -147,7 +147,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
             if (decoration) {
               nextDeco = nextDeco.remove([decoration]).add(tr.doc, [
                 Decoration.node(pos, pos + node.nodeSize, {
-                  class: `pp-shuffle-block start-${getShuffleGridClass(start)} end-${getShuffleGridClass(end)}`,
+                  class: `shuffle-block start-${getShuffleGridClass(start)} end-${getShuffleGridClass(end)}`,
                 }),
               ]);
             }
@@ -207,7 +207,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `pp-shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
             }),
           );
 
@@ -282,7 +282,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         return shufflePluginKey.getState(state)?.deco;
       },
       attributes: {
-        class: "pp-shuffle-block start-left end-right",
+        class: "shuffle-block start-left end-right",
       },
       handleDOMEvents: {
         dragstart(_, event) {
@@ -360,9 +360,9 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
               clone.dataset["shuffleClone"] = "true";
               initialStyles = startResult.initialStyles;
 
-              const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+              const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
               if (!gridWrapper) return;
-              const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
+              const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
               if (!skeleton) return;
 
               skeletonOn = true;
@@ -408,9 +408,9 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
             document.removeEventListener("pointermove", onMove);
             document.removeEventListener("pointerup", onUp);
 
-            const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+            const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
             if (!gridWrapper) return;
-            const skeleton = gridWrapper.querySelector("[data-pp-grid-skeleton]");
+            const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
             if (!skeleton) return;
 
             animate(skeleton, { opacity: 0 }, { duration: 0.25 });

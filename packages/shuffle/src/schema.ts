@@ -35,7 +35,7 @@ export const row: NodeSpec = {
   toDOM() {
     return [
       "div",
-      { "data-node-type": "shuffle-row", class: "pp-shuffle-block row start-left end-right" },
+      { "data-node-type": "shuffle-row", class: "shuffle-block row start-left end-right" },
       0,
     ];
   },
@@ -47,10 +47,16 @@ export const row: NodeSpec = {
   },
 };
 
+export interface AddShuffleNodesOptions {
+  defaultStart?: number;
+  defaultEnd?: number;
+}
+
 export function addShuffleNodes<Nodes extends string, Marks extends string>(
   schema: Schema<Nodes, Marks>,
   content: string,
   group: string,
+  { defaultStart = 4, defaultEnd = 9 }: AddShuffleNodesOptions = {},
 ) {
   let nodes = schema.spec.nodes.append({
     container: { ...container, content, ...(group && { group }) },
@@ -61,7 +67,17 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
     if (new RegExp(`\\b${group}\\b`).test(node.group ?? "")) {
       nodes = nodes.update(name, {
         ...node,
-        attrs: { ...node.attrs, ...shuffleAttrs },
+        attrs: {
+          ...node.attrs,
+          shuffleStart: {
+            ...shuffleAttrs,
+            default: defaultStart,
+          },
+          shuffleEnd: {
+            ...shuffleAttrs,
+            default: defaultEnd,
+          },
+        },
         draggable: false,
         pitterPatter: {
           ...node.pitterPatter,

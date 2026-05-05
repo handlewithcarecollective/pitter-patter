@@ -4,10 +4,10 @@ import { EditorView } from "prosemirror-view";
 import { setShuffleColumns } from "../commands";
 
 export function reposition(view: EditorView, before: number, rect: DOMRect): Transaction | null {
-  const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
+  const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
   if (!gridWrapper) return null;
 
-  const bars = gridWrapper.querySelectorAll("[data-pp-grid-skeleton-bar]");
+  const bars = gridWrapper.querySelectorAll("[data-shuffle-skeleton-bar]");
 
   let closestBar: null | number = null;
   let closestDistance: null | number = null;
