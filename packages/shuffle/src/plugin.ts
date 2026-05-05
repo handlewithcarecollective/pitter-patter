@@ -63,16 +63,19 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
     state: {
       init(_, state) {
         const decorations: Decoration[] = [];
-        state.doc.descendants((node, pos) => {
+        state.doc.descendants((node, pos, _parent, index) => {
           const { shuffleStart, shuffleEnd } = node.attrs;
 
-          if (shuffleStart === undefined || shuffleEnd === undefined) {
+          if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
           }
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              ...(!isShuffleRow(node) && {
+                class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              }),
+              style: `grid-row: ${index + 1}`,
             }),
           );
 
@@ -115,7 +118,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           activeNodePos: undefined,
         };
       },
-      apply(tr, value, oldState, newState) {
+      apply(tr, value, _oldState, newState) {
         const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
         let nextComp = value.comp;
 
@@ -133,90 +136,40 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           nextActiveNodePos = tr.mapping.map(nextActiveNodePos);
         }
 
-        let nextDeco = value.deco.map(tr.mapping, tr.doc);
-        if (meta?.type === "resize") {
-          const { pos, start, end } = meta.payload;
-
-          const node = oldState.doc.resolve(pos).nodeAfter;
-
-          if (node) {
-            const candidates = nextDeco.find(pos, pos, (spec) => !spec.shuffleActive);
-            const decoration = candidates.find(
-              (deco) => deco.from === pos && deco.to === pos + node.nodeSize,
-            );
-            if (decoration) {
-              nextDeco = nextDeco.remove([decoration]).add(tr.doc, [
-                Decoration.node(pos, pos + node.nodeSize, {
-                  class: `shuffle-block start-${getShuffleGridClass(start)} end-${getShuffleGridClass(end)}`,
-                }),
-              ]);
-            }
-          }
-        }
-
-        if (nextActiveNodePos !== value.activeNodePos) {
-          if (value.activeNodePos !== undefined) {
-            const node = oldState.doc.resolve(value.activeNodePos).nodeAfter;
-
-            if (node) {
-              const candidates = nextDeco.find(
-                value.activeNodePos,
-                value.activeNodePos,
-                (spec) => spec.shuffleActive,
-              );
-              const decoration = candidates.find(
-                (deco) =>
-                  deco.from === value.activeNodePos &&
-                  deco.to === value.activeNodePos + node.nodeSize,
-              );
-              if (decoration) {
-                nextDeco = nextDeco.remove([decoration]);
-              }
-            }
-          }
-          if (nextActiveNodePos !== undefined) {
-            const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
-
-            if (node) {
-              nextDeco = nextDeco.add(newState.doc, [
-                Decoration.node(
-                  nextActiveNodePos,
-                  nextActiveNodePos + node.nodeSize,
-                  { style: "opacity: 0.4" },
-                  { shuffleActive: true },
-                ),
-              ]);
-            }
-          }
-        }
-
         const decorations: Decoration[] = [];
-
-        tr.doc.descendants((node, pos) => {
+        tr.doc.descendants((node, pos, _parent, index) => {
           const { shuffleStart, shuffleEnd } = node.attrs;
 
-          if (shuffleStart === undefined || shuffleEnd === undefined) {
-            return true;
-          }
-
-          const existing = nextDeco.find(pos, pos + node.nodeSize, (spec) => !spec.shuffleActive);
-
-          if (existing.some((deco) => deco.from === pos && deco.to === pos + node.nodeSize)) {
+          if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
           }
 
           decorations.push(
             Decoration.node(pos, pos + node.nodeSize, {
-              class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              ...(!isShuffleRow(node) && {
+                class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+              }),
+              style: `grid-row: ${index + 1}`,
             }),
           );
 
           return true;
         });
 
-        nextDeco = nextDeco.remove(
-          nextDeco.find(undefined, undefined, (spec) => spec.isDragHandle),
-        );
+        if (nextActiveNodePos !== undefined) {
+          const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
+
+          if (node) {
+            decorations.push(
+              Decoration.node(
+                nextActiveNodePos,
+                nextActiveNodePos + node.nodeSize,
+                { style: "opacity: 0.4" },
+                { shuffleActive: true },
+              ),
+            );
+          }
+        }
 
         const { $from, $to } = newState.selection;
         let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
@@ -248,7 +201,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         }
 
         return {
-          deco: nextDeco.add(tr.doc, decorations),
+          deco: DecorationSet.create(tr.doc, decorations),
           comp: nextComp,
           activeNodePos: nextActiveNodePos,
         };
