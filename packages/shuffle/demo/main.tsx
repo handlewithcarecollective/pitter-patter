@@ -10,6 +10,7 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
+import { Schema } from "prosemirror-model";
 import { schema as basic } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { useState } from "react";
@@ -32,7 +33,18 @@ basic.spec.nodes = basic.spec.nodes.update("image", {
   inline: false,
 });
 
-const schema = addShuffleNodes(basic, "block+", "block");
+let nodes = basic.spec.nodes.update("paragraph", {
+  ...basic.spec.nodes.get("paragraph"),
+  toDOM() {
+    return ["p", { "data-node-type": "paragraph" }, 0];
+  },
+});
+
+const schema = addShuffleNodes(
+  new Schema({ nodes, marks: basic.spec.marks }) as unknown as typeof basic,
+  "block+",
+  "block",
+);
 
 const doc = schema.nodes.doc.create(null, [
   schema.nodes.row.create({ shuffleStart: 1, shuffleEnd: 12 }, [

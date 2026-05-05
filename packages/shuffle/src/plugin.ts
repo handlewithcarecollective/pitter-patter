@@ -351,6 +351,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
               );
 
               clone = startResult.clone;
+              clone.dataset["shuffleClone"] = "true";
               initialStyles = startResult.initialStyles;
 
               const gridWrapper = view.dom.closest("[data-pp-grid-wrapper]");
@@ -398,6 +399,8 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           });
 
           function onUp() {
+            document.removeEventListener("mousedown", preventSelection);
+            document.removeEventListener("mousedown", preventSelection);
             document.removeEventListener("pointermove", onMove);
             document.removeEventListener("pointerup", onUp);
 
@@ -443,8 +446,14 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
             return;
           }
 
+          const preventSelection = (e: MouseEvent) => {
+            e.preventDefault();
+          };
+
           document.addEventListener("pointermove", onMove);
           document.addEventListener("pointerup", onUp);
+          document.addEventListener("mousedown", preventSelection);
+          document.addEventListener("mousemove", preventSelection);
 
           return true;
         },
