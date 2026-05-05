@@ -21,7 +21,7 @@ import { ShuffleSkeleton } from "../src/components/Skeleton.tsx";
 import { shuffle } from "../src/plugin.ts";
 import { addShuffleNodes } from "../src/schema.ts";
 
-import "../src/styles.css";
+import "../style/shuffle.css";
 import "./styles.css";
 import "prosemirror-view/style/prosemirror.css";
 

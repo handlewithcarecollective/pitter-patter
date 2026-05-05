@@ -1,20 +1,24 @@
 {
   "name": "@pitter-patter/shuffle",
   "version": "0.1.0",
+  "license": "MIT",
   "files": [
-    "./styles.css",
+    "./style/shuffle.css",
     "./dist"
   ],
   "type": "module",
+  "sideEffects": [
+    "./style/shuffle.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
-    "./styles.css": "./styles.css"
+    "./style/shuffle.css": "./style/shuffle.css"
   },
   "publishConfig": {
     "access": "public",
     "exports": {
       ".": "./dist/index.js",
-      "./styles.css": "./styles.css"
+      "./style/shuffle.css": "./style/shuffle.css"
     }
   },
   "scripts": {
