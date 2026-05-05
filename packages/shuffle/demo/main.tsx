@@ -10,17 +10,18 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
+import { Schema } from "prosemirror-model";
 import { schema as basic } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 
-import { GridSkeleton } from "../src/components/GridSkeleton.tsx";
 import { ResizeHandles } from "../src/components/ResizeHandles.tsx";
+import { ShuffleSkeleton } from "../src/components/Skeleton.tsx";
 import { shuffle } from "../src/plugin.ts";
 import { addShuffleNodes } from "../src/schema.ts";
 
-import "../src/styles.css";
+import "../style/shuffle.css";
 import "./styles.css";
 import "prosemirror-view/style/prosemirror.css";
 
@@ -32,7 +33,18 @@ basic.spec.nodes = basic.spec.nodes.update("image", {
   inline: false,
 });
 
-const schema = addShuffleNodes(basic, "block+", "block");
+let nodes = basic.spec.nodes.update("paragraph", {
+  ...basic.spec.nodes.get("paragraph"),
+  toDOM() {
+    return ["p", { "data-node-type": "paragraph" }, 0];
+  },
+});
+
+const schema = addShuffleNodes(
+  new Schema({ nodes, marks: basic.spec.marks }) as unknown as typeof basic,
+  "block+",
+  "block",
+);
 
 const doc = schema.nodes.doc.create(null, [
   schema.nodes.row.create({ shuffleStart: 1, shuffleEnd: 12 }, [
@@ -42,7 +54,6 @@ const doc = schema.nodes.doc.create(null, [
       src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
     }),
     schema.nodes.container.create({ shuffleStart: 7, shuffleEnd: 12 }, [
-      // schema.nodes.container.create({}, [
       schema.nodes.paragraph.create(null, [schema.text("This is some sample text")]),
       schema.nodes.paragraph.create(null, [schema.text("This is some more sample text")]),
     ]),
@@ -133,10 +144,10 @@ const editorState = EditorState.create({
 function Editor() {
   return (
     <ProseMirror defaultState={editorState} nodeViewComponents={nodeViewComponents}>
-      <GridSkeleton>
+      <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />
-      </GridSkeleton>
+      </ShuffleSkeleton>
     </ProseMirror>
   );
 }
