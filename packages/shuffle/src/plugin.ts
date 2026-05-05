@@ -1,5 +1,5 @@
 import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
-import { createLayout, Timeline } from "animejs";
+import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
@@ -13,6 +13,7 @@ import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
 import { autogroup } from "./transform/autogroup";
 import { reorder } from "./transform/reorder";
 import { reposition } from "./transform/reposition";
+import { TranslateCalculator } from "./translation.js";
 
 interface ShufflePluginStartMeta {
   type: "start";
@@ -274,7 +275,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         return shufflePluginKey.getState(state)?.deco;
       },
       attributes: {
-        class: "pp-shuffle-block  start-left end-right",
+        class: "pp-shuffle-block start-left end-right",
       },
       handleDOMEvents: {
         dragstart(_, event) {
@@ -289,11 +290,9 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           while (
             dom &&
             dom !== view.dom &&
-            "pmViewDesc" in dom &&
-            !dom.pmViewDesc.widget?.spec.isDragHandle &&
-            dom.pmViewDesc.node &&
-            !supportsResize(dom.pmViewDesc.node) &&
-            !supportsDrag(dom.pmViewDesc.node)
+            !dom.pmViewDesc?.widget?.spec.isDragHandle &&
+            !supportsResize(dom.pmViewDesc?.node) &&
+            !supportsDrag(dom.pmViewDesc?.node)
           ) {
             dom = dom.parentElement;
           }
@@ -303,6 +302,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           if (dom.pmViewDesc?.widget) {
             const domPos = dom.pmViewDesc.widget.spec.nodePos;
             dom = view.nodeDOM(domPos) as HTMLElement;
+            console.log("widget");
           }
 
           const viewDesc = dom.pmViewDesc;
@@ -324,16 +324,23 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           const startX = event.clientX;
           const startY = event.clientY;
 
-          const translateCalc = new TranslateCalculator(originX, originY, startX, startY, domRect);
+          const translateCalc = new TranslateCalculator(
+            originX,
+            originY,
+            startX,
+            startY,
+            domRect,
+            LIFT_AMOUNT,
+          );
 
           let clone: HTMLElement | null = null;
           let initialStyles: InitialStyles | null = null;
 
-          const layout = createLayout(view.dom);
+          let layout: AutoLayout | null = null;
           let currentAnimation: Timeline | null = null;
           let skeletonOn = false;
           const onMove = throttle(function onMove(e: PointerEvent) {
-            if (!skeletonOn || !clone || !initialStyles) {
+            if (!skeletonOn || !clone || !initialStyles || !layout) {
               const startResult = startDrag(dom!, translateCalc);
 
               view.dispatch(
@@ -353,6 +360,7 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
               skeletonOn = true;
               animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
+              layout = createLayout(view.dom);
             }
             if (!(dom instanceof HTMLElement)) return;
 
@@ -458,32 +466,6 @@ interface NodeViewDesc {
 
 export type ViewDesc = NodeViewDesc & WidgetViewDesc;
 const LIFT_AMOUNT = 24;
-
-class TranslateCalculator {
-  constructor(
-    private originX: number,
-    private originY: number,
-    public startX: number,
-    public startY: number,
-    private rect: DOMRect,
-  ) {}
-
-  slide(x: number, y: number) {
-    const dx = x - this.startX;
-    const dy = y - this.startY;
-    return `rotateX(0) scale(1.05) translate(${this.originX + dx}px, ${this.originY + dy - LIFT_AMOUNT}px)`;
-  }
-
-  place(x: number, y: number) {
-    const offsetX = this.rect.x - this.startX;
-    const offsetY = this.rect.y - this.startY;
-
-    const dx = x - this.startX - offsetX;
-    const dy = y - this.startY - offsetY;
-
-    return `rotateX(0) scale(1) translate(${this.originX + dx}px, ${this.originY + dy}px)`;
-  }
-}
 
 interface InitialStyles {
   boxShadow: string;
