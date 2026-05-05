@@ -29,12 +29,15 @@ export const container: NodeSpec = {
 };
 
 export const row: NodeSpec = {
-  attrs: shuffleAttrs,
   parseDOM: [{ tag: 'div[data-node-type="shuffle-row"]' }],
   defining: true,
   isolating: true,
   toDOM() {
-    return ["div", { "data-node-type": "shuffle-row", class: "row" }, 0];
+    return [
+      "div",
+      { "data-node-type": "shuffle-row", class: "pp-shuffle-block row start-left end-right" },
+      0,
+    ];
   },
   pitterPatter: {
     shuffle: {
