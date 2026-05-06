@@ -1,5 +1,7 @@
 {
-  "include": ["scripts/*.mts"],
+  "include": [
+    "scripts/*.mts"
+  ],
   "compilerOptions": {
     "noEmit": true
   },

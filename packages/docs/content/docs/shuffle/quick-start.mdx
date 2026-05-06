@@ -1,0 +1,226 @@
+---
+title: Quick start
+description: Install and configure Shuffle
+---
+
+```npm
+npm i @pitter-patter/shuffle prosemirror-view@1.47.1
+```
+
+## Update your schema
+
+Shuffle requires a few schema modifications in order to work as expected:
+
+- A `row` node spec. `row` is a block node that should allow other top level blocks as children.
+  When a node is dragged alongside an existing node, they will be automatically wrapped in a `row`
+  parent node, which allows them to live on the same grid row.
+- A `container` node spec. `container` is an optional vertical grouping of block nodes.
+- A `pitterPatter.shuffle` configuration for any existing node specs that should be draggable and/or
+  resizable.
+
+Shuffle can automatically extend your schema for you, or you can modify your schema yourself to add
+Shuffle support.
+
+To extend your schema automatically:
+
+```ts
+import { addShuffleNodes } from "@pitter-patter/shuffle";
+
+// Adds row and container nodes to your schema with
+// content: "block+", and configures each node with
+// the group "block" to be resizable and draggable.
+const shuffledSchema = addShuffleNodes(schema, "block+", "block");
+```
+
+Or, to manually update your schema, just add the row and container nodes yourself, and configure
+nodes to be resizable and draggable as needed:
+
+```ts
+import { container, row, shuffleAttrs } from "@pitter-patter/shuffle";
+
+const schema = new Schema({
+  nodes: {
+    doc: {
+      content: "block+",
+    },
+    text: {
+      group: "inline",
+      inline: true,
+    },
+    paragraph: {
+      group: "block",
+      content: "inline*",
+      attrs: {
+        ...shuffleAttrs,
+      },
+      pitterPatter: {
+        shuffle: {
+          resizable: true,
+          draggablue: true,
+        },
+      },
+    },
+    row: {
+      ...row,
+      group: "block",
+      content: "block+",
+    },
+    container: {
+      ...container,
+      group: "block",
+      content: "block+",
+    },
+  },
+});
+```
+
+## Add the plugin
+
+Most of Shuffle’s logic lives in the `shuffle()` ProseMirror plugin. This should be added to your
+EditorState:
+
+```ts
+import { reactKeys } from "@handlewithcare/react-prosemirror";
+import { shuffle } from "@pitter-patter/shuffle";
+
+const editorState = EditorState.create({
+  schema,
+  doce,
+  plugins: [reactKeys(), shuffle()],
+});
+```
+
+## Configure drag handles
+
+Some editor components, like images, can be easily dragged and resized on their own. Others, like
+paragraphs, benefit from a drag handle to provide an easy target to click and move. To add drag
+handles pass a record of drag handles to the shuffle plugin. These should be React ProseMirror
+widget components.
+
+The example below creates a `ParagraphHandle` widget that positions a handle to the top left of an
+element, and adds it to all paragraph nodes.
+
+```tsx
+import {
+  reactKeys,
+  useEditorEffect,
+  type WidgetViewComponentProps,
+} from "@handlewithcare/react-prosemirror";
+import { shuffle } from "@pitter-patter/shuffle";
+
+function ParagraphHandle({ widget, ref, getPos, ...props }: WidgetViewComponentProps) {
+  const [top, setTop] = useState(0);
+  const [left, setLeft] = useState(0);
+
+  useEditorEffect(
+    (view) => {
+      const viewRect = view.dom.getBoundingClientRect();
+      const coords = view.coordsAtPos(widget.spec.nodePos, 1);
+      setTop(coords.top - viewRect.top);
+      setLeft(coords.left - viewRect.left + (widget.spec.nodeDepth - 1) * 24);
+    },
+    [widget.spec.nodePos, widget.spec.nodeDepth],
+  );
+
+  return (
+    <div
+      ref={ref}
+      {...props}
+      contentEditable={false}
+      style={{
+        position: "absolute",
+        backgroundColor: "lightblue",
+        transform: "translateY(-1.5rem)",
+        top,
+        left,
+      }}
+    >
+      {name}
+    </div>
+  );
+}
+
+const editorState = EditorState.create({
+  schema,
+  doc,
+  plugins: [
+    reactKeys(),
+    shuffle({
+      dragHandles: {
+        paragraph: ParagraphHandle,
+      },
+    }),
+  ],
+});
+```
+
+## Wrap your ProseMirror component with the `ShuffleSkeleton` and add `ResizeHandles`
+
+Shuffle provides a `ShuffleSkeleton` component that wraps your `ProseMirrorDoc`. It renders
+Shuffle's grid skeleton, and must be rendered for resize and reposition behaviors to work correctly.
+The component should be a direct parent of the `ProseMirrorDoc` component.
+
+To add resize handles to your elements, include the `ResizeHandles` component as a child of your
+`ShuffleSkeleton`.
+
+```tsx
+function Editor() {
+  return (
+    <ProseMirror defaultState={editorState}>
+      <ShuffleSkeleton>
+        <ProseMirrorDoc />
+        <ResizeHandles />
+      </ShuffleSkeleton>
+    </ProseMirror>
+  );
+}
+```
+
+## Import the styles
+
+Shuffle provides a small functional stylesheet for visualizing and positioning nodes on the grid.
+
+```ts
+import "@pitter-patter/shuffle/styles.css";
+```
+
+## Customizing
+
+The appearance of the skeleton can be customized with CSS variables:
+
+```css
+:root {
+  --shuffle-column-width: 3rem; /* The width of an individual grid column */
+  --shuffle-gutter-width: 1.5rem; /* The visual gap between grid columns in the skeleton */
+  --shuffle-row-gap: 1rem; /* The gap between rows in the grid */
+  --shuffle-skeleton-color: lightgray /* The color of the grid columns in the skeleton */;
+}
+```
+
+The `ResizeHandles` component optionally takes a `handleComponent` prop that will be used instead of
+the default light blue button:
+
+```tsx
+import { ResizeHandles } from "@pitter-patter/shuffle";
+import { EventHandler, PointerDown } from "react";
+
+interface Props {
+  style: { top: number; left: number };
+  onPointerDown: EventHandler<PointerDown>;
+}
+
+function ResizeHandle({ styles, onPointerDown }) {
+  return <button type="button" styles={styles} onPointerDown={onPointerDown} />;
+}
+
+function Editor() {
+  return (
+    <ProseMirror defaultState={editorState}>
+      <ShuffleSkeleton>
+        <ProseMirrorDoc />
+        <ResizeHandles handleComponent={ResizeHandle} />
+      </ShuffleSkeleton>
+    </ProseMirror>
+  );
+}
+```

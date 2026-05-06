@@ -43,6 +43,15 @@ yarn add @pitter-patter/shuffle prosemirror-view@1.47.1
 
 ### Update your schema
 
+Shuffle requires a few schema modifications in order to work as expected:
+
+- A `row` node spec. `row` is a block node that should allow other top level blocks as children.
+  When a node is dragged alongside an existing node, they will be automatically wrapped in a `row`
+  parent node, which allows them to live on the same grid row.
+- A `container` node spec. `container` is an optional vertical grouping of block nodes.
+- A `pitterPatter.shuffle` configuration for any existing node specs that should be draggable and/or
+  resizable.
+
 Shuffle can automatically extend your schema for you, or you can modify your schema yourself to add
 Shuffle support.
 
@@ -115,8 +124,15 @@ const editorState = EditorState.create({
 });
 ```
 
-The plugin can be passed a record of drag handle components. These should be React ProseMirror
+## Configure drag handles
+
+Some editor components, like images, can be easily dragged and resized on their own. Others, like
+paragraphs, benefit from a drag handle to provide an easy target to click and move. To add drag
+handles pass a record of drag handles to the shuffle plugin. These should be React ProseMirror
 widget components.
+
+The example below creates a `ParagraphHandle` widget that positions a handle to the top left of an
+element, and adds it to all paragraph nodes.
 
 ```tsx
 import {
@@ -172,10 +188,14 @@ const editorState = EditorState.create({
 });
 ```
 
-### Wrap your ProseMirror component with the ShuffleSkeleton
+## Wrap your ProseMirror component with the `ShuffleSkeleton` and add `ResizeHandles`
 
-Shuffle provides a `ShuffleSkeleton` component that you can wrap your `ProseMirrorDoc` with, as well
-as a `ResizeHandles` component:
+Shuffle provides a `ShuffleSkeleton` component that wraps your `ProseMirrorDoc`. It renders
+Shuffle's grid skeleton, and must be rendered for resize and reposition behaviors to work correctly.
+The component should be a direct parent of the `ProseMirrorDoc` component.
+
+To add resize handles to your elements, include the `ResizeHandles` component as a child of your
+`ShuffleSkeleton`.
 
 ```tsx
 function Editor() {
