@@ -1,5 +1,5 @@
 {
-  "ignorePatterns": [".yarn", ".pnp.*"],
+  "ignorePatterns": [".yarn", ".pnp.*", "/packages/docs/src/routeTree.gen.ts"],
   "proseWrap": "always",
   "sortImports": {
     "sortSideEffects": true,

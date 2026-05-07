@@ -1,0 +1,16 @@
+.ProseMirror {
+  position: relative;
+  background-color: #f3efea;
+  color: #351900;
+  padding-top: 2rem;
+  min-height: 800px;
+}
+
+img {
+  border-radius: 1rem;
+}
+
+[data-node-type][data-shuffle-clone] {
+  border-radius: 1rem;
+  background-color: white;
+}
