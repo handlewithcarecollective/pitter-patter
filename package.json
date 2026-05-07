@@ -15,7 +15,8 @@
     "fix": "yarn fix:format && yarn fix:lint",
     "demo:full": "yarn check:types && yarn workspace @pitter-patter/demo start",
     "demo:shuffle": "yarn workspace @pitter-patter/shuffle demo",
-    "dev:docs": "yarn workspace @pitter-patter/docs dev"
+    "dev:docs": "yarn workspace @pitter-patter/docs dev",
+    "build:docs": "yarn workspace @pitter-patter/docs build"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
