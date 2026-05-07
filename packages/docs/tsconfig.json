@@ -1,6 +1,7 @@
 {
   "include": [".**/*.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
+    "composite": true,
     "strict": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
