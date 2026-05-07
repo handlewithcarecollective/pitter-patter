@@ -10,7 +10,7 @@ auto-grouping, repositioning, and resizing.
 ## Installation
 
 ```sh
-yarn add @pitter-patter/shuffle prosemirror-view@1.47.1
+yarn add @pitter-patter/shuffle prosemirror-view@1.41.7
 ```
 
 <!-- toc -->
