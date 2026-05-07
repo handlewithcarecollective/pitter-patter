@@ -26,7 +26,7 @@ jobs:
         run: npm i -g corepack
 
       - name: Install dependencies
-        run: yarn workspace focus @pitter-patter/docs
+        run: yarn workspaces focus @pitter-patter/docs
 
       - name: Build
         run: yarn build:docs
