@@ -89,6 +89,9 @@ export interface LongPollListenerOptions {
   fetch?: typeof globalThis.fetch;
 }
 
+// Todo: Do we actually need a long poll listener? It just makes a getCommits request
+//       Might be less confusing to have the user define this function.
+//       All of the long polling failure logic lives in collabClient
 export class LongPollListener {
   private headers: HeadersInit;
   private fetch: typeof globalThis.fetch;
@@ -114,6 +117,7 @@ export class LongPollListener {
       throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
     }
 
+    // Todo: The response body should be an json object with the commits as a field
     const commitJSONs = (await response.json()) as CommitJSON[];
     return commitJSONs;
   }
