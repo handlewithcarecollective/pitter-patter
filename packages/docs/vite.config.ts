@@ -33,5 +33,6 @@ export default defineConfig({
     alias: {
       tslib: "tslib/tslib.es6.js",
     },
+    dedupe: ["@handlewithcare/react-prosemirror"],
   },
 });
