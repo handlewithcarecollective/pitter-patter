@@ -5,7 +5,10 @@ import mdx from "fumadocs-mdx/vite";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
+const base = process.env.NODE_ENV === "production" ? "/pitter-patter/" : "/";
+
 export default defineConfig({
+  base,
   server: {
     port: 3000,
   },
@@ -16,6 +19,9 @@ export default defineConfig({
       prerender: {
         enabled: true,
         crawlLinks: true,
+      },
+      router: {
+        basepath: base,
       },
     }),
     react(),
