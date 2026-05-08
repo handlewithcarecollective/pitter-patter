@@ -5,8 +5,7 @@
   "sideEffects": false,
   "scripts": {
     "dev": "vite dev",
-    "postbuild": "find .output/public -name '*.js' -exec sed -i 's|`/__tsr/|`/pitter-patter/__tsr/|g' {} +",
-    "build": "vite build && yarn postbuild",
+    "build": "vite build",
     "start": "serve .output/public --config ../../serve.json",
     "preview": "vite preview",
     "types:check": "fumadocs-mdx && tsc --noEmit",
