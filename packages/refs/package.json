@@ -2,7 +2,6 @@
   "name": "@pitter-patter/refs",
   "version": "0.1.0",
   "files": [
-    "./styles.css",
     "./dist"
   ],
   "type": "module",
