@@ -139,6 +139,8 @@ export class CollabAuthority<Transaction> {
     await this.broadcastManager.broadcastCommit(docId, appliedCommitJSON);
   }
 
+  // Todo: We should have this function and/or the associated endpoint return an object with the
+  //       commits as one field. Makes it easier to add fields or refactor later if needed. 
   async listenForCommit(docId: string, version: number) {
     // Create listner to notify if commits are made. After this await, the listener is registered with
     // the notification service and will be notified if a commit is made.

@@ -8,7 +8,6 @@ import { EditorState, Transaction } from "prosemirror-state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  LongPollListener,
   CollabClient,
   CollabClientConfig,
   receiveCommitTransaction,
@@ -60,16 +59,6 @@ export function Editor({ doc }: Props) {
 
   const [initialState] = useState(state);
 
-  const [listener] = useState(
-    () =>
-      new LongPollListener(
-        new URL(
-          `/api/docs/${doc.id}/commits`,
-          typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
-        ),
-      ),
-  );
-
   const collabConfig = useMemo<CollabClientConfig>(
     () => ({
       sendCommit: async (commit) => {
@@ -79,14 +68,31 @@ export function Editor({ doc }: Props) {
           body: JSON.stringify(commit.toJSON()),
         });
       },
-      getCommits: listener.getCommits.bind(listener),
+      getCommits: async (version) => {
+        const url = new URL(`http://localhost:3000/api/docs/${doc.id}/commits`);
+        url.searchParams.append("version", version.toString());
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get commits. ${response.status}: ${response.statusText}`,
+          );
+        }
+
+        const commitJSONs = (await response.json()) as CommitJSON[];
+        return commitJSONs;
+      },
       receiveCommits: (commits) => {
         setState((prev) =>
-          commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev),
+          commits.reduce(
+            (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
+            prev,
+          ),
         );
       },
     }),
-    [listener, doc.id],
+    [doc.id],
   );
 
   const [presenceListener] = useState(
@@ -94,7 +100,9 @@ export function Editor({ doc }: Props) {
       new PresenceListener(
         new URL(
           `/api/docs/${doc.id}/presence`,
-          typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
+          typeof window !== "undefined"
+            ? window.location.href
+            : "http://localhost:3000",
         ),
       ),
   );
@@ -111,7 +119,9 @@ export function Editor({ doc }: Props) {
       },
       getIndicators: presenceListener.getIndicators.bind(presenceListener),
       receiveIndicators: (indicators) => {
-        setState((prev) => prev.apply(receivePresenceTransaction(prev, indicators)));
+        setState((prev) =>
+          prev.apply(receivePresenceTransaction(prev, indicators)),
+        );
       },
     }),
     [presenceListener, doc.id],
@@ -120,7 +130,10 @@ export function Editor({ doc }: Props) {
   const versionHistoryConfig = useMemo<VersionHistoryClientConfig>(
     () => ({
       getSnapshots: async (version?: number) => {
-        const url = new URL(`/api/docs/${doc.id}/snapshots`, window.location.href);
+        const url = new URL(
+          `/api/docs/${doc.id}/snapshots`,
+          window.location.href,
+        );
         if (version !== undefined) {
           url.searchParams.append("version", version.toString());
         }
@@ -136,7 +149,9 @@ export function Editor({ doc }: Props) {
     [doc.id],
   );
 
-  const [versionHistoryClient] = useState(() => new VersionHistoryClient(versionHistoryConfig));
+  const [versionHistoryClient] = useState(
+    () => new VersionHistoryClient(versionHistoryConfig),
+  );
 
   const [presenceClient] = useState(() => new PresenceClient(presenceConfig));
 
@@ -156,7 +171,9 @@ export function Editor({ doc }: Props) {
 
   useEffect(() => {
     const abortController = new AbortController();
-    collabClient?.listen(initialState, abortController.signal).catch((e) => console.error(e));
+    collabClient
+      ?.listen(initialState, abortController.signal)
+      .catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
@@ -165,7 +182,9 @@ export function Editor({ doc }: Props) {
 
   useEffect(() => {
     const abortController = new AbortController();
-    presenceClient.listen(abortController.signal).catch((e) => console.error(e));
+    presenceClient
+      .listen(abortController.signal)
+      .catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
@@ -174,7 +193,9 @@ export function Editor({ doc }: Props) {
 
   useEffect(() => {
     const abortController = new AbortController();
-    versionHistoryClient.poll(abortController.signal).catch((e) => console.error(e));
+    versionHistoryClient
+      .poll(abortController.signal)
+      .catch((e) => console.error(e));
 
     return () => {
       abortController.abort();

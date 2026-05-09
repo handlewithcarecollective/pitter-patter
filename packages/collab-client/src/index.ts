@@ -82,39 +82,3 @@ export class CollabClient {
     }
   }
 }
-
-export interface LongPollListenerOptions {
-  timeout?: number;
-  headers?: HeadersInit;
-  fetch?: typeof globalThis.fetch;
-}
-
-export class LongPollListener {
-  private headers: HeadersInit;
-  private fetch: typeof globalThis.fetch;
-
-  constructor(
-    private url: URL,
-    options: LongPollListenerOptions = {},
-  ) {
-    this.headers = options.headers ?? {};
-    this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-    this.getCommits = this.getCommits.bind(this);
-  }
-
-  async getCommits(version: number) {
-    const url = new URL(this.url);
-    url.searchParams.append("version", version.toString());
-
-    const response = await this.fetch(url, {
-      headers: this.headers,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
-    }
-
-    const commitJSONs = (await response.json()) as CommitJSON[];
-    return commitJSONs;
-  }
-}
