@@ -1,11 +1,9 @@
-import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
 import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
-import { Decoration, DecorationSet } from "prosemirror-view";
+import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import throttle from "raf-throttle";
-import { ComponentType, ForwardRefExoticComponent, RefAttributes } from "react";
 
 import { randomRef } from "@pitter-patter/refs";
 
@@ -39,25 +37,34 @@ interface ShufflePluginMapMeta {
   };
 }
 
+interface ShufflePluginHoverMeta {
+  type: "hover";
+  payload: {
+    positions: { from: number; to: number }[];
+  };
+}
+
 export type ShufflePluginMeta =
   | ShufflePluginStartMeta
   | ShufflePluginEndMeta
   | ShufflePluginMapMeta
-  | ShufflePluginResizeMeta;
+  | ShufflePluginResizeMeta
+  | ShufflePluginHoverMeta;
 
 export interface ShufflePluginState {
   deco: DecorationSet;
   comp: string | undefined;
   activeNodePos: number | undefined;
+  hoverPositions: { from: number; to: number }[];
 }
 
 export const shufflePluginKey = new PluginKey<ShufflePluginState>("@pitter-patter/shuffle");
 
 export interface ShufflePluginOptions {
-  dragHandles?: Record<string, ComponentType<WidgetViewComponentProps>>;
+  hoverDecorations?: Record<string, (from: number, to: number, node: Node) => Decoration>;
 }
 
-export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
+export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
   return new Plugin<ShufflePluginState>({
     key: shufflePluginKey,
     state: {
@@ -82,45 +89,21 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           return true;
         });
 
-        const { $from, $to } = state.selection;
-
-        let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
-
-        if (d !== undefined) {
-          while (d > 0) {
-            const before = $from.before(d);
-            const node = $from.node(d);
-            const handle = dragHandles?.[node.type.name];
-            if (handle) {
-              decorations.push(
-                widget(
-                  before,
-                  handle as ForwardRefExoticComponent<
-                    RefAttributes<HTMLElement> & WidgetViewComponentProps
-                  >,
-                  {
-                    key: `drag-handle-${d}`,
-                    nodePos: before,
-                    nodeDepth: d,
-                    isDragHandle: true,
-                    side: -1,
-                  },
-                ),
-              );
-            }
-            d--;
-          }
-        }
-
         return {
           deco: DecorationSet.create(state.doc, decorations),
           comp: undefined,
           activeNodePos: undefined,
+          hoverPositions: [],
         };
       },
       apply(tr, value, _oldState, newState) {
         const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
         let nextComp = value.comp;
+        let nextHoverPositions = value.hoverPositions;
+
+        if (meta?.type === "hover") {
+          nextHoverPositions = meta.payload.positions;
+        }
 
         if (meta?.type === "start") {
           nextComp = randomRef();
@@ -156,6 +139,22 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           return true;
         });
 
+        if (hoverDecorations) {
+          nextHoverPositions.forEach(({ from, to }) => {
+            const $from = tr.doc.resolve(from);
+            const node = $from.nodeAfter;
+
+            if (!node) return;
+
+            const nodeName = node.type.name;
+            const decorationCreator = hoverDecorations[nodeName];
+
+            if (!decorationCreator) return;
+
+            decorations.push(decorationCreator(from, to, node));
+          });
+        }
+
         if (nextActiveNodePos !== undefined) {
           const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
 
@@ -171,39 +170,11 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           }
         }
 
-        const { $from, $to } = newState.selection;
-        let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
-
-        if (d !== undefined) {
-          while (d > 0) {
-            const before = $from.before(d);
-            const node = $from.node(d);
-            const handle = dragHandles?.[node.type.name];
-            if (handle) {
-              decorations.push(
-                widget(
-                  before,
-                  handle as ForwardRefExoticComponent<
-                    RefAttributes<HTMLElement> & WidgetViewComponentProps
-                  >,
-                  {
-                    key: `drag-handle-${d}`,
-                    nodePos: before,
-                    nodeDepth: d,
-                    isDragHandle: true,
-                    side: -1,
-                  },
-                ),
-              );
-            }
-            d--;
-          }
-        }
-
         return {
           deco: DecorationSet.create(tr.doc, decorations),
           comp: nextComp,
           activeNodePos: nextActiveNodePos,
+          hoverPositions: nextHoverPositions,
         };
       },
     },
@@ -241,6 +212,41 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         dragstart(_, event) {
           event.preventDefault();
         },
+        // TODO: Store the event coords so that we can recheck on scroll
+        // and view.update
+        mousemove: throttle((view, event) => {
+          if (!view.editable) return false;
+
+          const elements = document.elementsFromPoint(event.clientX, event.clientY);
+          const positions = elements
+            .filter((el) => {
+              const dom: Element & { pmViewDesc?: ViewDesc } = el;
+              return supportsResize(dom.pmViewDesc?.node) || supportsDrag(dom.pmViewDesc?.node);
+            })
+            .map((el) => {
+              const dom = el as Element & { pmViewDesc: ViewDesc };
+              return {
+                from: dom.pmViewDesc.posBefore,
+                to: dom.pmViewDesc.posBefore + dom.pmViewDesc.node.nodeSize,
+              };
+            });
+
+          const shuffleState = shufflePluginKey.getState(view.state);
+          const currentPositions = shuffleState?.hoverPositions ?? [];
+
+          if (arePositionsEqual(positions, currentPositions)) {
+            return false;
+          }
+
+          view.dispatch(
+            view.state.tr.setMeta(shufflePluginKey, {
+              type: "hover",
+              payload: { positions },
+            } satisfies ShufflePluginMeta),
+          );
+
+          return false;
+        }),
         pointerdown(view, event) {
           if (!view.editable) return false;
           if (!(event.target instanceof HTMLElement)) return false;
@@ -250,7 +256,6 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           while (
             dom &&
             dom !== view.dom &&
-            !dom.pmViewDesc?.widget?.spec.isDragHandle &&
             !supportsResize(dom.pmViewDesc?.node) &&
             !supportsDrag(dom.pmViewDesc?.node)
           ) {
@@ -259,160 +264,18 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
 
           if (!dom || dom === view.dom) return false;
 
-          if (dom.pmViewDesc?.widget) {
-            const domPos = dom.pmViewDesc.widget.spec.nodePos;
-            dom = view.nodeDOM(domPos) as HTMLElement;
-          }
-
           const viewDesc = dom.pmViewDesc;
 
-          if (viewDesc?.contentDOM?.contains(event.target)) return false;
+          if (!viewDesc) return false;
+          if (viewDesc.contentDOM?.contains(event.target)) return false;
 
-          view.dispatch(
-            view.state.tr.setMeta(shufflePluginKey, {
-              type: "start",
-            } satisfies ShufflePluginMeta),
+          return startDragOnPointerDown(
+            view,
+            viewDesc.posBefore,
+            dom,
+            event.clientX,
+            event.clientY,
           );
-
-          const domRect = dom.getBoundingClientRect();
-
-          const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
-          const originX = transform.m41;
-          const originY = transform.m42;
-
-          const startX = event.clientX;
-          const startY = event.clientY;
-
-          const translateCalc = new TranslateCalculator(
-            originX,
-            originY,
-            startX,
-            startY,
-            domRect,
-            LIFT_AMOUNT,
-          );
-
-          let clone: HTMLElement | null = null;
-          let initialStyles: InitialStyles | null = null;
-
-          let layout: AutoLayout | null = null;
-          let currentAnimation: Timeline | null = null;
-          let skeletonOn = false;
-          const onMove = throttle(function onMove(e: PointerEvent) {
-            if (!skeletonOn || !clone || !initialStyles || !layout) {
-              const startResult = startDrag(dom!, translateCalc);
-
-              view.dispatch(
-                view.state.tr.setMeta(shufflePluginKey, {
-                  type: "map",
-                  payload: { newPos: viewDesc?.posBefore },
-                }),
-              );
-
-              clone = startResult.clone;
-              clone.dataset["shuffleClone"] = "true";
-              initialStyles = startResult.initialStyles;
-
-              const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-              if (!gridWrapper) return;
-              const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-              if (!skeleton) return;
-
-              skeletonOn = true;
-              animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
-              layout = createLayout(view.dom, { duration: 150 });
-            }
-            if (!(dom instanceof HTMLElement)) return;
-
-            clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
-
-            const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-            if (before === undefined) return;
-
-            if (currentAnimation?.began && !currentAnimation.completed) return;
-
-            const tr =
-              autogroup(view, before, e.clientX, e.clientY) ??
-              reorder(view, before, e.clientX, e.clientY) ??
-              reposition(view, before, clone!.getBoundingClientRect());
-
-            if (!tr) return;
-
-            currentAnimation = layout.update(() => {
-              view.dispatch(tr);
-            });
-
-            const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-            if (updatedBefore === undefined) return;
-
-            const nodeDom = view.nodeDOM(updatedBefore);
-            if (nodeDom === dom) return;
-            if (!(nodeDom instanceof HTMLElement)) return;
-
-            dom = nodeDom;
-            dom.dataset["shuffleActive"] = "true";
-          });
-
-          function onUp() {
-            document.removeEventListener("mousedown", preventSelection);
-            document.removeEventListener("mousedown", preventSelection);
-            document.removeEventListener("pointermove", onMove);
-            document.removeEventListener("pointerup", onUp);
-
-            const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-            if (!gridWrapper) return;
-            const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-            if (!skeleton) return;
-
-            animate(skeleton, { opacity: 0 }, { duration: 0.25 });
-
-            if (!clone || !initialStyles) return;
-
-            if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
-              currentAnimation.complete();
-            }
-
-            const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-            if (before === undefined) return;
-
-            const dom = view.nodeDOM(before);
-            if (!(dom instanceof HTMLElement)) return;
-
-            view.dispatch(
-              view.state.tr.setMeta(shufflePluginKey, {
-                type: "end",
-              } satisfies ShufflePluginMeta),
-            );
-
-            clone.style.transition = "transform 0.2s ease";
-            clone.style.boxShadow = initialStyles.boxShadow;
-
-            const domRect = dom.getBoundingClientRect();
-
-            clone.style.transform = translateCalc.place(domRect.left, domRect.top);
-
-            setTimeout(() => {
-              clone!.style.transition = "none";
-              delete dom.dataset["shuffleActive"];
-              clone!.remove();
-            }, 250);
-
-            return;
-          }
-
-          const preventSelection = (e: MouseEvent) => {
-            e.preventDefault();
-          };
-
-          document.addEventListener("pointermove", onMove);
-          document.addEventListener("pointerup", onUp);
-          document.addEventListener("mousedown", preventSelection);
-          document.addEventListener("mousemove", preventSelection);
-
-          return true;
         },
       },
     },
@@ -428,6 +291,160 @@ interface NodeViewDesc {
   dom: HTMLElement;
   contentDOM?: HTMLElement;
   posBefore: number;
+}
+
+export function startDragOnPointerDown(
+  view: EditorView,
+  pos: number,
+  dom: HTMLElement & { pmViewDesc?: ViewDesc },
+  clientX: number,
+  clientY: number,
+) {
+  view.dispatch(
+    view.state.tr.setMeta(shufflePluginKey, {
+      type: "start",
+    } satisfies ShufflePluginMeta),
+  );
+
+  const domRect = dom.getBoundingClientRect();
+
+  const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
+  const originX = transform.m41;
+  const originY = transform.m42;
+
+  const startX = clientX;
+  const startY = clientY;
+
+  const translateCalc = new TranslateCalculator(
+    originX,
+    originY,
+    startX,
+    startY,
+    domRect,
+    LIFT_AMOUNT,
+  );
+
+  let clone: HTMLElement | null = null;
+  let initialStyles: InitialStyles | null = null;
+
+  let layout: AutoLayout | null = null;
+  let currentAnimation: Timeline | null = null;
+  let skeletonOn = false;
+  const onMove = throttle(function onMove(e: PointerEvent) {
+    if (!skeletonOn || !clone || !initialStyles || !layout) {
+      const startResult = startDrag(dom!, translateCalc);
+
+      view.dispatch(
+        view.state.tr.setMeta(shufflePluginKey, {
+          type: "map",
+          payload: { newPos: pos },
+        }),
+      );
+
+      clone = startResult.clone;
+      clone.dataset["shuffleClone"] = "true";
+      initialStyles = startResult.initialStyles;
+
+      const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
+      if (!gridWrapper) return;
+      const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
+      if (!skeleton) return;
+
+      skeletonOn = true;
+      animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
+      layout = createLayout(view.dom, { duration: 150 });
+    }
+    if (!(dom instanceof HTMLElement)) return;
+
+    clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
+
+    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (before === undefined) return;
+
+    if (currentAnimation?.began && !currentAnimation.completed) return;
+
+    const tr =
+      autogroup(view, before, e.clientX, e.clientY) ??
+      reorder(view, before, e.clientX, e.clientY) ??
+      reposition(view, before, clone!.getBoundingClientRect());
+
+    if (!tr) return;
+
+    currentAnimation = layout.update(() => {
+      view.dispatch(tr);
+    });
+
+    const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (updatedBefore === undefined) return;
+
+    const nodeDom = view.nodeDOM(updatedBefore);
+    if (nodeDom === dom) return;
+    if (!(nodeDom instanceof HTMLElement)) return;
+
+    dom = nodeDom;
+    dom.dataset["shuffleActive"] = "true";
+  });
+
+  function onUp() {
+    document.removeEventListener("mousedown", preventSelection);
+    document.removeEventListener("mousedown", preventSelection);
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+
+    const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
+    if (!gridWrapper) return;
+    const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
+    if (!skeleton) return;
+
+    animate(skeleton, { opacity: 0 }, { duration: 0.25 });
+
+    if (!clone || !initialStyles) return;
+
+    if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
+      currentAnimation.complete();
+    }
+
+    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (before === undefined) return;
+
+    const dom = view.nodeDOM(before);
+    if (!(dom instanceof HTMLElement)) return;
+
+    view.dispatch(
+      view.state.tr.setMeta(shufflePluginKey, {
+        type: "end",
+      } satisfies ShufflePluginMeta),
+    );
+
+    clone.style.transition = "transform 0.2s ease";
+    clone.style.boxShadow = initialStyles.boxShadow;
+
+    const domRect = dom.getBoundingClientRect();
+
+    clone.style.transform = translateCalc.place(domRect.left, domRect.top);
+
+    setTimeout(() => {
+      clone!.style.transition = "none";
+      delete dom.dataset["shuffleActive"];
+      clone!.remove();
+    }, 250);
+
+    return;
+  }
+
+  const preventSelection = (e: MouseEvent) => {
+    e.preventDefault();
+  };
+
+  document.addEventListener("pointermove", onMove);
+  document.addEventListener("pointerup", onUp);
+  document.addEventListener("mousedown", preventSelection);
+  document.addEventListener("mousemove", preventSelection);
+
+  return true;
 }
 
 export type ViewDesc = NodeViewDesc & WidgetViewDesc;
@@ -474,4 +491,20 @@ function getShuffleGridClass(col: number) {
   if (col === 0) return "left";
   if (col === 13) return "right";
   return col;
+}
+
+function arePositionsEqual(
+  positions: { from: number; to: number }[],
+  decorations: { from: number; to: number }[],
+) {
+  if (positions.length !== decorations.length) return false;
+
+  for (let i = 0; i < positions.length; i++) {
+    const pos = positions[i]!;
+    const deco = decorations[i]!;
+
+    if (pos.from !== deco.from || pos.to !== deco.to) return false;
+  }
+
+  return true;
 }
