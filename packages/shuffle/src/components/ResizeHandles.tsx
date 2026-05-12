@@ -35,13 +35,13 @@ export function ResizeHandles({ handleComponent }: Props) {
       return { pos: selection.from, node: selection.node };
     }
 
-    const blockRange = selection.$from.blockRange(selection.$to);
+    const spansBlock = selection.$from.parent !== selection.$to.parent;
 
-    if (!blockRange) return null;
+    const blockRange = selection.$from.blockRange(selection.$to)!;
 
-    let node = blockRange.parent;
-    let depth = blockRange.depth;
-    while (depth >= 0 && !supportsResize(node)) {
+    let node = spansBlock ? blockRange.parent : selection.$from.parent;
+    let depth = spansBlock ? blockRange.depth : selection.$from.depth;
+    while (depth > 0 && !supportsResize(node)) {
       depth--;
       node = blockRange.$from.node(depth);
     }

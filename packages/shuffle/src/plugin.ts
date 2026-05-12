@@ -1,11 +1,9 @@
-import { widget, WidgetViewComponentProps } from "@handlewithcare/react-prosemirror";
 import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import throttle from "raf-throttle";
-import { ComponentType, ForwardRefExoticComponent, RefAttributes } from "react";
 
 import { randomRef } from "@pitter-patter/refs";
 
@@ -39,25 +37,34 @@ interface ShufflePluginMapMeta {
   };
 }
 
+interface ShufflePluginHoverMeta {
+  type: "hover";
+  payload: {
+    positions: { from: number; to: number }[];
+  };
+}
+
 export type ShufflePluginMeta =
   | ShufflePluginStartMeta
   | ShufflePluginEndMeta
   | ShufflePluginMapMeta
-  | ShufflePluginResizeMeta;
+  | ShufflePluginResizeMeta
+  | ShufflePluginHoverMeta;
 
 export interface ShufflePluginState {
   deco: DecorationSet;
   comp: string | undefined;
   activeNodePos: number | undefined;
+  hoverPositions: { from: number; to: number }[];
 }
 
 export const shufflePluginKey = new PluginKey<ShufflePluginState>("@pitter-patter/shuffle");
 
 export interface ShufflePluginOptions {
-  dragHandles?: Record<string, ComponentType<WidgetViewComponentProps>>;
+  hoverDecorations?: Record<string, (from: number, to: number, node: Node) => Decoration>;
 }
 
-export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
+export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
   return new Plugin<ShufflePluginState>({
     key: shufflePluginKey,
     state: {
@@ -82,45 +89,21 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           return true;
         });
 
-        const { $from, $to } = state.selection;
-
-        let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
-
-        if (d !== undefined) {
-          while (d > 0) {
-            const before = $from.before(d);
-            const node = $from.node(d);
-            const handle = dragHandles?.[node.type.name];
-            if (handle) {
-              decorations.push(
-                widget(
-                  before,
-                  handle as ForwardRefExoticComponent<
-                    RefAttributes<HTMLElement> & WidgetViewComponentProps
-                  >,
-                  {
-                    key: `drag-handle-${d}`,
-                    nodePos: before,
-                    nodeDepth: d,
-                    isDragHandle: true,
-                    side: -1,
-                  },
-                ),
-              );
-            }
-            d--;
-          }
-        }
-
         return {
           deco: DecorationSet.create(state.doc, decorations),
           comp: undefined,
           activeNodePos: undefined,
+          hoverPositions: [],
         };
       },
       apply(tr, value, _oldState, newState) {
         const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
         let nextComp = value.comp;
+        let nextHoverPositions = value.hoverPositions;
+
+        if (meta?.type === "hover") {
+          nextHoverPositions = meta.payload.positions;
+        }
 
         if (meta?.type === "start") {
           nextComp = randomRef();
@@ -156,6 +139,22 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           return true;
         });
 
+        if (hoverDecorations) {
+          nextHoverPositions.forEach(({ from, to }) => {
+            const $from = tr.doc.resolve(from);
+            const node = $from.nodeAfter;
+
+            if (!node) return;
+
+            const nodeName = node.type.name;
+            const decorationCreator = hoverDecorations[nodeName];
+
+            if (!decorationCreator) return;
+
+            decorations.push(decorationCreator(from, to, node));
+          });
+        }
+
         if (nextActiveNodePos !== undefined) {
           const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
 
@@ -171,39 +170,11 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           }
         }
 
-        const { $from, $to } = newState.selection;
-        let d = $from.parent === $to.parent ? $from.depth : $from.blockRange($to)?.depth;
-
-        if (d !== undefined) {
-          while (d > 0) {
-            const before = $from.before(d);
-            const node = $from.node(d);
-            const handle = dragHandles?.[node.type.name];
-            if (handle) {
-              decorations.push(
-                widget(
-                  before,
-                  handle as ForwardRefExoticComponent<
-                    RefAttributes<HTMLElement> & WidgetViewComponentProps
-                  >,
-                  {
-                    key: `drag-handle-${d}`,
-                    nodePos: before,
-                    nodeDepth: d,
-                    isDragHandle: true,
-                    side: -1,
-                  },
-                ),
-              );
-            }
-            d--;
-          }
-        }
-
         return {
           deco: DecorationSet.create(tr.doc, decorations),
           comp: nextComp,
           activeNodePos: nextActiveNodePos,
+          hoverPositions: nextHoverPositions,
         };
       },
     },
@@ -241,6 +212,41 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
         dragstart(_, event) {
           event.preventDefault();
         },
+        // TODO: Store the event coords so that we can recheck on scroll
+        // and view.update
+        mousemove: throttle((view, event) => {
+          if (!view.editable) return false;
+
+          const elements = document.elementsFromPoint(event.clientX, event.clientY);
+          const positions = elements
+            .filter((el) => {
+              const dom: Element & { pmViewDesc?: ViewDesc } = el;
+              return supportsResize(dom.pmViewDesc?.node) || supportsDrag(dom.pmViewDesc?.node);
+            })
+            .map((el) => {
+              const dom = el as Element & { pmViewDesc: ViewDesc };
+              return {
+                from: dom.pmViewDesc.posBefore,
+                to: dom.pmViewDesc.posBefore + dom.pmViewDesc.node.nodeSize,
+              };
+            });
+
+          const shuffleState = shufflePluginKey.getState(view.state);
+          const currentPositions = shuffleState?.hoverPositions ?? [];
+
+          if (arePositionsEqual(positions, currentPositions)) {
+            return false;
+          }
+
+          view.dispatch(
+            view.state.tr.setMeta(shufflePluginKey, {
+              type: "hover",
+              payload: { positions },
+            } satisfies ShufflePluginMeta),
+          );
+
+          return false;
+        }),
         pointerdown(view, event) {
           if (!view.editable) return false;
           if (!(event.target instanceof HTMLElement)) return false;
@@ -250,7 +256,6 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           while (
             dom &&
             dom !== view.dom &&
-            !dom.pmViewDesc?.widget?.spec.isDragHandle &&
             !supportsResize(dom.pmViewDesc?.node) &&
             !supportsDrag(dom.pmViewDesc?.node)
           ) {
@@ -258,11 +263,6 @@ export function shuffle({ dragHandles }: ShufflePluginOptions = {}) {
           }
 
           if (!dom || dom === view.dom) return false;
-
-          if (dom.pmViewDesc?.widget) {
-            const domPos = dom.pmViewDesc.widget.spec.nodePos;
-            dom = view.nodeDOM(domPos) as HTMLElement;
-          }
 
           const viewDesc = dom.pmViewDesc;
 
@@ -474,4 +474,20 @@ function getShuffleGridClass(col: number) {
   if (col === 0) return "left";
   if (col === 13) return "right";
   return col;
+}
+
+function arePositionsEqual(
+  positions: { from: number; to: number }[],
+  decorations: { from: number; to: number }[],
+) {
+  if (positions.length !== decorations.length) return false;
+
+  for (let i = 0; i < positions.length; i++) {
+    const pos = positions[i]!;
+    const deco = decorations[i]!;
+
+    if (pos.from !== deco.from || pos.to !== deco.to) return false;
+  }
+
+  return true;
 }

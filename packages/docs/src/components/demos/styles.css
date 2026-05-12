@@ -14,3 +14,18 @@ img {
   border-radius: 1rem;
   background-color: white;
 }
+
+.shuffle-block {
+  border: 1px solid transparent;
+}
+
+.shuffle-hover-block {
+  border: 1px solid lightblue;
+}
+
+.shuffle-hover-block::before {
+  content: attr(data-shuffle-demo-node-name);
+  position: absolute;
+  background-color: lightblue;
+  transform: translateY(-100%);
+}
