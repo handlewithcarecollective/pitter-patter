@@ -22,7 +22,6 @@
     }
   },
   "scripts": {
-    "demo": "yarn vite",
     "fix:toc": "markdown-toc --bullets='-' -i README.md",
     "prepack": "yarn check:types",
     "prepublish": "yarn check:format && yarn check:lint"
