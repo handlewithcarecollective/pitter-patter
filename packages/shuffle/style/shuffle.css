@@ -603,3 +603,9 @@
   margin: 0;
   border: none;
 }
+
+.shuffle-drag-handle {
+  position: absolute;
+  background-color: lightblue;
+  transform: translateY(-100%);
+}

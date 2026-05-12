@@ -2,7 +2,7 @@ import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { Plugin, PluginKey } from "prosemirror-state";
-import { Decoration, DecorationSet } from "prosemirror-view";
+import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import throttle from "raf-throttle";
 
 import { randomRef } from "@pitter-patter/refs";
@@ -266,153 +266,16 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
 
           const viewDesc = dom.pmViewDesc;
 
-          if (viewDesc?.contentDOM?.contains(event.target)) return false;
+          if (!viewDesc) return false;
+          if (viewDesc.contentDOM?.contains(event.target)) return false;
 
-          view.dispatch(
-            view.state.tr.setMeta(shufflePluginKey, {
-              type: "start",
-            } satisfies ShufflePluginMeta),
+          return startDragOnPointerDown(
+            view,
+            viewDesc.posBefore,
+            dom,
+            event.clientX,
+            event.clientY,
           );
-
-          const domRect = dom.getBoundingClientRect();
-
-          const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
-          const originX = transform.m41;
-          const originY = transform.m42;
-
-          const startX = event.clientX;
-          const startY = event.clientY;
-
-          const translateCalc = new TranslateCalculator(
-            originX,
-            originY,
-            startX,
-            startY,
-            domRect,
-            LIFT_AMOUNT,
-          );
-
-          let clone: HTMLElement | null = null;
-          let initialStyles: InitialStyles | null = null;
-
-          let layout: AutoLayout | null = null;
-          let currentAnimation: Timeline | null = null;
-          let skeletonOn = false;
-          const onMove = throttle(function onMove(e: PointerEvent) {
-            if (!skeletonOn || !clone || !initialStyles || !layout) {
-              const startResult = startDrag(dom!, translateCalc);
-
-              view.dispatch(
-                view.state.tr.setMeta(shufflePluginKey, {
-                  type: "map",
-                  payload: { newPos: viewDesc?.posBefore },
-                }),
-              );
-
-              clone = startResult.clone;
-              clone.dataset["shuffleClone"] = "true";
-              initialStyles = startResult.initialStyles;
-
-              const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-              if (!gridWrapper) return;
-              const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-              if (!skeleton) return;
-
-              skeletonOn = true;
-              animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
-              layout = createLayout(view.dom, { duration: 150 });
-            }
-            if (!(dom instanceof HTMLElement)) return;
-
-            clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
-
-            const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-            if (before === undefined) return;
-
-            if (currentAnimation?.began && !currentAnimation.completed) return;
-
-            const tr =
-              autogroup(view, before, e.clientX, e.clientY) ??
-              reorder(view, before, e.clientX, e.clientY) ??
-              reposition(view, before, clone!.getBoundingClientRect());
-
-            if (!tr) return;
-
-            currentAnimation = layout.update(() => {
-              view.dispatch(tr);
-            });
-
-            const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-            if (updatedBefore === undefined) return;
-
-            const nodeDom = view.nodeDOM(updatedBefore);
-            if (nodeDom === dom) return;
-            if (!(nodeDom instanceof HTMLElement)) return;
-
-            dom = nodeDom;
-            dom.dataset["shuffleActive"] = "true";
-          });
-
-          function onUp() {
-            document.removeEventListener("mousedown", preventSelection);
-            document.removeEventListener("mousedown", preventSelection);
-            document.removeEventListener("pointermove", onMove);
-            document.removeEventListener("pointerup", onUp);
-
-            const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-            if (!gridWrapper) return;
-            const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-            if (!skeleton) return;
-
-            animate(skeleton, { opacity: 0 }, { duration: 0.25 });
-
-            if (!clone || !initialStyles) return;
-
-            if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
-              currentAnimation.complete();
-            }
-
-            const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-            if (before === undefined) return;
-
-            const dom = view.nodeDOM(before);
-            if (!(dom instanceof HTMLElement)) return;
-
-            view.dispatch(
-              view.state.tr.setMeta(shufflePluginKey, {
-                type: "end",
-              } satisfies ShufflePluginMeta),
-            );
-
-            clone.style.transition = "transform 0.2s ease";
-            clone.style.boxShadow = initialStyles.boxShadow;
-
-            const domRect = dom.getBoundingClientRect();
-
-            clone.style.transform = translateCalc.place(domRect.left, domRect.top);
-
-            setTimeout(() => {
-              clone!.style.transition = "none";
-              delete dom.dataset["shuffleActive"];
-              clone!.remove();
-            }, 250);
-
-            return;
-          }
-
-          const preventSelection = (e: MouseEvent) => {
-            e.preventDefault();
-          };
-
-          document.addEventListener("pointermove", onMove);
-          document.addEventListener("pointerup", onUp);
-          document.addEventListener("mousedown", preventSelection);
-          document.addEventListener("mousemove", preventSelection);
-
-          return true;
         },
       },
     },
@@ -428,6 +291,160 @@ interface NodeViewDesc {
   dom: HTMLElement;
   contentDOM?: HTMLElement;
   posBefore: number;
+}
+
+export function startDragOnPointerDown(
+  view: EditorView,
+  pos: number,
+  dom: HTMLElement & { pmViewDesc?: ViewDesc },
+  clientX: number,
+  clientY: number,
+) {
+  view.dispatch(
+    view.state.tr.setMeta(shufflePluginKey, {
+      type: "start",
+    } satisfies ShufflePluginMeta),
+  );
+
+  const domRect = dom.getBoundingClientRect();
+
+  const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
+  const originX = transform.m41;
+  const originY = transform.m42;
+
+  const startX = clientX;
+  const startY = clientY;
+
+  const translateCalc = new TranslateCalculator(
+    originX,
+    originY,
+    startX,
+    startY,
+    domRect,
+    LIFT_AMOUNT,
+  );
+
+  let clone: HTMLElement | null = null;
+  let initialStyles: InitialStyles | null = null;
+
+  let layout: AutoLayout | null = null;
+  let currentAnimation: Timeline | null = null;
+  let skeletonOn = false;
+  const onMove = throttle(function onMove(e: PointerEvent) {
+    if (!skeletonOn || !clone || !initialStyles || !layout) {
+      const startResult = startDrag(dom!, translateCalc);
+
+      view.dispatch(
+        view.state.tr.setMeta(shufflePluginKey, {
+          type: "map",
+          payload: { newPos: pos },
+        }),
+      );
+
+      clone = startResult.clone;
+      clone.dataset["shuffleClone"] = "true";
+      initialStyles = startResult.initialStyles;
+
+      const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
+      if (!gridWrapper) return;
+      const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
+      if (!skeleton) return;
+
+      skeletonOn = true;
+      animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
+      layout = createLayout(view.dom, { duration: 150 });
+    }
+    if (!(dom instanceof HTMLElement)) return;
+
+    clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
+
+    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (before === undefined) return;
+
+    if (currentAnimation?.began && !currentAnimation.completed) return;
+
+    const tr =
+      autogroup(view, before, e.clientX, e.clientY) ??
+      reorder(view, before, e.clientX, e.clientY) ??
+      reposition(view, before, clone!.getBoundingClientRect());
+
+    if (!tr) return;
+
+    currentAnimation = layout.update(() => {
+      view.dispatch(tr);
+    });
+
+    const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (updatedBefore === undefined) return;
+
+    const nodeDom = view.nodeDOM(updatedBefore);
+    if (nodeDom === dom) return;
+    if (!(nodeDom instanceof HTMLElement)) return;
+
+    dom = nodeDom;
+    dom.dataset["shuffleActive"] = "true";
+  });
+
+  function onUp() {
+    document.removeEventListener("mousedown", preventSelection);
+    document.removeEventListener("mousedown", preventSelection);
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+
+    const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
+    if (!gridWrapper) return;
+    const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
+    if (!skeleton) return;
+
+    animate(skeleton, { opacity: 0 }, { duration: 0.25 });
+
+    if (!clone || !initialStyles) return;
+
+    if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
+      currentAnimation.complete();
+    }
+
+    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (before === undefined) return;
+
+    const dom = view.nodeDOM(before);
+    if (!(dom instanceof HTMLElement)) return;
+
+    view.dispatch(
+      view.state.tr.setMeta(shufflePluginKey, {
+        type: "end",
+      } satisfies ShufflePluginMeta),
+    );
+
+    clone.style.transition = "transform 0.2s ease";
+    clone.style.boxShadow = initialStyles.boxShadow;
+
+    const domRect = dom.getBoundingClientRect();
+
+    clone.style.transform = translateCalc.place(domRect.left, domRect.top);
+
+    setTimeout(() => {
+      clone!.style.transition = "none";
+      delete dom.dataset["shuffleActive"];
+      clone!.remove();
+    }, 250);
+
+    return;
+  }
+
+  const preventSelection = (e: MouseEvent) => {
+    e.preventDefault();
+  };
+
+  document.addEventListener("pointermove", onMove);
+  document.addEventListener("pointerup", onUp);
+  document.addEventListener("mousedown", preventSelection);
+  document.addEventListener("mousemove", preventSelection);
+
+  return true;
 }
 
 export type ViewDesc = NodeViewDesc & WidgetViewDesc;

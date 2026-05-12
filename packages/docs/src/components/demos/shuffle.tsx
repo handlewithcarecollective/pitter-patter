@@ -14,9 +14,15 @@ import { schema as basic } from "prosemirror-schema-basic";
 import { EditorState } from "prosemirror-state";
 import { Decoration } from "prosemirror-view";
 
-import { shuffle, addShuffleNodes, ShuffleSkeleton, ResizeHandles } from "@pitter-patter/shuffle";
+import {
+  shuffle,
+  addShuffleNodes,
+  DragHandles,
+  ShuffleSkeleton,
+  ResizeHandles,
+} from "@pitter-patter/shuffle";
 
-import "./styles.css";
+import "./shuffle.css";
 import "@pitter-patter/shuffle/style/shuffle.css";
 import "prosemirror-view/style/prosemirror.css";
 
@@ -108,6 +114,7 @@ export function ShuffleDemo() {
       <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />
+        <DragHandles />
       </ShuffleSkeleton>
     </ProseMirror>
   );

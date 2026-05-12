@@ -23,9 +23,6 @@ img {
   border: 1px solid lightblue;
 }
 
-.shuffle-hover-block::before {
-  content: attr(data-shuffle-demo-node-name);
-  position: absolute;
-  background-color: lightblue;
-  transform: translateY(-100%);
+.shuffle-drag-handle {
+  color: #351900;
 }
