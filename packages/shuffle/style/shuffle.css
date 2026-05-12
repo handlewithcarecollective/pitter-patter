@@ -1,4 +1,5 @@
 .shuffle-wrapper {
+  position: relative;
   align-content: start;
   display: grid;
   grid-template-columns:
