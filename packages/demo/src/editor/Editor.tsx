@@ -79,7 +79,7 @@ export function Editor({ doc }: Props) {
           body: JSON.stringify(commit.toJSON()),
         });
       },
-      getCommits: listener.getCommits.bind(listener),
+      listener,
       receiveCommits: (commits) => {
         setState((prev) =>
           commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev),
