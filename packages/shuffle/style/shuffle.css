@@ -1,4 +1,5 @@
 .shuffle-wrapper {
+  position: relative;
   align-content: start;
   display: grid;
   grid-template-columns:
@@ -601,4 +602,10 @@
   padding: 0;
   margin: 0;
   border: none;
+}
+
+.shuffle-drag-handle {
+  position: absolute;
+  background-color: lightblue;
+  transform: translateY(-100%);
 }

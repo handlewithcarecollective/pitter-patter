@@ -35,13 +35,13 @@ export function ResizeHandles({ handleComponent }: Props) {
       return { pos: selection.from, node: selection.node };
     }
 
-    const blockRange = selection.$from.blockRange(selection.$to);
+    const spansBlock = selection.$from.parent !== selection.$to.parent;
 
-    if (!blockRange) return null;
+    const blockRange = selection.$from.blockRange(selection.$to)!;
 
-    let node = blockRange.parent;
-    let depth = blockRange.depth;
-    while (depth >= 0 && !supportsResize(node)) {
+    let node = spansBlock ? blockRange.parent : selection.$from.parent;
+    let depth = spansBlock ? blockRange.depth : selection.$from.depth;
+    while (depth > 0 && !supportsResize(node)) {
       depth--;
       node = blockRange.$from.node(depth);
     }
@@ -84,11 +84,19 @@ export function LeftResizeHandle({ pos, node, handleComponent: Handle }: ResizeH
 
   useEditorEffect(
     (view) => {
-      const dom = view.nodeDOM(pos);
-      if (!(dom instanceof HTMLElement)) return;
-      const rect = dom.getBoundingClientRect();
-      setLeft(rect.left - 8);
-      setTop((rect.bottom + rect.top) / 2);
+      const nodeDOM = view.nodeDOM(pos);
+      if (!(nodeDOM instanceof HTMLElement)) return;
+      const nodeRect = nodeDOM.getBoundingClientRect();
+      // Handles are positioned relative to the shuffle wrapper.
+      // There may be more than one shuffle-enabled editor on the page,
+      // so find the one that's specifically wrapping this editor.
+      const wrapperDOM = view.dom.closest("[data-shuffle-wrapper]");
+      const offsetRect = wrapperDOM?.getBoundingClientRect();
+      const offsetLeft = offsetRect?.left ?? 0;
+      const offsetTop = offsetRect?.top ?? 0;
+
+      setLeft(nodeRect.left - 8 - offsetLeft);
+      setTop((nodeRect.bottom + nodeRect.top) / 2 - offsetTop);
     },
     [pos, node],
   );
@@ -116,11 +124,16 @@ export function RightResizeHandle({ pos, node, handleComponent: Handle }: Resize
 
   useEditorEffect(
     (view) => {
-      const dom = view.nodeDOM(pos);
-      if (!(dom instanceof HTMLElement)) return;
-      const rect = dom.getBoundingClientRect();
-      setLeft(rect.right + 8);
-      setTop((rect.top + rect.bottom) / 2);
+      const nodeDOM = view.nodeDOM(pos);
+      if (!(nodeDOM instanceof HTMLElement)) return;
+      const nodeRect = nodeDOM.getBoundingClientRect();
+      const wrapperDOM = view.dom.closest("[data-shuffle-wrapper]");
+      const offsetRect = wrapperDOM?.getBoundingClientRect();
+      const offsetLeft = offsetRect?.left ?? 0;
+      const offsetTop = offsetRect?.top ?? 0;
+
+      setLeft(nodeRect.right + 8 - offsetLeft);
+      setTop((nodeRect.bottom + nodeRect.top) / 2 - offsetTop);
     },
     [pos, node],
   );

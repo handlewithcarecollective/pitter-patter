@@ -18,7 +18,7 @@
     }
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.5",
+    "@handlewithcare/react-prosemirror": "^3.0.6",
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/refs": "workspace:^",
     "classnames": "^2.5.1",

@@ -14,3 +14,15 @@ img {
   border-radius: 1rem;
   background-color: white;
 }
+
+.shuffle-block {
+  border: 1px solid transparent;
+}
+
+.shuffle-hover-block {
+  border: 1px solid lightblue;
+}
+
+.shuffle-drag-handle {
+  color: #351900;
+}
