@@ -61,7 +61,7 @@ export interface ShufflePluginState {
 export const shufflePluginKey = new PluginKey<ShufflePluginState>("@pitter-patter/shuffle");
 
 export interface ShufflePluginOptions {
-  hoverDecorations?: Record<string, (from: number, to: number, node: Node) => Decoration>;
+  hoverDecorations?: (from: number, to: number, node: Node) => Decoration | null;
 }
 
 export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
@@ -146,12 +146,10 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
 
             if (!node) return;
 
-            const nodeName = node.type.name;
-            const decorationCreator = hoverDecorations[nodeName];
-
-            if (!decorationCreator) return;
-
-            decorations.push(decorationCreator(from, to, node));
+            const hoverDeco = hoverDecorations(from, to, node);
+            if (hoverDeco) {
+              decorations.push(hoverDeco);
+            }
           });
         }
 

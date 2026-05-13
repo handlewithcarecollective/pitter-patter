@@ -86,6 +86,7 @@ export function DragHandle({ pos, handleComponent: Handle }: DragHandleProps) {
 
   return (
     <button
+      type="button"
       className="shuffle-drag-handle"
       style={{ top, left }}
       draggable="false"

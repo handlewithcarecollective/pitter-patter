@@ -69,17 +69,16 @@ be set on the row and container node specs.
 
 ```ts
 interface ShufflePluginOptions {
-  dragHandles?: Record<string, ComponentType<WidgetViewComponentProps>>;
+  hoverDecorations?: (from: number, to: number, node: Node) => Decoration | null;
 }
 ```
 
-Options to be passed to `shuffle`. Can be used to provide drag handle widget components for specific
-node views.
+Options to be passed to `shuffle`. Can be used to provide hover decorations.
 
 ## `shuffle`
 
 ```ts
-function shuffle({ dragHandles }: ShufflePluginOptions = {}): Plugin<ShufflePluginState>;
+function shuffle({ hoverDecorations }: ShufflePluginOptions = {}): Plugin<ShufflePluginState>;
 ```
 
 A ProseMirror plugin factory. Manages decorations, state, and event listeners necessary for
@@ -159,6 +158,37 @@ A React hook that can be used to build a custom resize handles component. It tak
 the selected node and whether to create a handler for the start or end handler.
 
 It returns an event handler that can be added to the `"pointerdown"` event.
+
+## `DragHandles`
+
+```ts
+function DragHandles(props: {
+  handleComponent?: ComponentType<{
+    style: { top: number; left: number };
+    onPointerDown: EventHandler<SyntheticPointerEvent>;
+    node: Node;
+  }>;
+}): JSX.Element;
+```
+
+A React component that renders the drag handles. This component will render a drag handle for each
+node that the pointer is currently hovering over. It should be a descendant of the `ProseMirror`
+component. The `handleComponent` prop can be used to provide a custom handle implementation.
+
+Example usage:
+
+```tsx
+function Editor() {
+  return (
+    <ProseMirror defaultState={editorState}>
+      <ShuffleSkeleton>
+        <ProseMirrorDoc />
+        <DragHandles />
+      </ShuffleSkeleton>
+    </ProseMirror>
+  );
+}
+```
 
 ## `supportsResize`
 
