@@ -83,13 +83,10 @@ const nodeViewComponents = {
   image: Image,
 };
 
-function hoverDeco(name: string) {
-  return function (from: number, to: number) {
-    return Decoration.node(from, to, {
-      class: "shuffle-hover-block",
-      "data-shuffle-demo-node-name": name,
-    });
-  };
+function hoverDecorations(from: number, to: number) {
+  return Decoration.node(from, to, {
+    class: "shuffle-hover-block",
+  });
 }
 
 const editorState = EditorState.create({
@@ -97,12 +94,7 @@ const editorState = EditorState.create({
   plugins: [
     reactKeys(),
     shuffle({
-      hoverDecorations: {
-        paragraph: hoverDeco("Paragraph"),
-        container: hoverDeco("Container"),
-        row: hoverDeco("Row"),
-        image: hoverDeco("Image"),
-      },
+      hoverDecorations,
     }),
     keymap(baseKeymap),
   ],

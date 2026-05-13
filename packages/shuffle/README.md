@@ -124,54 +124,27 @@ const editorState = EditorState.create({
 });
 ```
 
-## Configure drag handles
+### Configure hover decorations
 
-Some editor components, like images, can be easily dragged and resized on their own. Others, like
-paragraphs, benefit from a drag handle to provide an easy target to click and move. To add drag
-handles pass a record of drag handles to the shuffle plugin. These should be React ProseMirror
-widget components.
+In schemas that can have deeply nested nodes, it can be helpful to use borders or highlights to
+indicate to the user which nodes are being hovered over.
 
-The example below creates a `ParagraphHandle` widget that positions a handle to the top left of an
-element, and adds it to all paragraph nodes.
+The `hoverDecorations` argument to the shuffle plugin creator will be called with each hovered node
+to determine whether to render a node decoration.
 
 ```tsx
-import {
-  reactKeys,
-  useEditorEffect,
-  type WidgetViewComponentProps,
-} from "@handlewithcare/react-prosemirror";
+import { reactKeys } from "@handlewithcare/react-prosemirror";
 import { shuffle } from "@pitter-patter/shuffle";
+import { Decoration } from "prosemirror-view";
+import { Node } from "prosemirror-model";
 
-function ParagraphHandle({ widget, ref, getPos, ...props }: WidgetViewComponentProps) {
-  const [top, setTop] = useState(0);
-  const [left, setLeft] = useState(0);
+function hoverDecorations(from: number, to: number, node: Node) {
+  // Return null to skip decorations for a given node
+  if (node.type.name === "image") return null;
 
-  useEditorEffect(
-    (view) => {
-      const viewRect = view.dom.getBoundingClientRect();
-      const coords = view.coordsAtPos(widget.spec.nodePos, 1);
-      setTop(coords.top - viewRect.top);
-      setLeft(coords.left - viewRect.left + (widget.spec.nodeDepth - 1) * 24);
-    },
-    [widget.spec.nodePos, widget.spec.nodeDepth],
-  );
-
-  return (
-    <div
-      ref={ref}
-      {...props}
-      contentEditable={false}
-      style={{
-        position: "absolute",
-        backgroundColor: "lightblue",
-        transform: "translateY(-1.5rem)",
-        top,
-        left,
-      }}
-    >
-      {name}
-    </div>
-  );
+  return Decoration.node(from, to, {
+    class: "shuffle-hover-block",
+  });
 }
 
 const editorState = EditorState.create({
@@ -180,22 +153,20 @@ const editorState = EditorState.create({
   plugins: [
     reactKeys(),
     shuffle({
-      dragHandles: {
-        paragraph: ParagraphHandle,
-      },
+      hoverDecorations,
     }),
   ],
 });
 ```
 
-## Wrap your ProseMirror component with the `ShuffleSkeleton` and add `ResizeHandles`
+### Wrap your ProseMirror component with the `ShuffleSkeleton` and add `ResizeHandles` and `DragHandles`
 
 Shuffle provides a `ShuffleSkeleton` component that wraps your `ProseMirrorDoc`. It renders
 Shuffle's grid skeleton, and must be rendered for resize and reposition behaviors to work correctly.
 The component should be a direct parent of the `ProseMirrorDoc` component.
 
 To add resize handles to your elements, include the `ResizeHandles` component as a child of your
-`ShuffleSkeleton`.
+`ShuffleSkeleton`. Likewise, include the `DragHandles` component to render drag handles.
 
 ```tsx
 function Editor() {
@@ -204,6 +175,7 @@ function Editor() {
       <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />
+        <DragHandles />
       </ShuffleSkeleton>
     </ProseMirror>
   );
@@ -244,7 +216,9 @@ interface Props {
 }
 
 function ResizeHandle({ styles, onPointerDown }) {
-  return <button type="button" styles={styles} onPointerDown={onPointerDown} />;
+  return (
+    <button type="button" className="resize-handle" styles={styles} onPointerDown={onPointerDown} />
+  );
 }
 
 function Editor() {
@@ -253,6 +227,38 @@ function Editor() {
       <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles handleComponent={ResizeHandle} />
+      </ShuffleSkeleton>
+    </ProseMirror>
+  );
+}
+```
+
+Similarly, the `DragHandles` component optionally takes a `handleComponent` prop that will be used
+instead of the default light blue button:
+
+```tsx
+import { DragHandles } from "@pitter-patter/shuffle";
+import { EventHandler, PointerDown } from "react";
+
+interface Props {
+  style: { top: number; left: number };
+  onPointerDown: EventHandler<PointerDown>;
+}
+
+function DragHandle({ styles, onPointerDown, node }) {
+  return (
+    <button type="button" className="drag-handle" styles={styles} onPointerDown={onPointerDown}>
+      {node.type.name[0].toUpperCase() + node.type.name.slice(1)}
+    </button>
+  );
+}
+
+function Editor() {
+  return (
+    <ProseMirror defaultState={editorState}>
+      <ShuffleSkeleton>
+        <ProseMirrorDoc />
+        <DragHandles handleComponent={DragHandle} />
       </ShuffleSkeleton>
     </ProseMirror>
   );
@@ -327,17 +333,16 @@ be set on the row and container node specs.
 
 ```ts
 interface ShufflePluginOptions {
-  dragHandles?: Record<string, ComponentType<WidgetViewComponentProps>>;
+  hoverDecorations?: (from: number, to: number, node: Node) => Decoration | null;
 }
 ```
 
-Options to be passed to `shuffle`. Can be used to provide drag handle widget components for specific
-node views.
+Options to be passed to `shuffle`. Can be used to provide hover decorations.
 
 ### `shuffle`
 
 ```ts
-function shuffle({ dragHandles }: ShufflePluginOptions = {}): Plugin<ShufflePluginState>;
+function shuffle({ hoverDecorations }: ShufflePluginOptions = {}): Plugin<ShufflePluginState>;
 ```
 
 A ProseMirror plugin factory. Manages decorations, state, and event listeners necessary for
@@ -401,6 +406,37 @@ function Editor() {
       <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />
+      </ShuffleSkeleton>
+    </ProseMirror>
+  );
+}
+```
+
+### `DragHandles`
+
+```ts
+function DragHandles(props: {
+  handleComponent?: ComponentType<{
+    style: { top: number; left: number };
+    onPointerDown: EventHandler<SyntheticPointerEvent>;
+    node: Node;
+  }>;
+}): JSX.Element;
+```
+
+A React component that renders the drag handles. This component will render a drag handle for each
+node that the pointer is currently hovering over. It should be a descendant of the `ProseMirror`
+component. The `handleComponent` prop can be used to provide a custom handle implementation.
+
+Example usage:
+
+```tsx
+function Editor() {
+  return (
+    <ProseMirror defaultState={editorState}>
+      <ShuffleSkeleton>
+        <ProseMirrorDoc />
+        <DragHandles />
       </ShuffleSkeleton>
     </ProseMirror>
   );
