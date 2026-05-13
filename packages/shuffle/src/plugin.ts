@@ -315,14 +315,7 @@ export function startDragOnPointerDown(
   const startX = clientX;
   const startY = clientY;
 
-  const translateCalc = new TranslateCalculator(
-    originX,
-    originY,
-    startX,
-    startY,
-    domRect,
-    LIFT_AMOUNT,
-  );
+  const translateCalc = new TranslateCalculator(originX, originY, startX, startY, domRect);
 
   let clone: HTMLElement | null = null;
   let initialStyles: InitialStyles | null = null;
@@ -356,7 +349,10 @@ export function startDragOnPointerDown(
     }
     if (!(dom instanceof HTMLElement)) return;
 
-    clone.style.transform = translateCalc.slide(e.clientX, e.clientY);
+    const { transform, transformOrigin } = translateCalc.slide(e.clientX, e.clientY);
+
+    clone.style.transform = transform;
+    clone.style.transformOrigin = transformOrigin;
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
 
@@ -424,7 +420,10 @@ export function startDragOnPointerDown(
 
     const domRect = dom.getBoundingClientRect();
 
-    clone.style.transform = translateCalc.place(domRect.left, domRect.top);
+    const { transform, transformOrigin } = translateCalc.place(domRect.left, domRect.top);
+
+    clone.style.transform = transform;
+    clone.style.transformOrigin = transformOrigin;
 
     setTimeout(() => {
       clone!.style.transition = "none";
@@ -448,7 +447,6 @@ export function startDragOnPointerDown(
 }
 
 export type ViewDesc = NodeViewDesc & WidgetViewDesc;
-const LIFT_AMOUNT = 24;
 
 interface InitialStyles {
   boxShadow: string;
@@ -471,7 +469,13 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   const initialBoxShadow = dom.style.boxShadow;
 
   clone.style.transition = "transform 0.1s ease";
-  clone.style.transform = translateCalc.slide(translateCalc.startX, translateCalc.startY);
+  const { transform, transformOrigin } = translateCalc.slide(
+    translateCalc.startX,
+    translateCalc.startY,
+  );
+
+  clone.style.transform = transform;
+  clone.style.transformOrigin = transformOrigin;
   clone.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
   clone.style.zIndex = "100";
 

@@ -10,9 +10,13 @@ img {
   border-radius: 1rem;
 }
 
+[data-node-type] {
+  border-radius: 0.25rem;
+}
+
 [data-node-type][data-shuffle-clone] {
-  border-radius: 1rem;
-  background-color: white;
+  background-color: #f3efea;
+  color: #351900;
 }
 
 .shuffle-block {
