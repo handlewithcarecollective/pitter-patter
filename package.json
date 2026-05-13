@@ -19,16 +19,21 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
+    "@types/semver": "^7",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "@yarnpkg/cli": "^4.14.1",
     "@yarnpkg/core": "^4.7.0",
     "@yarnpkg/fslib": "^3.1.5",
+    "@yarnpkg/libzip": "^3.2.2",
+    "@yarnpkg/parsers": "^3.0.3",
     "@yarnpkg/plugin-git": "^3.2.0",
     "@yarnpkg/plugin-version": "^4.2.0",
     "@yarnpkg/sdks": "^3.2.3",
+    "es-toolkit": "^1.46.1",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
-    "oxlint-tsgolint": "^0.22.1"
+    "oxlint-tsgolint": "^0.22.1",
+    "semver": "^7.8.0"
   },
   "resolutions": {
     "prosemirror-view@npm:^1.27.0": "1.41.7",
