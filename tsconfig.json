@@ -1,5 +1,8 @@
 {
-  "include": ["scripts/*.mts"],
+  // There's some weird typescript issue with
+  // @yarnpkg/plugin-git / @yarnpkg/libzip
+  // "include": ["scripts/*.mts"],
+  "include": [],
   "compilerOptions": {
     "noEmit": true
   },
