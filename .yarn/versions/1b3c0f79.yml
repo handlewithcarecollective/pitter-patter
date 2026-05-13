@@ -1,6 +1,0 @@
-releases:
-  "@pitter-patter/shuffle": minor
-
-declined:
-  - "@pitter-patter/comments-client"
-  - "@pitter-patter/presence-client"
