@@ -50,7 +50,7 @@ jobs:
           PREV_TAG: ${{ steps.prev_tag.outputs.tag }}
           REPO: ${{ github.repository }}
           OUTPUT_FILE: release_notes.md
-        run: node scripts/generate-release-notes.mjs
+        run: node scripts/generateReleaseNotes.mjs
 
       - name: Release
         uses: softprops/action-gh-release@v3
