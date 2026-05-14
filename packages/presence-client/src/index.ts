@@ -10,21 +10,30 @@ export { presence, presenceKey, receivePresenceTransaction } from "./plugin";
 
 export { type PresenceIndicator, type PresenceClientConfig };
 
+export interface PresenceListener {
+  listen: (
+    clientId: string,
+    refs?: Record<string, string>,
+    options?: { signal?: AbortSignal },
+  ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
+}
+
 export class PresenceClient {
   private userId: string;
   private clientId: string;
   private refs: Record<string, string> = {};
   private sendIndicator: PresenceClientConfig["sendIndicator"];
-  private getIndicators: PresenceClientConfig["getIndicators"];
+  private listener: CollabClientConfig["listener"];
   private receiveIndicators: PresenceClientConfig["receiveIndicators"];
 
   private lastSent: PresenceIndicator | null = null;
+  private controller = new AbortController();
 
   constructor(config: PresenceClientConfig) {
     this.clientId = randomRef();
     this.userId = config.userId;
     this.sendIndicator = config.sendIndicator;
-    this.getIndicators = config.getIndicators;
+    this.listener = config.listener;
     this.receiveIndicators = config.receiveIndicators;
   }
 
@@ -32,7 +41,9 @@ export class PresenceClient {
     const state = collabKey.getState(editorState);
 
     if (!state) {
-      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
+      throw new Error(
+        "EditorState is missing the collab plugin, unable to listen for changes",
+      );
     }
 
     const { unconfirmed, version } = state;
@@ -65,30 +76,44 @@ export class PresenceClient {
     } catch {}
   }
 
-  async listen(signal: AbortSignal) {
-    while (!signal.aborted) {
-      try {
-        const indicators = await this.getIndicators(this.clientId, this.refs, {
-          signal,
-        });
+  update(config: Partial<Omit<PresenceClientConfig, "listener">>) {
+    if (config.sendIndicator) this.sendIndicator = config.sendIndicator;
+    if (config.receiveIndicators)
+      this.receiveIndicators = config.receiveIndicators;
+  }
 
-        const newRefs = Object.fromEntries(
-          Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
-        );
+  async listen(signal?: AbortSignal) {
+    // Todo: do we still need the this.controller?
+    const getIndicatorsSignal = AbortSignal.any([
+      ...(signal ? [signal] : []),
+      this.controller.signal,
+    ]);
 
-        if (Object.entries(newRefs).every(([clientId, ref]) => this.refs[clientId] === ref)) {
-          continue;
-        }
+    for await (const indicators of this.listener.listen(
+      this.clientId,
+      this.refs,
+      {
+        signal,
+      },
+    )) {
+      const newRefs = Object.fromEntries(
+        Object.entries(indicators).map(([clientId, indicator]) => [
+          clientId,
+          indicator.ref,
+        ]),
+      );
 
-        this.refs = newRefs;
-
-        this.receiveIndicators(indicators);
-      } catch (e) {
-        console.error(e);
-        await new Promise<void>((resolve) => {
-          setTimeout(() => resolve(), 3_000);
-        });
+      if (
+        Object.entries(newRefs).every(
+          ([clientId, ref]) => this.refs[clientId] === ref,
+        )
+      ) {
+        continue;
       }
+
+      this.refs = newRefs;
+
+      this.receiveIndicators(indicators);
     }
   }
 }
@@ -109,24 +134,45 @@ export class LongPollListener {
   ) {
     this.headers = options.headers ?? {};
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-
-    this.getIndicators = this.getIndicators.bind(this);
   }
 
-  async getIndicators(clientId: string, refs?: Record<string, string>) {
-    const response = await this.fetch(this.url, {
-      headers: { ...this.headers, "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({
-        clientId,
-        refs,
-      }),
-    });
+  update(headers: Record<string, string>) {
+    this.headers = headers;
+  }
 
-    if (!response.ok) {
-      throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
+  async *listen(clientId: string, refs?: Record<string, string>, options: { signal?: AbortSignal } = {}) {
+    while (!options?.signal || !options.signal.aborted) {
+      const url = new URL(this.url);
+      url.searchParams.append("version", version.toString());
+
+      try {
+        const response = await this.fetch(this.url, {
+          headers: { ...this.headers, "Content-Type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({
+            clientId,
+            refs,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get presence indicators. ${response.status}: ${response.statusText}`,
+          );
+        }
+
+        const indicators = (await response.json()) as Record<string, PresenceIndicator>;
+        yield commitJSONs;
+      } catch (e) {
+        console.error(e);
+
+        if (options.signal?.aborted) return;
+
+        // TODO: Implement a backoff strategy
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 3_000);
+        });
+      }
     }
-
-    return (await response.json()) as Record<string, PresenceIndicator>;
   }
 }
