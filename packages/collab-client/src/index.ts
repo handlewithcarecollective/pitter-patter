@@ -12,9 +12,16 @@ export { receiveCommitTransaction, getVersion, Commit, type CommitJSON, type Nod
 
 export { collab, collabKey } from "./plugin";
 
+export interface CommitsListener {
+  listen: (
+    version: number,
+    options?: { signal?: AbortSignal },
+  ) => AsyncIterableIterator<CommitJSON[]>;
+}
+
 export interface CollabClientConfig {
   sendCommit: (commit: Commit) => Promise<void>;
-  getCommits: (version: number, options?: { signal?: AbortSignal }) => Promise<CommitJSON[]>;
+  listener: CommitsListener;
   receiveCommits: (commits: Commit[]) => void;
 }
 
@@ -22,15 +29,16 @@ export class CollabClient {
   private sending: null | string = null;
   private version: number | undefined = undefined;
   private seen = new Set<string>();
+  private controller = new AbortController();
 
   private sendCommit: CollabClientConfig["sendCommit"];
-  private getCommits: CollabClientConfig["getCommits"];
+  private listener: CollabClientConfig["listener"];
   private receiveCommits: CollabClientConfig["receiveCommits"];
 
   constructor(config: CollabClientConfig) {
     this.sendCommit = config.sendCommit;
     this.receiveCommits = config.receiveCommits;
-    this.getCommits = config.getCommits;
+    this.listener = config.listener;
   }
 
   async send(editorState: EditorState) {
@@ -52,33 +60,34 @@ export class CollabClient {
     }
   }
 
-  async listen(editorState: EditorState, signal: AbortSignal) {
+  update(config: Partial<Omit<CollabClientConfig, "listener">>) {
+    if (config.sendCommit) this.sendCommit = config.sendCommit;
+    if (config.receiveCommits) this.receiveCommits = config.receiveCommits;
+  }
+
+  async listen(editorState: EditorState, signal?: AbortSignal) {
     this.version = getVersion(editorState);
 
     if (this.version === undefined) {
       throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
     }
 
-    while (!signal.aborted) {
-      try {
-        const commitJSONs = await this.getCommits(this.version, { signal });
-        const commits = commitJSONs.map((json) => Commit.FromJSON(editorState.schema, json));
+    const getCommitsSignal = AbortSignal.any([...(signal ? [signal] : []), this.controller.signal]);
 
-        // Ensure that we don't process the same commit multiple times
-        const newCommits = commits.filter((commit) => !this.seen.has(commit.ref));
-        const lastCommit = newCommits[newCommits.length - 1];
-        if (!lastCommit) continue;
-        this.version = lastCommit.version;
-        newCommits.forEach((commit) => this.seen.add(commit.ref));
+    for await (const commitJSONs of this.listener.listen(this.version, {
+      signal: getCommitsSignal,
+    })) {
+      if (getCommitsSignal.aborted) break;
+      const commits = commitJSONs.map((json) => Commit.FromJSON(editorState.schema, json));
 
-        this.receiveCommits(newCommits);
-      } catch (e) {
-        // TODO: Implement a backoff strategy
-        console.error(e);
-        await new Promise<void>((resolve) => {
-          setTimeout(() => resolve(), 3_000);
-        });
-      }
+      // Ensure that we don't process the same commit multiple times
+      const newCommits = commits.filter((commit) => !this.seen.has(commit.ref));
+      const lastCommit = newCommits[newCommits.length - 1];
+      if (!lastCommit) continue;
+      this.version = lastCommit.version;
+      newCommits.forEach((commit) => this.seen.add(commit.ref));
+
+      this.receiveCommits(newCommits);
     }
   }
 }
@@ -99,22 +108,39 @@ export class LongPollListener {
   ) {
     this.headers = options.headers ?? {};
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-    this.getCommits = this.getCommits.bind(this);
   }
 
-  async getCommits(version: number) {
-    const url = new URL(this.url);
-    url.searchParams.append("version", version.toString());
+  update(headers: HeadersInit) {
+    this.headers = headers;
+  }
 
-    const response = await this.fetch(url, {
-      headers: this.headers,
-    });
+  async *listen(version: number, options: { signal?: AbortSignal } = {}) {
+    while (!options?.signal || !options.signal.aborted) {
+      const url = new URL(this.url);
+      url.searchParams.append("version", version.toString());
 
-    if (!response.ok) {
-      throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
+      try {
+        const response = await this.fetch(url, {
+          headers: this.headers,
+          ...(options?.signal && { signal: options.signal }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
+        }
+
+        const commitJSONs = (await response.json()) as CommitJSON[];
+        yield commitJSONs;
+      } catch (e) {
+        console.error(e);
+
+        if (options.signal?.aborted) return;
+
+        // TODO: Implement a backoff strategy
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 3_000);
+        });
+      }
     }
-
-    const commitJSONs = (await response.json()) as CommitJSON[];
-    return commitJSONs;
   }
 }
