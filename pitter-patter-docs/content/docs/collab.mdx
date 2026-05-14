@@ -194,7 +194,7 @@ with the CollabAuthority.
 You need two endpoints. One to send commits to the CollabAuthority and one to listen for commits from the 
 CollabAuthority.
 
-First, we will make a POST endpoint clients can send their local commits to.
+First, we will make a sendCommit endpoint that clients can send their local commits to. 
 --Todo: We should change the body sent by the collab client to be a json object with the commits set to one field
         This will allow adding fields in the future if necessary with minimal breaking changes
 ```
@@ -224,8 +224,7 @@ The collabAuthority does the work of saving the new commit to the database and n
 changes.
 
 
-Next we will make a GET endpoint where clients can listen for remote changes.
-
+Next we will make a getCommits endpoint where clients can listen for remote changes.
 ```
 app.get("/api/docs/:docId/commits", async (req, res) => {
   const commits = await collabAuthority.listenForCommit(
@@ -235,8 +234,10 @@ app.get("/api/docs/:docId/commits", async (req, res) => {
   res.status(200).send(commits);
 });
 ```
-The path of this endpoint is up to you. The only requirement is that the `docId` is provided in the path. The `version` 
-of the latest document already received by the client is provided as a query parameter by the frontend collabClient (see below).
+The path of this endpoint is up to you. The only requirement is that the `docId`, `version` 
+of the latest document already received by the client are included in the request. We will construct this request
+in the frontend collabClient below. In this example, we include the `docId` in the endpoint's path and the latest `version`
+as a query parameter.
 
 The function body just calls the collabAuthority's listenForCommit function and returns any commits that are found.  When
 called, it will check for any new commits, and return if new commits are found. If new commits are not immediately found,
@@ -244,74 +245,98 @@ it will listen for a new commit notification from the BroadcastManager. If a not
 retrieved and returned immediately. If no notification is received before a maximum timeout (eg. 15 seconds), an empty 
 array is returned. 
 
--- Todo: Change this to a note on why we use longpolling instead of websockets. probably move it to a section at the bottom
-In theory, you can also use websockets, but we do not recommend this because long polling is both more efficient and
-less error prone for typical collaborative editing use cases. 
-
 ## Creating the client
 
-import {
-  LongPollListener,
-  CollabClient,
-  CollabClientConfig,
-  receiveCommitTransaction,
-  collab,
-} from "@pitter-patter/collab-client";
+We can now connect our frontend editor to the collab backend. PitterPatter's CollabClient manages synchronizing state between
+your frontend and backend. 
 
+First create an EditorState. In the example, we are using prosemirror's basic schema and are starting with an empty document.
 
 ```
 import { Node } from "prosemirror-model";
 import { EditorState, Transaction } from "prosemirror-state";
 import { schema } from "prosemirror-schema-basic";
 import { collab } from "@pitter-patter/collab-client";
+import { useState } from "react";
+import { v4 as uuid } from "uuid";
 
-EditorState.create({
-  doc: schema.nodes.doc.createAndFill()!,   -- Todo: Make sure this line is correct
-  plugins: [collab({ version: 0 })], -- Todo: Also make sure the version number here is correct
-}),
+const docId = uuid(); -- Todo: does this mess up the use memo call below?
+
+const [state, setState] = useState(() =>
+  EditorState.create({
+    doc: Node.fromJSON(schema,  schema.nodes.doc.createAndFill()!), -- Todo: Make sure this line correctly make an empty document
+    plugins: [collab({ version: 0 }), presence()],                  -- Todo: Also make sure the version number here is valid
+  }),
+);
 ```
 
-  ```
-    const listner = new LongPollListener(
-      new URL(
-        `/api/docs/${doc.id}/commits`,
-        typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
-      ),
-    ),
-  ```
-  The long poll listener has a 
+Next create a config for the CollabClient. The config contains three functions that the CollabClient will use
+to interact with your backend and your local editor state, sendCommit, getCommits, and receiveCommits.
 
-  ```
-    const collabConfig = useMemo<CollabClientConfig>(
-      () => ({
-        sendCommit: async (commit) => {
-          await fetch(`/api/docs/${doc.id}/commits`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(commit.toJSON()),
-          });
-        },
-        getCommits: listener.getCommits.bind(listener),
-        receiveCommits: (commits) => {
-          setState((prev) =>
-            commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev),
-          );
-        },
-      }),
-      [listener, doc.id],
-    );
-  ```
+sendCommit:
+  takes a new commit as an argument and sends it to the sendCommits endpoint you created above.
 
-  const [collabClient] = useState(() => new CollabClient(collabConfig));
+getCommits:
+  takes a version number and requests any new commits from the getCommits endpoint you created above.
 
-  useEffect(() => {
-    collabClient.send(state).catch((e) => console.error(e));
-  }, [collabClient, state]);
+receiveCommits:
+  takes an array of commits and merges them into your local editor state
 
+```
+const collabConfig = useMemo<CollabClientConfig>(
+  () => ({
+    sendCommit: async (commit) => {
+      await fetch(`/api/docs/${docId}/commits`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(commit.toJSON()),
+      });
+    },
+    getCommits: async (version) => {
+      const url = new URL(`http://localhost:3000/api/docs/${docId}/commits`);
+      url.searchParams.append("version", version.toString());
 
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to get commits. ${response.status}: ${response.statusText}`,
+        );
+      }
+
+      const commitJSONs = (await response.json()) as CommitJSON[];
+      return commitJSONs;
+    },
+    receiveCommits: (commits) => {
+      setState((prev) =>
+        commits.reduce(
+          (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
+          prev,
+        ),
+      );
+    },
+  }),
+  [docId],
+);
+```
+
+Then you create a CollabClient. The collab client will automatically start listening for remote commits. 
+```
+const [collabClient] = useState(() => new CollabClient(collabConfig));
+```
+
+When the local editor state changes, you need to tell collabClient to create and send a new commit.
+```
+useEffect(() => {
+  collabClient.send(state).catch((e) => console.error(e));
+}, [collabClient, state]);
+```
 
 
 Server endpoints to implement
 
 Client side config
 
+-- Todo: Change this to a note on why we use longpolling instead of websockets. probably move it to a section at the bottom
+In theory, you can also use websockets, but we do not recommend this because long polling is both more efficient and
+less error prone for typical collaborative editing use cases. 
