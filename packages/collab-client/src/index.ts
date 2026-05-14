@@ -17,6 +17,9 @@ export interface CommitsListener {
     version: number,
     options?: { signal?: AbortSignal },
   ) => AsyncIterableIterator<CommitJSON[]>;
+  updateVersion: (
+    version: number
+  );
 }
 
 export interface CollabClientConfig {
@@ -74,6 +77,7 @@ export class CollabClient {
 
     const getCommitsSignal = AbortSignal.any([...(signal ? [signal] : []), this.controller.signal]);
 
+    this.listener.updateVersion(this.version)
     for await (const commitJSONs of this.listener.listen(this.version, {
       signal: getCommitsSignal,
     })) {
@@ -85,6 +89,7 @@ export class CollabClient {
       const lastCommit = newCommits[newCommits.length - 1];
       if (!lastCommit) continue;
       this.version = lastCommit.version;
+      this.listener.updateVersion(this.version)
       newCommits.forEach((commit) => this.seen.add(commit.ref));
 
       this.receiveCommits(newCommits);
@@ -101,6 +106,7 @@ export interface LongPollListenerOptions {
 export class LongPollListener {
   private headers: HeadersInit;
   private fetch: typeof globalThis.fetch;
+  private version: number;
 
   constructor(
     private url: URL,
@@ -108,16 +114,17 @@ export class LongPollListener {
   ) {
     this.headers = options.headers ?? {};
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
+    this.version = 0;
   }
 
   update(headers: HeadersInit) {
     this.headers = headers;
   }
 
-  async *listen(version: number, options: { signal?: AbortSignal } = {}) {
+  async *listen(options: { signal?: AbortSignal } = {}) {
     while (!options?.signal || !options.signal.aborted) {
       const url = new URL(this.url);
-      url.searchParams.append("version", version.toString());
+      url.searchParams.append("version", this.version.toString());
 
       try {
         const response = await this.fetch(url, {
@@ -142,5 +149,9 @@ export class LongPollListener {
         });
       }
     }
+  }
+
+  updateVersion(version: number) {
+    this.version = version;
   }
 }
