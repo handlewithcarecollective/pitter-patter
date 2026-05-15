@@ -8,13 +8,7 @@ import {
 } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { EditorState } from "prosemirror-state";
 
-export {
-  receiveCommitTransaction,
-  getVersion,
-  Commit,
-  type CommitJSON,
-  type NodeJSON,
-};
+export { receiveCommitTransaction, getVersion, Commit, type CommitJSON, type NodeJSON };
 
 export { collab, collabKey } from "./plugin";
 
@@ -70,10 +64,7 @@ export class CollabClient {
   }
 
   async listen(editorState: EditorState, signal?: AbortSignal) {
-    const getCommitsSignal = AbortSignal.any([
-      ...(signal ? [signal] : []),
-      this.controller.signal,
-    ]);
+    const getCommitsSignal = AbortSignal.any([...(signal ? [signal] : []), this.controller.signal]);
 
     for await (const newCommits of this.listener.listen(editorState, {
       signal: getCommitsSignal,
@@ -106,16 +97,11 @@ export class LongPollListener {
     this.headers = headers;
   }
 
-  async *listen(
-    editorState: EditorState,
-    options: { signal?: AbortSignal } = {},
-  ) {
+  async *listen(editorState: EditorState, options: { signal?: AbortSignal } = {}) {
     const seen = new Set<string>();
     let version = getVersion(editorState);
     if (version === undefined) {
-      throw new Error(
-        "EditorState is missing the collab plugin, unable to listen for changes",
-      );
+      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
     }
 
     while (!options?.signal || !options.signal.aborted) {
@@ -129,16 +115,12 @@ export class LongPollListener {
         });
 
         if (!response.ok) {
-          throw new Error(
-            `Failed to get commits. ${response.status}: ${response.statusText}`,
-          );
+          throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
         }
 
         const commitJSONs = (await response.json()) as CommitJSON[];
 
-        const commits = commitJSONs.map((json) =>
-          Commit.FromJSON(editorState.schema, json),
-        );
+        const commits = commitJSONs.map((json) => Commit.FromJSON(editorState.schema, json));
 
         // Ensure that we don't process the same commit multiple times
         const newCommits = commits.filter((commit) => !seen.has(commit.ref));
