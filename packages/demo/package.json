@@ -51,7 +51,11 @@
   "targets": {
     "server": {
       "source": "src/server.tsx",
-      "context": "react-server"
+      "context": "react-server",
+      "includeNodeModules": {
+        "jiti": false,
+        "kysely-ctl": false
+      }
     }
   }
 }
