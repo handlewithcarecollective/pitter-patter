@@ -8,7 +8,7 @@ import { EditorState, Transaction } from "prosemirror-state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  LongPollListener,
+  LongPollListener as CollabLongPollListener,
   CollabClient,
   CollabClientConfig,
   receiveCommitTransaction,
@@ -18,7 +18,7 @@ import {
   presence,
   PresenceClient,
   receivePresenceTransaction,
-  LongPollListener as PresenceListener,
+  LongPollListener as PresenceLongPollListener,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
 import {
@@ -62,7 +62,7 @@ export function Editor({ doc }: Props) {
 
   const [listener] = useState(
     () =>
-      new LongPollListener(
+      new CollabLongPollListener(
         new URL(
           `/api/docs/${doc.id}/commits`,
           typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
@@ -91,7 +91,7 @@ export function Editor({ doc }: Props) {
 
   const [presenceListener] = useState(
     () =>
-      new PresenceListener(
+      new PresenceLongPollListener(
         new URL(
           `/api/docs/${doc.id}/presence`,
           typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
@@ -109,10 +109,10 @@ export function Editor({ doc }: Props) {
           body: JSON.stringify(indicator),
         });
       },
-      getIndicators: presenceListener.getIndicators.bind(presenceListener),
       receiveIndicators: (indicators) => {
         setState((prev) => prev.apply(receivePresenceTransaction(prev, indicators)));
       },
+      listener: presenceListener,
     }),
     [presenceListener, doc.id],
   );
