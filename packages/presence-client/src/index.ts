@@ -10,12 +10,18 @@ export { presence, presenceKey, receivePresenceTransaction } from "./plugin";
 
 export { type PresenceIndicator, type PresenceClientConfig };
 
+export interface IndicatorListener {
+  listen: (
+    clientId: string,
+    options?: { signal?: AbortSignal | undefined },
+  ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
+}
+
 export class PresenceClient {
   private userId: string;
   private clientId: string;
-  private refs: Record<string, string> = {};
   private sendIndicator: PresenceClientConfig["sendIndicator"];
-  private getIndicators: PresenceClientConfig["getIndicators"];
+  private listener: PresenceClientConfig["listener"];
   private receiveIndicators: PresenceClientConfig["receiveIndicators"];
 
   private lastSent: PresenceIndicator | null = null;
@@ -24,7 +30,7 @@ export class PresenceClient {
     this.clientId = randomRef();
     this.userId = config.userId;
     this.sendIndicator = config.sendIndicator;
-    this.getIndicators = config.getIndicators;
+    this.listener = config.listener;
     this.receiveIndicators = config.receiveIndicators;
   }
 
@@ -65,30 +71,17 @@ export class PresenceClient {
     } catch {}
   }
 
-  async listen(signal: AbortSignal) {
-    while (!signal.aborted) {
-      try {
-        const indicators = await this.getIndicators(this.clientId, this.refs, {
-          signal,
-        });
+  update(config: Partial<Omit<PresenceClientConfig, "listener">>) {
+    if (config.sendIndicator) this.sendIndicator = config.sendIndicator;
+    if (config.receiveIndicators) this.receiveIndicators = config.receiveIndicators;
+  }
 
-        const newRefs = Object.fromEntries(
-          Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
-        );
-
-        if (Object.entries(newRefs).every(([clientId, ref]) => this.refs[clientId] === ref)) {
-          continue;
-        }
-
-        this.refs = newRefs;
-
-        this.receiveIndicators(indicators);
-      } catch (e) {
-        console.error(e);
-        await new Promise<void>((resolve) => {
-          setTimeout(() => resolve(), 3_000);
-        });
-      }
+  async listen(signal?: AbortSignal) {
+    for await (const indicators of this.listener.listen(this.clientId, {
+      signal,
+    })) {
+      if (signal && signal.aborted) break;
+      this.receiveIndicators(indicators);
     }
   }
 }
@@ -109,24 +102,55 @@ export class LongPollListener {
   ) {
     this.headers = options.headers ?? {};
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-
-    this.getIndicators = this.getIndicators.bind(this);
   }
 
-  async getIndicators(clientId: string, refs?: Record<string, string>) {
-    const response = await this.fetch(this.url, {
-      headers: { ...this.headers, "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({
-        clientId,
-        refs,
-      }),
-    });
+  update(headers: Record<string, string>) {
+    this.headers = headers;
+  }
 
-    if (!response.ok) {
-      throw new Error(`Failed to get commits. ${response.status}: ${response.statusText}`);
+  async *listen(clientId: string, options: { signal?: AbortSignal | undefined } = {}) {
+    let refs: Record<string, string> = {};
+
+    while (!options?.signal || !options.signal.aborted) {
+      try {
+        const response = await this.fetch(this.url, {
+          headers: { ...this.headers, "Content-Type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({
+            clientId,
+            refs,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to get presence indicators. ${response.status}: ${response.statusText}`,
+          );
+        }
+
+        const indicators = (await response.json()) as Record<string, PresenceIndicator>;
+
+        const newRefs = Object.fromEntries(
+          Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
+        );
+
+        if (Object.entries(newRefs).every(([clientId, ref]) => refs[clientId] === ref)) {
+          continue;
+        }
+
+        refs = newRefs;
+
+        yield indicators;
+      } catch (e) {
+        console.error(e);
+
+        if (options.signal?.aborted) return;
+
+        // TODO: Implement a backoff strategy
+        await new Promise<void>((resolve) => {
+          setTimeout(() => resolve(), 3_000);
+        });
+      }
     }
-
-    return (await response.json()) as Record<string, PresenceIndicator>;
   }
 }

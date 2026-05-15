@@ -15,7 +15,7 @@ export { collab, collabKey } from "./plugin";
 export interface CommitsListener {
   listen: (
     editorState: EditorState,
-    options?: { signal?: AbortSignal },
+    options?: { signal?: AbortSignal | undefined },
   ) => AsyncIterableIterator<Commit[]>;
 }
 
@@ -27,7 +27,6 @@ export interface CollabClientConfig {
 
 export class CollabClient {
   private sending: null | string = null;
-  private controller = new AbortController();
 
   private sendCommit: CollabClientConfig["sendCommit"];
   private listener: CollabClientConfig["listener"];
@@ -64,12 +63,10 @@ export class CollabClient {
   }
 
   async listen(editorState: EditorState, signal?: AbortSignal) {
-    const getCommitsSignal = AbortSignal.any([...(signal ? [signal] : []), this.controller.signal]);
-
     for await (const newCommits of this.listener.listen(editorState, {
-      signal: getCommitsSignal,
+      signal,
     })) {
-      if (getCommitsSignal.aborted) break;
+      if (signal && signal.aborted) break;
       this.receiveCommits(newCommits);
     }
   }
@@ -97,7 +94,7 @@ export class LongPollListener {
     this.headers = headers;
   }
 
-  async *listen(editorState: EditorState, options: { signal?: AbortSignal } = {}) {
+  async *listen(editorState: EditorState, options: { signal?: AbortSignal | undefined } = {}) {
     const seen = new Set<string>();
     let version = getVersion(editorState);
     if (version === undefined) {
