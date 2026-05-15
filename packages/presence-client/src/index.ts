@@ -13,7 +13,7 @@ export { type PresenceIndicator, type PresenceClientConfig };
 export interface IndicatorListener {
   listen: (
     clientId: string,
-    options?: { signal?: AbortSignal },
+    options?: { signal?: AbortSignal | undefined },
   ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
 }
 
@@ -77,8 +77,9 @@ export class PresenceClient {
   }
 
   async listen(signal?: AbortSignal) {
-    const options = signal ? { signal } : {};
-    for await (const indicators of this.listener.listen(this.clientId, options)) {
+    for await (const indicators of this.listener.listen(this.clientId, {
+      signal,
+    })) {
       if (signal && signal.aborted) break;
       this.receiveIndicators(indicators);
     }
@@ -107,7 +108,7 @@ export class LongPollListener {
     this.headers = headers;
   }
 
-  async *listen(clientId: string, options: { signal?: AbortSignal } = {}) {
+  async *listen(clientId: string, options: { signal?: AbortSignal | undefined } = {}) {
     let refs: Record<string, string> = {};
 
     while (!options?.signal || !options.signal.aborted) {
