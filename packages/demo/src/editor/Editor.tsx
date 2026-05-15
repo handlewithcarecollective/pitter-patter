@@ -89,6 +89,7 @@ export function Editor({ doc }: Props) {
     [listener, doc.id],
   );
 
+  // Todo: It could be convenient to disambiguate the presence and collab long poll listeners in their class name
   const [presenceListener] = useState(
     () =>
       new PresenceListener(
@@ -102,8 +103,8 @@ export function Editor({ doc }: Props) {
   const presenceConfig = useMemo<PresenceClientConfig>(
     () => ({
       userId,
-      sendIndicator: async (clientId, indicator) => {
-        await fetch(`/api/docs/${doc.id}/presence/${clientId}`, {
+      sendIndicator: async (indicator) => {
+        await fetch(`/api/docs/${doc.id}/presence/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(indicator),

@@ -166,7 +166,7 @@ app.post("/api/docs/:docId/presence", async (req, res) => {
   res.status(200).send(presence);
 });
 
-app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
+app.post("/api/docs/:docId/presence/", async (req, res) => {
   const indicator = req.body as PresenceIndicator;
   await presenceAuthority.updatePresence(req.params.docId, indicator);
 

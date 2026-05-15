@@ -60,7 +60,7 @@ export class PresenceClient {
     }
 
     try {
-      await this.sendIndicator(this.clientId, indicator);
+      await this.sendIndicator(indicator);
       this.lastSent = indicator;
     } catch {}
   }

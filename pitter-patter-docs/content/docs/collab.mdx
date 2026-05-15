@@ -270,14 +270,34 @@ const [state, setState] = useState(() =>
 );
 ```
 
-Next create a config for the CollabClient. The config contains three functions that the CollabClient will use
-to interact with your backend and your local editor state, sendCommit, getCommits, and receiveCommits.
+Next we need to create a listener for commit changes. Currently the only supported listner is the `LongPollListner`. It
+(long) polls the getCommits endpoint you implmented above. Support is planned for direct connections to realtime databases
+like Firestore and Convex.
+
+The LongPollListener only requires the url to poll. 
+
+```
+  const [commitListener] = useState(
+    () =>
+      new LongPollListener(
+        new URL(
+          `/api/docs/${doc.id}/commits`,
+          typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
+        ),
+      ),
+  );
+```
+
+The LongPollListener also accepts optional headers to include in your request (an auth token for example). These can be updated with
+the listner's update function.
+-- Todo: add the actual update function name for the long poll listner ^
+
+
+Next create a config for the CollabClient. The config contains the listener created above and two functions that the CollabClient will use
+to interact with your backend and your local editor state, sendCommit and receiveCommits. 
 
 sendCommit:
   takes a new commit as an argument and sends it to the sendCommits endpoint you created above.
-
-getCommits:
-  takes a version number and requests any new commits from the getCommits endpoint you created above.
 
 receiveCommits:
   takes an array of commits and merges them into your local editor state
@@ -292,21 +312,6 @@ const collabConfig = useMemo<CollabClientConfig>(
         body: JSON.stringify(commit.toJSON()),
       });
     },
-    getCommits: async (version) => {
-      const url = new URL(`http://localhost:3000/api/docs/${docId}/commits`);
-      url.searchParams.append("version", version.toString());
-
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to get commits. ${response.status}: ${response.statusText}`,
-        );
-      }
-
-      const commitJSONs = (await response.json()) as CommitJSON[];
-      return commitJSONs;
-    },
     receiveCommits: (commits) => {
       setState((prev) =>
         commits.reduce(
@@ -315,8 +320,9 @@ const collabConfig = useMemo<CollabClientConfig>(
         ),
       );
     },
+    listner: commitListener
   }),
-  [docId],
+  [docId, commitListener],
 );
 ```
 
@@ -331,12 +337,3 @@ useEffect(() => {
   collabClient.send(state).catch((e) => console.error(e));
 }, [collabClient, state]);
 ```
-
-
-Server endpoints to implement
-
-Client side config
-
--- Todo: Change this to a note on why we use longpolling instead of websockets. probably move it to a section at the bottom
-In theory, you can also use websockets, but we do not recommend this because long polling is both more efficient and
-less error prone for typical collaborative editing use cases. 
