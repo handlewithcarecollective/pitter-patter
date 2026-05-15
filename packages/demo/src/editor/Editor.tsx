@@ -8,7 +8,7 @@ import { EditorState, Transaction } from "prosemirror-state";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  LongPollListener as CollabLongPollListner,
+  LongPollListener as CollabLongPollListener,
   CollabClient,
   CollabClientConfig,
   receiveCommitTransaction,
@@ -62,7 +62,7 @@ export function Editor({ doc }: Props) {
 
   const [listener] = useState(
     () =>
-      new CollabLongPollListner(
+      new CollabLongPollListener(
         new URL(
           `/api/docs/${doc.id}/commits`,
           typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
