@@ -14,9 +14,9 @@ export { collab, collabKey } from "./plugin";
 
 export interface CommitsListener {
   listen: (
-    version: number,
+    editorState: EditorState,
     options?: { signal?: AbortSignal },
-  ) => AsyncIterableIterator<CommitJSON[]>;
+  ) => AsyncIterableIterator<Commit[]>;
 }
 
 export interface CollabClientConfig {
@@ -27,8 +27,6 @@ export interface CollabClientConfig {
 
 export class CollabClient {
   private sending: null | string = null;
-  private version: number | undefined = undefined;
-  private seen = new Set<string>();
   private controller = new AbortController();
 
   private sendCommit: CollabClientConfig["sendCommit"];
@@ -66,27 +64,12 @@ export class CollabClient {
   }
 
   async listen(editorState: EditorState, signal?: AbortSignal) {
-    this.version = getVersion(editorState);
-
-    if (this.version === undefined) {
-      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
-    }
-
     const getCommitsSignal = AbortSignal.any([...(signal ? [signal] : []), this.controller.signal]);
 
-    for await (const commitJSONs of this.listener.listen(this.version, {
+    for await (const newCommits of this.listener.listen(editorState, {
       signal: getCommitsSignal,
     })) {
       if (getCommitsSignal.aborted) break;
-      const commits = commitJSONs.map((json) => Commit.FromJSON(editorState.schema, json));
-
-      // Ensure that we don't process the same commit multiple times
-      const newCommits = commits.filter((commit) => !this.seen.has(commit.ref));
-      const lastCommit = newCommits[newCommits.length - 1];
-      if (!lastCommit) continue;
-      this.version = lastCommit.version;
-      newCommits.forEach((commit) => this.seen.add(commit.ref));
-
       this.receiveCommits(newCommits);
     }
   }
@@ -114,7 +97,13 @@ export class LongPollListener {
     this.headers = headers;
   }
 
-  async *listen(version: number, options: { signal?: AbortSignal } = {}) {
+  async *listen(editorState: EditorState, options: { signal?: AbortSignal } = {}) {
+    const seen = new Set<string>();
+    let version = getVersion(editorState);
+    if (version === undefined) {
+      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
+    }
+
     while (!options?.signal || !options.signal.aborted) {
       const url = new URL(this.url);
       url.searchParams.append("version", version.toString());
@@ -130,7 +119,17 @@ export class LongPollListener {
         }
 
         const commitJSONs = (await response.json()) as CommitJSON[];
-        yield commitJSONs;
+
+        const commits = commitJSONs.map((json) => Commit.FromJSON(editorState.schema, json));
+
+        // Ensure that we don't process the same commit multiple times
+        const newCommits = commits.filter((commit) => !seen.has(commit.ref));
+        const lastCommit = newCommits[newCommits.length - 1];
+        if (!lastCommit) continue;
+        version = lastCommit.version;
+        newCommits.forEach((commit) => seen.add(commit.ref));
+
+        yield newCommits;
       } catch (e) {
         console.error(e);
 
