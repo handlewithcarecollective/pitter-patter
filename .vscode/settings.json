@@ -5,5 +5,8 @@
   },
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.experimental.useTsgo": true,
-  "js/ts.experimantal.useTsgo": true
+  "js/ts.experimantal.useTsgo": true,
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true
 }
