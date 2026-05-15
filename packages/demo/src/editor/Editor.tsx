@@ -102,6 +102,7 @@ export function Editor({ doc }: Props) {
   const presenceConfig = useMemo<PresenceClientConfig>(
     () => ({
       userId,
+      // Todo: Remove clientId from this path. It is not used
       sendIndicator: async (clientId, indicator) => {
         await fetch(`/api/docs/${doc.id}/presence/${clientId}`, {
           method: "POST",

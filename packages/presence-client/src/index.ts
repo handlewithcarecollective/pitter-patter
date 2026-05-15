@@ -127,7 +127,7 @@ export class LongPollListener {
             `Failed to get presence indicators. ${response.status}: ${response.statusText}`,
           );
         }
-
+        // Todo: The response body should be an json object with the indicators as a field
         const indicators = (await response.json()) as Record<string, PresenceIndicator>;
 
         const newRefs = Object.fromEntries(
