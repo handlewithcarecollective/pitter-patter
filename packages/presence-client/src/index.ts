@@ -13,7 +13,6 @@ export { type PresenceIndicator, type PresenceClientConfig };
 export interface PresenceListener {
   listen: (
     clientId: string,
-    refs?: Record<string, string>,
     options?: { signal?: AbortSignal },
   ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
 }
@@ -21,9 +20,8 @@ export interface PresenceListener {
 export class PresenceClient {
   private userId: string;
   private clientId: string;
-  private refs: Record<string, string> = {};
   private sendIndicator: PresenceClientConfig["sendIndicator"];
-  private listener: CollabClientConfig["listener"];
+  private listener: PresenceClientConfig["listener"];
   private receiveIndicators: PresenceClientConfig["receiveIndicators"];
 
   private lastSent: PresenceIndicator | null = null;
@@ -89,30 +87,9 @@ export class PresenceClient {
       this.controller.signal,
     ]);
 
-    for await (const indicators of this.listener.listen(
-      this.clientId,
-      this.refs,
-      {
-        signal,
-      },
-    )) {
-      const newRefs = Object.fromEntries(
-        Object.entries(indicators).map(([clientId, indicator]) => [
-          clientId,
-          indicator.ref,
-        ]),
-      );
-
-      if (
-        Object.entries(newRefs).every(
-          ([clientId, ref]) => this.refs[clientId] === ref,
-        )
-      ) {
-        continue;
-      }
-
-      this.refs = newRefs;
-
+    for await (const indicators of this.listener.listen(this.clientId, {
+      signal: getIndicatorsSignal,
+    })) {
       this.receiveIndicators(indicators);
     }
   }
@@ -140,11 +117,10 @@ export class LongPollListener {
     this.headers = headers;
   }
 
-  async *listen(clientId: string, refs?: Record<string, string>, options: { signal?: AbortSignal } = {}) {
-    while (!options?.signal || !options.signal.aborted) {
-      const url = new URL(this.url);
-      url.searchParams.append("version", version.toString());
+  async *listen(clientId: string, options: { signal?: AbortSignal } = {}) {
+    let refs: Record<string, string> = {};
 
+    while (!options?.signal || !options.signal.aborted) {
       try {
         const response = await this.fetch(this.url, {
           headers: { ...this.headers, "Content-Type": "application/json" },
@@ -161,8 +137,29 @@ export class LongPollListener {
           );
         }
 
-        const indicators = (await response.json()) as Record<string, PresenceIndicator>;
-        yield commitJSONs;
+        const indicators = (await response.json()) as Record<
+          string,
+          PresenceIndicator
+        >;
+
+        const newRefs = Object.fromEntries(
+          Object.entries(indicators).map(([clientId, indicator]) => [
+            clientId,
+            indicator.ref,
+          ]),
+        );
+
+        if (
+          Object.entries(newRefs).every(
+            ([clientId, ref]) => refs[clientId] === ref,
+          )
+        ) {
+          continue;
+        }
+
+        refs = newRefs;
+
+        yield indicators;
       } catch (e) {
         console.error(e);
 
@@ -176,3 +173,4 @@ export class LongPollListener {
     }
   }
 }
+
