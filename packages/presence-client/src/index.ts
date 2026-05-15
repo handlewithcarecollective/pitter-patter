@@ -25,7 +25,6 @@ export class PresenceClient {
   private receiveIndicators: PresenceClientConfig["receiveIndicators"];
 
   private lastSent: PresenceIndicator | null = null;
-  private controller = new AbortController();
 
   constructor(config: PresenceClientConfig) {
     this.clientId = randomRef();
@@ -39,9 +38,7 @@ export class PresenceClient {
     const state = collabKey.getState(editorState);
 
     if (!state) {
-      throw new Error(
-        "EditorState is missing the collab plugin, unable to listen for changes",
-      );
+      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
     }
 
     const { unconfirmed, version } = state;
@@ -76,20 +73,13 @@ export class PresenceClient {
 
   update(config: Partial<Omit<PresenceClientConfig, "listener">>) {
     if (config.sendIndicator) this.sendIndicator = config.sendIndicator;
-    if (config.receiveIndicators)
-      this.receiveIndicators = config.receiveIndicators;
+    if (config.receiveIndicators) this.receiveIndicators = config.receiveIndicators;
   }
 
   async listen(signal?: AbortSignal) {
-    // Todo: do we still need the this.controller?
-    const getIndicatorsSignal = AbortSignal.any([
-      ...(signal ? [signal] : []),
-      this.controller.signal,
-    ]);
-
-    for await (const indicators of this.listener.listen(this.clientId, {
-      signal: getIndicatorsSignal,
-    })) {
+    const options = signal ? { signal } : {};
+    for await (const indicators of this.listener.listen(this.clientId, options)) {
+      if (signal && signal.aborted) break;
       this.receiveIndicators(indicators);
     }
   }
@@ -137,23 +127,13 @@ export class LongPollListener {
           );
         }
 
-        const indicators = (await response.json()) as Record<
-          string,
-          PresenceIndicator
-        >;
+        const indicators = (await response.json()) as Record<string, PresenceIndicator>;
 
         const newRefs = Object.fromEntries(
-          Object.entries(indicators).map(([clientId, indicator]) => [
-            clientId,
-            indicator.ref,
-          ]),
+          Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
         );
 
-        if (
-          Object.entries(newRefs).every(
-            ([clientId, ref]) => refs[clientId] === ref,
-          )
-        ) {
+        if (Object.entries(newRefs).every(([clientId, ref]) => refs[clientId] === ref)) {
           continue;
         }
 

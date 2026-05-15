@@ -27,7 +27,6 @@ export interface CollabClientConfig {
 
 export class CollabClient {
   private sending: null | string = null;
-  private controller = new AbortController();
 
   private sendCommit: CollabClientConfig["sendCommit"];
   private listener: CollabClientConfig["listener"];
@@ -64,12 +63,9 @@ export class CollabClient {
   }
 
   async listen(editorState: EditorState, signal?: AbortSignal) {
-    const getCommitsSignal = AbortSignal.any([...(signal ? [signal] : []), this.controller.signal]);
-
-    for await (const newCommits of this.listener.listen(editorState, {
-      signal: getCommitsSignal,
-    })) {
-      if (getCommitsSignal.aborted) break;
+    let options = signal ? { signal } : {};
+    for await (const newCommits of this.listener.listen(editorState, options)) {
+      if (signal && signal.aborted) break;
       this.receiveCommits(newCommits);
     }
   }
