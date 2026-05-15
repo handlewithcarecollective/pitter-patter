@@ -10,7 +10,7 @@ export { presence, presenceKey, receivePresenceTransaction } from "./plugin";
 
 export { type PresenceIndicator, type PresenceClientConfig };
 
-export interface PresenceListener {
+export interface IndicatorListener {
   listen: (
     clientId: string,
     options?: { signal?: AbortSignal },
@@ -39,7 +39,9 @@ export class PresenceClient {
     const state = collabKey.getState(editorState);
 
     if (!state) {
-      throw new Error("EditorState is missing the collab plugin, unable to listen for changes");
+      throw new Error(
+        "EditorState is missing the collab plugin, unable to listen for changes",
+      );
     }
 
     const { unconfirmed, version } = state;
@@ -74,7 +76,8 @@ export class PresenceClient {
 
   update(config: Partial<Omit<PresenceClientConfig, "listener">>) {
     if (config.sendIndicator) this.sendIndicator = config.sendIndicator;
-    if (config.receiveIndicators) this.receiveIndicators = config.receiveIndicators;
+    if (config.receiveIndicators)
+      this.receiveIndicators = config.receiveIndicators;
   }
 
   async listen(signal?: AbortSignal) {
@@ -134,13 +137,23 @@ export class LongPollListener {
           );
         }
 
-        const indicators = (await response.json()) as Record<string, PresenceIndicator>;
+        const indicators = (await response.json()) as Record<
+          string,
+          PresenceIndicator
+        >;
 
         const newRefs = Object.fromEntries(
-          Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
+          Object.entries(indicators).map(([clientId, indicator]) => [
+            clientId,
+            indicator.ref,
+          ]),
         );
 
-        if (Object.entries(newRefs).every(([clientId, ref]) => refs[clientId] === ref)) {
+        if (
+          Object.entries(newRefs).every(
+            ([clientId, ref]) => refs[clientId] === ref,
+          )
+        ) {
           continue;
         }
 
