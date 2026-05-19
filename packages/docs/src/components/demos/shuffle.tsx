@@ -34,6 +34,37 @@ basic.spec.nodes = basic.spec.nodes.update("image", {
   inline: false,
 });
 
+basic.spec.nodes = basic.spec.nodes.update("card_deck", {
+  group: "block",
+  content: "card+",
+  toDOM() {
+    return ["div", { "data-node-type": "card_deck" }, 0];
+  },
+  parseDOM: [
+    {
+      tag: 'div[data-node-type="card_deck"]',
+    },
+  ],
+});
+
+basic.spec.nodes = basic.spec.nodes.update("card", {
+  content: "paragraph+",
+  toDOM() {
+    return ["div", { "data-node-type": "card" }, 0];
+  },
+  parseDOM: [
+    {
+      tag: 'div[data-node-type="card"]',
+    },
+  ],
+  pitterPatter: {
+    shuffle: {
+      containedBy: "card_deck",
+      draggable: true,
+    },
+  },
+});
+
 let nodes = basic.spec.nodes.update("paragraph", {
   ...basic.spec.nodes.get("paragraph"),
   toDOM() {
@@ -63,6 +94,23 @@ const doc = schema.nodes.doc.create(null, [
     src: "https://t4.ftcdn.net/jpg/02/71/88/53/360_F_271885326_Jkc8UkWTYmgB3dJjhrot2QZEiLneCaaM.jpg",
   }),
   schema.nodes.paragraph.create(null, schema.text("Another paragraph not in a row.")),
+  schema.nodes.card_deck.create({ shuffleStart: 2, shuffleEnd: 11 }, [
+    schema.nodes.card.create(null, [
+      schema.nodes.paragraph.create(null, [
+        schema.text("You can configure containment on node types, too."),
+      ]),
+    ]),
+    schema.nodes.card.create(null, [
+      schema.nodes.paragraph.create(null, [
+        schema.text("These cards can be dragged around within their deck…"),
+      ]),
+    ]),
+    schema.nodes.card.create(null, [
+      schema.nodes.paragraph.create(null, [
+        schema.text("…but they can't be dropped outside of it!"),
+      ]),
+    ]),
+  ]),
 ]);
 
 function Image({ nodeProps, ref, children: _, ...props }: NodeViewComponentProps) {
@@ -81,6 +129,8 @@ function Image({ nodeProps, ref, children: _, ...props }: NodeViewComponentProps
 
 const nodeViewComponents = {
   image: Image,
+  card_deck: CardDeck,
+  card: Card,
 };
 
 function hoverDecorations(from: number, to: number) {
@@ -109,5 +159,26 @@ export function ShuffleDemo() {
         <DragHandles />
       </ShuffleSkeleton>
     </ProseMirror>
+  );
+}
+
+function CardDeck({ nodeProps: _, ref, children, ...props }: NodeViewComponentProps) {
+  return (
+    <div
+      ref={ref}
+      {...props}
+      className={`card-deck ${props.className ?? ""}`}
+      data-node-type="card_deck"
+    >
+      {children}
+    </div>
+  );
+}
+
+function Card({ nodeProps: _, ref, children, ...props }: NodeViewComponentProps) {
+  return (
+    <div ref={ref} {...props} className={`card ${props.className ?? ""}`} data-node-type="card">
+      {children}
+    </div>
   );
 }
