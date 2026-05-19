@@ -14,12 +14,14 @@ import {
 
 import { shufflePluginKey, startDragOnPointerDown, ViewDesc } from "../plugin.js";
 
+export interface DragHandleProps {
+  style: { top: number; left: number };
+  onPointerDown: EventHandler<SyntheticPointerEvent>;
+  node: Node;
+}
+
 interface Props {
-  handleComponent?: ComponentType<{
-    style: { top: number; left: number };
-    onPointerDown: EventHandler<SyntheticPointerEvent>;
-    node: Node;
-  }>;
+  handleComponent?: ComponentType<DragHandleProps>;
 }
 
 export function DragHandles({ handleComponent }: Props) {
@@ -32,18 +34,18 @@ export function DragHandles({ handleComponent }: Props) {
   return (
     <>
       {hoverPositions.map(({ from }) => (
-        <DragHandle key={from} pos={from} handleComponent={handleComponent} />
+        <DragHandleRenderer key={from} pos={from} handleComponent={handleComponent} />
       ))}
     </>
   );
 }
 
-interface DragHandleProps {
+interface DragHandleRendererProps {
   pos: number;
   handleComponent?: Props["handleComponent"];
 }
 
-export function DragHandle({ pos, handleComponent: Handle }: DragHandleProps) {
+export function DragHandleRenderer({ pos, handleComponent: Handle }: DragHandleRendererProps) {
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
@@ -84,13 +86,17 @@ export function DragHandle({ pos, handleComponent: Handle }: DragHandleProps) {
     return <Handle style={{ top, left }} node={node} onPointerDown={handlePointerDown} />;
   }
 
+  return <DragHandle style={{ top, left }} onPointerDown={handlePointerDown} node={node} />;
+}
+
+export function DragHandle({ style, node, onPointerDown }: DragHandleProps) {
   return (
     <button
       type="button"
       className="shuffle-drag-handle"
-      style={{ top, left }}
+      style={style}
       draggable="false"
-      onPointerDown={handlePointerDown}
+      onPointerDown={onPointerDown}
     >
       {node.type.name}
     </button>
