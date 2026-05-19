@@ -1,4 +1,4 @@
-import { renderRequest } from "@parcel/rsc/node";
+git import { renderRequest } from "@parcel/rsc/node";
 import express from "express";
 import { Migrator, Transaction } from "kysely";
 import { TSFileMigrationProvider } from "kysely-ctl";
@@ -66,6 +66,8 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
       getCommit: async (tr, docId, commitRef) => {
         return (await getCommitByRef(tr, docId, commitRef)) ?? null;
       },
+      // Todo: make the role of this function more clear to external users. getCommitsAfter 
+      //       could work
       getCommits: async (tr, docId, version) => {
         return await getCommitsAfter(tr, docId, version);
       },
