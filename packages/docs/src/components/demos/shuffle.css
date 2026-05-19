@@ -12,11 +12,7 @@ img {
 
 [data-node-type] {
   border-radius: 0.25rem;
-}
-
-[data-node-type][data-shuffle-clone] {
   background-color: #f3efea;
-  color: #351900;
 }
 
 .shuffle-block {
@@ -38,7 +34,8 @@ img {
   border-radius: 0.25rem;
   justify-content: space-around;
   padding: 1rem;
-  margin: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .card {
@@ -48,10 +45,10 @@ img {
   border-radius: 0.25rem;
 }
 
-.card.shuffle-hover-block {
-  border: 1px solid lightblue;
+.card p {
+  background-color: white;
 }
 
-.card[data-shuffle-clone] {
-  background-color: white;
+.card.shuffle-hover-block {
+  border: 1px solid lightblue;
 }

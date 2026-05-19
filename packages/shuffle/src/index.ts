@@ -15,4 +15,4 @@ export {
 } from "./plugin.js";
 export { ShuffleSkeleton } from "./components/Skeleton.js";
 export { ResizeHandles, useResizeHandlePointerDown } from "./components/ResizeHandles.js";
-export { DragHandles } from "./components/DragHandles.js";
+export { type DragHandleProps, DragHandles, DragHandle } from "./components/DragHandles.js";
