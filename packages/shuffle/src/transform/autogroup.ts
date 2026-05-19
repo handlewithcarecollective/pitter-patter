@@ -18,6 +18,8 @@ export function autogroup(
   const node = view.state.doc.resolve(from).nodeAfter;
   if (!node) return null;
 
+  if (node.type.spec.pitterPatter?.shuffle?.containedBy) return null;
+
   const adjacentElements = findAdjacentElements(clientY, view.dom.getBoundingClientRect()).filter(
     (el) => !el.dataset["shuffleActive"] && el !== view.dom,
   );
