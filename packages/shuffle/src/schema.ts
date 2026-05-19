@@ -1,4 +1,4 @@
-import { Node, NodeSpec, NodeType, Schema } from "prosemirror-model";
+import { Node, NodeSpec, NodeType, ResolvedPos, Schema } from "prosemirror-model";
 
 export const shuffleAttrs: NodeSpec["attrs"] = {
   shuffleStart: {
@@ -135,6 +135,23 @@ export function getShuffleRowType(schema: Schema) {
   });
 
   return rowType ?? null;
+}
+
+export function getBeforeContainedBy($from: ResolvedPos) {
+  const node = $from.nodeAfter;
+  if (!node) return null;
+
+  const containedByName = node.type.spec.pitterPatter?.shuffle?.containedBy;
+  if (!containedByName) return null;
+
+  let d = $from.depth;
+  while ($from.node(d).type.name !== containedByName && d > 0) {
+    d--;
+  }
+
+  if (d === 0) return null;
+
+  return $from.doc.resolve($from.before(d));
 }
 
 declare module "prosemirror-model" {

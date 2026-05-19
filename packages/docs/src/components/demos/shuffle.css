@@ -30,3 +30,28 @@ img {
 .shuffle-drag-handle {
   color: #351900;
 }
+
+.card-deck {
+  display: flex;
+  background-color: lightgray;
+  gap: 1rem;
+  border-radius: 0.25rem;
+  justify-content: space-around;
+  padding: 1rem;
+  margin: 2rem;
+}
+
+.card {
+  border: 1px solid transparent;
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.card.shuffle-hover-block {
+  border: 1px solid lightblue;
+}
+
+.card[data-shuffle-clone] {
+  background-color: white;
+}
