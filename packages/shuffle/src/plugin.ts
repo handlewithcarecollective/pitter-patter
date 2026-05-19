@@ -9,6 +9,7 @@ import { randomRef } from "@pitter-patter/refs";
 
 import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
 import { autogroup } from "./transform/autogroup";
+import { inflate } from "./transform/inflate.js";
 import { reorder } from "./transform/reorder";
 import { reposition } from "./transform/reposition";
 import { TranslateCalculator } from "./translation.js";
@@ -277,6 +278,28 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
         },
       },
     },
+    view(view) {
+      function handleInflatePointerDown(event: PointerEvent) {
+        if (!view.editable) return;
+        if (!(event.target instanceof HTMLElement)) return;
+
+        if (view.dom.contains(event.target)) return;
+
+        const draggable = event.target.closest("[data-shuffle-inflatable]");
+
+        if (!(draggable instanceof HTMLElement)) return;
+
+        startDragOnPointerDown(view, null, draggable, event.clientX, event.clientY);
+      }
+
+      view.root.addEventListener("pointerdown", handleInflatePointerDown as EventListener);
+
+      return {
+        destroy() {
+          view.root.removeEventListener("pointerdown", handleInflatePointerDown as EventListener);
+        },
+      };
+    },
   });
 }
 
@@ -293,7 +316,7 @@ interface NodeViewDesc {
 
 export function startDragOnPointerDown(
   view: EditorView,
-  pos: number,
+  pos: number | null,
   dom: HTMLElement & { pmViewDesc?: ViewDesc },
   clientX: number,
   clientY: number,
@@ -329,16 +352,19 @@ export function startDragOnPointerDown(
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
   let skeletonOn = false;
+
   const onMove = throttle(function onMove(e: PointerEvent) {
     if (!skeletonOn || !clone || !initialStyles || !layout) {
       const startResult = startDrag(dom!, translateCalc);
 
-      view.dispatch(
-        view.state.tr.setMeta(shufflePluginKey, {
-          type: "map",
-          payload: { newPos: pos },
-        }),
-      );
+      if (pos !== null) {
+        view.dispatch(
+          view.state.tr.setMeta(shufflePluginKey, {
+            type: "map",
+            payload: { newPos: pos },
+          } satisfies ShufflePluginMeta),
+        );
+      }
 
       clone = startResult.clone;
       clone.dataset["shuffleClone"] = "true";
@@ -362,14 +388,13 @@ export function startDragOnPointerDown(
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
 
-    if (before === undefined) return;
-
     if (currentAnimation?.began && !currentAnimation.completed) return;
 
-    const tr =
-      autogroup(view, before, e.clientX, e.clientY) ??
-      reorder(view, before, e.clientX, e.clientY) ??
-      reposition(view, before, clone!.getBoundingClientRect());
+    const tr = before
+      ? (autogroup(view, before, e.clientX, e.clientY) ??
+        reorder(view, before, e.clientX, e.clientY) ??
+        reposition(view, before, clone.getBoundingClientRect()))
+      : inflate(view, clone, e.clientX, e.clientY);
 
     if (!tr) return;
 
@@ -388,6 +413,26 @@ export function startDragOnPointerDown(
     dom = nodeDom;
     dom.dataset["shuffleActive"] = "true";
   });
+
+  function endDrag(domRect?: DOMRect) {
+    if (!clone || !initialStyles) return;
+
+    clone.style.transition = "transform 0.2s ease";
+    clone.style.boxShadow = initialStyles.boxShadow;
+
+    const { transform, transformOrigin } = domRect
+      ? translateCalc.place(domRect.left, domRect.top)
+      : translateCalc.reset();
+
+    clone.style.transform = transform;
+    clone.style.transformOrigin = transformOrigin;
+
+    setTimeout(() => {
+      clone!.style.transition = "none";
+      delete dom.dataset["shuffleActive"];
+      clone!.remove();
+    }, 250);
+  }
 
   function onUp() {
     document.removeEventListener("mousedown", preventSelection);
@@ -410,10 +455,10 @@ export function startDragOnPointerDown(
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
 
-    if (before === undefined) return;
+    if (before === undefined) return endDrag();
 
     const dom = view.nodeDOM(before);
-    if (!(dom instanceof HTMLElement)) return;
+    if (!(dom instanceof HTMLElement)) return endDrag();
 
     view.dispatch(
       view.state.tr.setMeta(shufflePluginKey, {
@@ -421,23 +466,9 @@ export function startDragOnPointerDown(
       } satisfies ShufflePluginMeta),
     );
 
-    clone.style.transition = "transform 0.2s ease";
-    clone.style.boxShadow = initialStyles.boxShadow;
-
     const domRect = dom.getBoundingClientRect();
 
-    const { transform, transformOrigin } = translateCalc.place(domRect.left, domRect.top);
-
-    clone.style.transform = transform;
-    clone.style.transformOrigin = transformOrigin;
-
-    setTimeout(() => {
-      clone!.style.transition = "none";
-      delete dom.dataset["shuffleActive"];
-      clone!.remove();
-    }, 250);
-
-    return;
+    return endDrag(domRect);
   }
 
   const preventSelection = (e: MouseEvent) => {
