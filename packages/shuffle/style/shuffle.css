@@ -32,17 +32,6 @@
   grid-row-start: 1 !important;
 }
 
-/* The drag clone gets a little messed up since
-   its grid-template-columns is set to subgrid, but
-   it's absolutely positioned. So we manually duplicate
-   the grid template columns. This isn't perfect, but
-   it looks much less broken. */
-[data-shuffle-clone].row {
-  grid-template-columns:
-    minmax(0, 1fr) repeat(12, minmax(0, var(--shuffle-column-width, 3rem)))
-    minmax(0, 1fr);
-}
-
 .shuffle-block {
   width: 100%;
 }

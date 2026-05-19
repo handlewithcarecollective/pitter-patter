@@ -306,14 +306,22 @@ export function startDragOnPointerDown(
 
   const domRect = dom.getBoundingClientRect();
 
-  const transform = new DOMMatrixReadOnly(getComputedStyle(dom).transform);
+  const domStyle = getComputedStyle(dom);
+  const transform = new DOMMatrixReadOnly(domStyle.transform);
   const originX = transform.m41;
   const originY = transform.m42;
 
   const startX = clientX;
   const startY = clientY;
 
-  const translateCalc = new TranslateCalculator(originX, originY, startX, startY, domRect);
+  const translateCalc = new TranslateCalculator(
+    originX,
+    originY,
+    startX,
+    startY,
+    domRect,
+    parseInt(domStyle.marginTop, 10),
+  );
 
   let clone: HTMLElement | null = null;
   let initialStyles: InitialStyles | null = null;
@@ -455,11 +463,31 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   const bodyRect = document.body.getBoundingClientRect();
 
   const clone = dom.cloneNode(true) as HTMLElement;
+
+  let cloneQueue: Element[] = [clone];
+  let domQueue: Element[] = [dom];
+
+  while (cloneQueue.length && domQueue.length) {
+    const domElement = domQueue.pop();
+    const cloneElement = cloneQueue.pop();
+
+    if (!(domElement instanceof HTMLElement && cloneElement instanceof HTMLElement)) {
+      continue;
+    }
+
+    const domStyles = getComputedStyle(domElement);
+    for (let i = 0; i < domStyles.length; i++) {
+      const property = domStyles.item(i);
+      cloneElement.style.setProperty(property, domStyles.getPropertyValue(property));
+    }
+
+    cloneQueue.push(...cloneElement.children);
+    domQueue.push(...domElement.children);
+  }
+
   clone.style.position = "absolute";
   clone.style.top = `${domRect.top - bodyRect.top}px`;
   clone.style.left = `${domRect.left - bodyRect.left}px`;
-  clone.style.width = `${domRect.width}px`;
-  clone.style.height = `${domRect.height}px`;
   document.body.appendChild(clone);
 
   dom.dataset["shuffleActive"] = "true";

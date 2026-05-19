@@ -18,6 +18,8 @@ import {
   shuffle,
   addShuffleNodes,
   DragHandles,
+  DragHandle,
+  type DragHandleProps,
   ShuffleSkeleton,
   ResizeHandles,
 } from "@pitter-patter/shuffle";
@@ -156,10 +158,17 @@ export function ShuffleDemo() {
       <ShuffleSkeleton>
         <ProseMirrorDoc />
         <ResizeHandles />
-        <DragHandles />
+        <DragHandles handleComponent={CustomHandle} />
       </ShuffleSkeleton>
     </ProseMirror>
   );
+}
+
+function CustomHandle(props: DragHandleProps) {
+  if (["image", "card", "card_deck"].includes(props.node.type.name)) {
+    return null;
+  }
+  return <DragHandle {...props} />;
 }
 
 function CardDeck({ nodeProps: _, ref, children, ...props }: NodeViewComponentProps) {
