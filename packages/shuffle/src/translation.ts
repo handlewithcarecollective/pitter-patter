@@ -29,4 +29,11 @@ export class TranslateCalculator {
       transformOrigin: "initial",
     };
   }
+
+  reset() {
+    return {
+      transform: `rotateX(0) scale(1) translate(${this.originX}px, ${this.originY}px)`,
+      transformOrigin: "initial",
+    };
+  }
 }
