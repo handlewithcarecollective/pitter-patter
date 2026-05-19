@@ -58,7 +58,7 @@ export function reorder(
   return tr;
 }
 
-function findGap(doc: Node, pos: number, nodeType: NodeType) {
+export function findGap(doc: Node, pos: number, nodeType: NodeType) {
   const $pos = doc.resolve(pos);
 
   let d = $pos.depth;

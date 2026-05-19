@@ -154,13 +154,41 @@ const editorState = EditorState.create({
 
 export function ShuffleDemo() {
   return (
-    <ProseMirror defaultState={editorState} nodeViewComponents={nodeViewComponents}>
-      <ShuffleSkeleton>
-        <ProseMirrorDoc />
-        <ResizeHandles />
-        <DragHandles handleComponent={CustomHandle} />
-      </ShuffleSkeleton>
-    </ProseMirror>
+    <div>
+      <div className="inflatable-menu">
+        <div
+          data-shuffle-inflatable={JSON.stringify(
+            schema.nodes.card_deck
+              .create(null, [
+                schema.nodes.card.create(null, [
+                  schema.nodes.paragraph.create(null, [schema.text("This is a deck of cards.")]),
+                ]),
+                schema.nodes.card.create(null, [
+                  schema.nodes.paragraph.create(null, [
+                    schema.text("You can drag cards around to reorder them."),
+                  ]),
+                ]),
+                schema.nodes.card.create(null, [
+                  schema.nodes.paragraph.create(null, [
+                    schema.text("But you can't drag cards from one deck to another!"),
+                  ]),
+                ]),
+              ])
+              .toJSON(),
+          )}
+          className="card-deck-inflatable"
+        >
+          Card deck
+        </div>
+      </div>
+      <ProseMirror defaultState={editorState} nodeViewComponents={nodeViewComponents}>
+        <ShuffleSkeleton>
+          <ProseMirrorDoc />
+          <ResizeHandles />
+          <DragHandles handleComponent={CustomHandle} />
+        </ShuffleSkeleton>
+      </ProseMirror>
+    </div>
   );
 }
 

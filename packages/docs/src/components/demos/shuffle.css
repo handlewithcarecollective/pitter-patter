@@ -52,3 +52,17 @@ img {
 .card.shuffle-hover-block {
   border: 1px solid lightblue;
 }
+
+.inflatable-menu {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  justify-content: start;
+}
+
+.card-deck-inflatable {
+  background-color: #f3efea;
+  color: #351900;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
