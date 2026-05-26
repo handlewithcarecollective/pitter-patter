@@ -1,9 +1,26 @@
 import { ReactNode } from "react";
 
-interface Props {
-  children: ReactNode;
-}
-export function ShuffleSkeleton({ children }: Props) {
+/**
+ * A React component that renders the grid skeleton. This component must be rendered for resize and
+ * reposition behaviors to work correctly. The component should be a direct parent of the
+ * `ProseMirrorDoc` component.
+ *
+ * @example
+ *
+ * ```tsx
+ * function Editor() {
+ *   return (
+ *     <ProseMirror defaultState={editorState}>
+ *       <ShuffleSkeleton>
+ *         <ProseMirrorDoc />
+ *       </ShuffleSkeleton>
+ *     </ProseMirror>
+ *   );
+ * }
+ * ```
+ */
+export function ShuffleSkeleton(props: { children: ReactNode }) {
+  const { children } = props;
   return (
     <div data-shuffle-wrapper className="shuffle-wrapper">
       <div data-shuffle-skeleton className="shuffle-skeleton shuffle-block row start-1 end-12">
