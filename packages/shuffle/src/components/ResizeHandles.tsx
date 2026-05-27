@@ -20,14 +20,34 @@ import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
 import { supportsResize } from "../schema";
 import { resize } from "../transform/resize";
 
-interface Props {
+/**
+ * A React component that renders the resize handles. This component will render a single set of resize
+ * handles whenever the selection is within a resizable node. It should be a descendant of the
+ * `ProseMirror` component. The `handleComponent` prop can be used to provide a custom handle
+ * implementation.
+ *
+ * @example
+ *
+ * ```tsx
+ * function Editor() {
+ *   return (
+ *     <ProseMirror defaultState={editorState}>
+ *       <ShuffleSkeleton>
+ *         <ProseMirrorDoc />
+ *         <ResizeHandles />
+ *       </ShuffleSkeleton>
+ *     </ProseMirror>
+ *   );
+ * }
+ * ```
+ */
+export function ResizeHandles(props: {
   handleComponent?: ComponentType<{
     style: { top: number; left: number };
     onPointerDown: EventHandler<SyntheticPointerEvent>;
   }>;
-}
-
-export function ResizeHandles({ handleComponent }: Props) {
+}) {
+  const { handleComponent } = props;
   const { doc, selection } = useEditorState();
 
   const firstSelectedShuffleBlock = useMemo(() => {
@@ -75,7 +95,12 @@ export function ResizeHandles({ handleComponent }: Props) {
 interface ResizeHandleProps {
   pos: number;
   node: Node;
-  handleComponent?: Props["handleComponent"];
+  handleComponent?:
+    | ComponentType<{
+        style: { top: number; left: number };
+        onPointerDown: EventHandler<SyntheticPointerEvent>;
+      }>
+    | undefined;
 }
 
 export function LeftResizeHandle({ pos, node, handleComponent: Handle }: ResizeHandleProps) {
@@ -154,6 +179,12 @@ export function RightResizeHandle({ pos, node, handleComponent: Handle }: Resize
   );
 }
 
+/**
+ * A React hook that can be used to build a custom resize handles component. It takes the position of
+ * the selected node and whether to create a handler for the start or end handler.
+ *
+ * It returns an event handler that can be added to the `"pointerdown"` event.
+ */
 export function useResizeHandlePointerDown(pos: number, side: "start" | "end") {
   return useEditorEventCallback((view) => {
     if (!view.editable) return;

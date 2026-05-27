@@ -1,5 +1,6 @@
 export {
   addShuffleNodes,
+  type AddShuffleNodesOptions,
   row,
   container,
   shuffleAttrs,
@@ -8,7 +9,6 @@ export {
 } from "./schema.js";
 export {
   shuffle,
-  type ShufflePluginMeta,
   type ShufflePluginOptions,
   type ShufflePluginState,
   shufflePluginKey,

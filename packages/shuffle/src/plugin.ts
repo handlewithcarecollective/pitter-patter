@@ -65,6 +65,10 @@ export interface ShufflePluginOptions {
   hoverDecorations?: (from: number, to: number, node: Node) => Decoration | null;
 }
 
+/**
+ * A ProseMirror plugin factory. Manages decorations, state, and event listeners necessary for
+ * autogroup, reorder, and reposition behaviors.
+ */
 export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
   return new Plugin<ShufflePluginState>({
     key: shufflePluginKey,
