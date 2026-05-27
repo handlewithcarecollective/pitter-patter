@@ -19,3 +19,15 @@ export function setShuffleColumns(pos: number, start: number, end: number) {
     return true;
   };
 }
+
+export function setShuffleZIndex(pos: number, zIndex: number) {
+  return function setShuffleZIndex(state: EditorState, dispatch?: EditorView["dispatch"]) {
+    if (!dispatch) return true;
+
+    const tr = state.tr;
+    tr.setNodeAttribute(pos, "zIndex", zIndex);
+    tr.setMeta("composition", shufflePluginKey.getState(state)?.comp);
+    dispatch(tr);
+    return true;
+  };
+}

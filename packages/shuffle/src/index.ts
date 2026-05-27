@@ -16,3 +16,4 @@ export {
 export { ShuffleSkeleton } from "./components/Skeleton.js";
 export { ResizeHandles, useResizeHandlePointerDown } from "./components/ResizeHandles.js";
 export { type DragHandleProps, DragHandles, DragHandle } from "./components/DragHandles.js";
+export { setShuffleColumns, setShuffleZIndex } from "./commands.js";

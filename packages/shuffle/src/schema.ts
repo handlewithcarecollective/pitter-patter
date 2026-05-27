@@ -6,7 +6,7 @@ import { Node, NodeSpec, NodeType, ResolvedPos, Schema } from "prosemirror-model
  * is 13. You may wish to override the default values, which are 4 and 9 for `shuffleStart` and
  * `shuffleEnd`, respectively.
  */
-export const shuffleAttrs: NodeSpec["attrs"] = {
+export const shuffleAttrs = {
   shuffleStart: {
     default: 4,
     validate(value) {
@@ -19,7 +19,11 @@ export const shuffleAttrs: NodeSpec["attrs"] = {
       return typeof value === "number" && value <= 13 && value >= 0;
     },
   },
-};
+  zIndex: {
+    default: 0,
+    validate: "number",
+  },
+} satisfies NodeSpec["attrs"];
 
 /**
  * A node spec for a container node. A container is a vertical group, meant to wrap other block nodes,
@@ -106,13 +110,14 @@ export function addShuffleNodes<Nodes extends string, Marks extends string>(
         attrs: {
           ...node.attrs,
           shuffleStart: {
-            ...shuffleAttrs,
+            ...shuffleAttrs.shuffleStart,
             default: defaultStart,
           },
           shuffleEnd: {
-            ...shuffleAttrs,
+            ...shuffleAttrs.shuffleEnd,
             default: defaultEnd,
           },
+          zIndex: shuffleAttrs.zIndex,
         },
         draggable: false,
         pitterPatter: {
