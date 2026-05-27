@@ -17,7 +17,7 @@ function ResizeHandles(props: {
 ```
 
 Defined in:
-[components/ResizeHandles.tsx:44](https://github.com/handlewithcarecollective/pitter-patter/blob/ea232092d474b08ff7a0581295e4e3ccc497223b/packages/shuffle/src/components/ResizeHandles.tsx#L44)
+[components/ResizeHandles.tsx:44](https://github.com/handlewithcarecollective/pitter-patter/blob/d00ae753d2a935e710d41912ca995347835cab1b/packages/shuffle/src/components/ResizeHandles.tsx#L44)
 
 A React component that renders the resize handles. This component will render a single set of resize
 handles whenever the selection is within a resizable node. It should be a descendant of the

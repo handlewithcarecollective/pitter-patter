@@ -9,7 +9,7 @@ function supportsDrag(node: Node | undefined): boolean;
 ```
 
 Defined in:
-[schema.ts:158](https://github.com/handlewithcarecollective/pitter-patter/blob/ea232092d474b08ff7a0581295e4e3ccc497223b/packages/shuffle/src/schema.ts#L158)
+[schema.ts:163](https://github.com/handlewithcarecollective/pitter-patter/blob/d00ae753d2a935e710d41912ca995347835cab1b/packages/shuffle/src/schema.ts#L163)
 
 Returns true if the provided node’s type supports drag behaviors.
 

@@ -9,7 +9,7 @@ function DragHandles(props: { handleComponent?: ComponentType<DragHandleProps> }
 ```
 
 Defined in:
-[components/DragHandles.tsx:43](https://github.com/handlewithcarecollective/pitter-patter/blob/ea232092d474b08ff7a0581295e4e3ccc497223b/packages/shuffle/src/components/DragHandles.tsx#L43)
+[components/DragHandles.tsx:43](https://github.com/handlewithcarecollective/pitter-patter/blob/d00ae753d2a935e710d41912ca995347835cab1b/packages/shuffle/src/components/DragHandles.tsx#L43)
 
 A React component that renders the drag handles. This component will render a drag handle for each
 node that the pointer is currently hovering over. It should be a descendant of the `ProseMirror`

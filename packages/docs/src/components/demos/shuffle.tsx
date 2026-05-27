@@ -115,8 +115,6 @@ const doc = schema.nodes.doc.create(null, [
   ]),
 ]);
 
-console.log(doc);
-
 function Image({ nodeProps, ref, children: _, ...props }: NodeViewComponentProps) {
   useSelectNode(() => {});
 
