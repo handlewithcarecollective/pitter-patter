@@ -14,7 +14,7 @@ function addShuffleNodes<Nodes, Marks>(
 ```
 
 Defined in:
-[schema.ts:89](https://github.com/handlewithcarecollective/pitter-patter/blob/77847a6e5f056de116cf628557786668e90c3b4e/packages/shuffle/src/schema.ts#L89)
+[schema.ts:89](https://github.com/handlewithcarecollective/pitter-patter/blob/ea232092d474b08ff7a0581295e4e3ccc497223b/packages/shuffle/src/schema.ts#L89)
 
 Augments the provided schema with the row and container nodes, as well as adding the `shuffleStart`
 and `shuffleEnd` attributes to every node in the group `group`. The `content` argument should be a
@@ -54,7 +54,7 @@ draggable.
 
 ### options?
 
-[`AddShuffleNodesOptions`](../interfaces/AddShuffleNodesOptions.md) = `{}`
+[`AddShuffleNodesOptions`](/docs/shuffle/reference/interfaces/AddShuffleNodesOptions) = `{}`
 
 ## Returns
 

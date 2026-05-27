@@ -9,7 +9,7 @@ function shuffle(__namedParameters?: ShufflePluginOptions): Plugin<ShufflePlugin
 ```
 
 Defined in:
-[plugin.ts:72](https://github.com/handlewithcarecollective/pitter-patter/blob/77847a6e5f056de116cf628557786668e90c3b4e/packages/shuffle/src/plugin.ts#L72)
+[plugin.ts:72](https://github.com/handlewithcarecollective/pitter-patter/blob/ea232092d474b08ff7a0581295e4e3ccc497223b/packages/shuffle/src/plugin.ts#L72)
 
 A ProseMirror plugin factory. Manages decorations, state, and event listeners necessary for
 autogroup, reorder, and reposition behaviors.
@@ -18,8 +18,8 @@ autogroup, reorder, and reposition behaviors.
 
 ### \_\_namedParameters?
 
-[`ShufflePluginOptions`](../interfaces/ShufflePluginOptions.md) = `{}`
+[`ShufflePluginOptions`](/docs/shuffle/reference/interfaces/ShufflePluginOptions) = `{}`
 
 ## Returns
 
-`Plugin`\<[`ShufflePluginState`](../interfaces/ShufflePluginState.md)\>
+`Plugin`\<[`ShufflePluginState`](/docs/shuffle/reference/interfaces/ShufflePluginState)\>

@@ -6,26 +6,26 @@ title: "@pitter-patter/shuffle"
 
 ## Interfaces
 
-- [AddShuffleNodesOptions](interfaces/AddShuffleNodesOptions.md)
-- [DragHandleProps](interfaces/DragHandleProps.md)
-- [ShufflePluginOptions](interfaces/ShufflePluginOptions.md)
-- [ShufflePluginState](interfaces/ShufflePluginState.md)
+- [AddShuffleNodesOptions](/docs/shuffle/reference/interfaces/AddShuffleNodesOptions)
+- [DragHandleProps](/docs/shuffle/reference/interfaces/DragHandleProps)
+- [ShufflePluginOptions](/docs/shuffle/reference/interfaces/ShufflePluginOptions)
+- [ShufflePluginState](/docs/shuffle/reference/interfaces/ShufflePluginState)
 
 ## Variables
 
-- [container](variables/container.md)
-- [row](variables/row.md)
-- [shuffleAttrs](variables/shuffleAttrs.md)
-- [shufflePluginKey](variables/shufflePluginKey.md)
+- [container](/docs/shuffle/reference/variables/container)
+- [row](/docs/shuffle/reference/variables/row)
+- [shuffleAttrs](/docs/shuffle/reference/variables/shuffleAttrs)
+- [shufflePluginKey](/docs/shuffle/reference/variables/shufflePluginKey)
 
 ## Functions
 
-- [addShuffleNodes](functions/addShuffleNodes.md)
-- [DragHandle](functions/DragHandle.md)
-- [DragHandles](functions/DragHandles.md)
-- [ResizeHandles](functions/ResizeHandles.md)
-- [shuffle](functions/shuffle.md)
-- [ShuffleSkeleton](functions/ShuffleSkeleton.md)
-- [supportsDrag](functions/supportsDrag.md)
-- [supportsResize](functions/supportsResize.md)
-- [useResizeHandlePointerDown](functions/useResizeHandlePointerDown.md)
+- [addShuffleNodes](/docs/shuffle/reference/functions/addShuffleNodes)
+- [DragHandle](/docs/shuffle/reference/functions/DragHandle)
+- [DragHandles](/docs/shuffle/reference/functions/DragHandles)
+- [ResizeHandles](/docs/shuffle/reference/functions/ResizeHandles)
+- [shuffle](/docs/shuffle/reference/functions/shuffle)
+- [ShuffleSkeleton](/docs/shuffle/reference/functions/ShuffleSkeleton)
+- [supportsDrag](/docs/shuffle/reference/functions/supportsDrag)
+- [supportsResize](/docs/shuffle/reference/functions/supportsResize)
+- [useResizeHandlePointerDown](/docs/shuffle/reference/functions/useResizeHandlePointerDown)
