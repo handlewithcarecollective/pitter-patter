@@ -595,7 +595,7 @@
   background-color: lightblue;
   width: 0.25rem;
   height: 2rem;
-  z-index: 999;
+  z-index: 10000;
   transform: translateY(-50%);
   border-radius: 0.25rem;
   cursor: col-resize;
@@ -608,4 +608,5 @@
   position: absolute;
   background-color: lightblue;
   transform: translateY(-100%);
+  z-index: 10000;
 }

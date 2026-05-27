@@ -9,7 +9,7 @@ function DragHandle(props: DragHandleProps): Element;
 ```
 
 Defined in:
-[components/DragHandles.tsx:109](https://github.com/handlewithcarecollective/pitter-patter/blob/ea232092d474b08ff7a0581295e4e3ccc497223b/packages/shuffle/src/components/DragHandles.tsx#L109)
+[components/DragHandles.tsx:109](https://github.com/handlewithcarecollective/pitter-patter/blob/5f9831b289582242a2f8b7c6f9c1d64b034de5a9/packages/shuffle/src/components/DragHandles.tsx#L109)
 
 ## Parameters
 

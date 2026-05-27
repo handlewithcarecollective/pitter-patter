@@ -24,6 +24,8 @@ title: "@pitter-patter/shuffle"
 - [DragHandle](/docs/shuffle/reference/functions/DragHandle)
 - [DragHandles](/docs/shuffle/reference/functions/DragHandles)
 - [ResizeHandles](/docs/shuffle/reference/functions/ResizeHandles)
+- [setShuffleColumns](/docs/shuffle/reference/functions/setShuffleColumns)
+- [setShuffleZIndex](/docs/shuffle/reference/functions/setShuffleZIndex)
 - [shuffle](/docs/shuffle/reference/functions/shuffle)
 - [ShuffleSkeleton](/docs/shuffle/reference/functions/ShuffleSkeleton)
 - [supportsDrag](/docs/shuffle/reference/functions/supportsDrag)
