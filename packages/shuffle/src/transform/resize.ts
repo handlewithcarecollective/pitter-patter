@@ -19,10 +19,11 @@ export function resize(
   for (let i = 0; i < bars.length; i++) {
     const bar = bars.item(i);
     const barRect = bar.getBoundingClientRect();
-    const distance = Math.abs(clientX - barRect.left);
+    const barSide = side === "start" ? barRect.left : barRect.right;
+    const distance = Math.abs(clientX - barSide);
     if (closestBar === null || closestDistance === null) {
       closestBar = i;
-      closestDistance = Math.abs(clientX - barRect.left);
+      closestDistance = Math.abs(clientX - barSide);
       continue;
     }
     if (closestDistance > distance) {
@@ -54,7 +55,7 @@ export function resize(
     return transaction;
   }
 
-  const newEnd = Math.max(0, closestBar);
+  const newEnd = Math.max(0, closestBar + 1);
   setShuffleColumns(
     pos,
     shuffleStart,

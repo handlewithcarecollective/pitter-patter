@@ -5,7 +5,8 @@
     "correctness": "error"
   },
   "rules": {
-    "import/consistent-type-specifier-style": ["error", "prefer-inline"]
+    "import/consistent-type-specifier-style": ["error", "prefer-inline"],
+    "no-console": ["error"]
   },
   "env": {
     "builtin": true
