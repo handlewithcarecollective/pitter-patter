@@ -20,11 +20,28 @@ export interface DragHandleProps {
   node: Node;
 }
 
-interface Props {
-  handleComponent?: ComponentType<DragHandleProps>;
-}
-
-export function DragHandles({ handleComponent }: Props) {
+/**
+ * A React component that renders the drag handles. This component will render a drag handle for each
+ * node that the pointer is currently hovering over. It should be a descendant of the `ProseMirror`
+ * component. The `handleComponent` prop can be used to provide a custom handle implementation.
+ *
+ * @example
+ *
+ * ```tsx
+ * function Editor() {
+ *   return (
+ *     <ProseMirror defaultState={editorState}>
+ *       <ShuffleSkeleton>
+ *         <ProseMirrorDoc />
+ *         <DragHandles />
+ *       </ShuffleSkeleton>
+ *     </ProseMirror>
+ *   );
+ * }
+ * ```
+ */
+export function DragHandles(props: { handleComponent?: ComponentType<DragHandleProps> }) {
+  const { handleComponent } = props;
   const editorState = useEditorState();
 
   const shuffleState = shufflePluginKey.getState(editorState);
@@ -42,7 +59,7 @@ export function DragHandles({ handleComponent }: Props) {
 
 interface DragHandleRendererProps {
   pos: number;
-  handleComponent?: Props["handleComponent"];
+  handleComponent?: ComponentType<DragHandleProps> | undefined;
 }
 
 export function DragHandleRenderer({ pos, handleComponent: Handle }: DragHandleRendererProps) {
@@ -89,7 +106,8 @@ export function DragHandleRenderer({ pos, handleComponent: Handle }: DragHandleR
   return <DragHandle style={{ top, left }} onPointerDown={handlePointerDown} node={node} />;
 }
 
-export function DragHandle({ style, node, onPointerDown }: DragHandleProps) {
+export function DragHandle(props: DragHandleProps) {
+  const { style, node, onPointerDown } = props;
   return (
     <button
       type="button"
