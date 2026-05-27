@@ -76,7 +76,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
       init(_, state) {
         const decorations: Decoration[] = [];
         state.doc.descendants((node, pos, _parent, index) => {
-          const { shuffleStart, shuffleEnd } = node.attrs;
+          const { shuffleStart, shuffleEnd, zIndex } = node.attrs;
 
           if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
@@ -87,7 +87,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
               ...(!isShuffleRow(node) && {
                 class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
               }),
-              style: `grid-row: ${index + 1}`,
+              style: `grid-row: ${index + 1}; z-index: ${zIndex}`,
             }),
           );
 
@@ -126,7 +126,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
 
         const decorations: Decoration[] = [];
         tr.doc.descendants((node, pos, _parent, index) => {
-          const { shuffleStart, shuffleEnd } = node.attrs;
+          const { shuffleStart, shuffleEnd, zIndex } = node.attrs;
 
           if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
@@ -137,7 +137,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
               ...(!isShuffleRow(node) && {
                 class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
               }),
-              style: `grid-row: ${index + 1}`,
+              style: `grid-row: ${index + 1}; z-index: ${zIndex}`,
             }),
           );
 
@@ -182,24 +182,31 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
       },
     },
     appendTransaction(transactions, _oldState, newState) {
-      if (
-        !transactions.some(
-          (tr) => (tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined)?.type === "end",
-        )
-      ) {
-        return null;
-      }
-      const collapsibleRows: [number, Node][] = [];
-      newState.doc.descendants((node, pos) => {
-        if (isShuffleRow(node) && node.childCount <= 1) {
-          collapsibleRows.push([pos, node]);
-        }
-      });
+      const endTr = transactions.find(
+        (tr) => (tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined)?.type === "end",
+      );
+      const startTr = transactions.find(
+        (tr) => (tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined)?.type === "map",
+      );
 
       const tr = newState.tr;
 
-      for (const [pos, node] of collapsibleRows) {
-        tr.replaceWith(tr.mapping.map(pos), tr.mapping.map(pos + node.nodeSize), node.children);
+      if (endTr) {
+        const collapsibleRows: [number, Node][] = [];
+        newState.doc.descendants((node, pos) => {
+          if (isShuffleRow(node) && node.childCount <= 1) {
+            collapsibleRows.push([pos, node]);
+          }
+        });
+
+        for (const [pos, node] of collapsibleRows) {
+          tr.replaceWith(tr.mapping.map(pos), tr.mapping.map(pos + node.nodeSize), node.children);
+        }
+      } else if (startTr) {
+        const activeNodePos = shufflePluginKey.getState(newState)?.activeNodePos;
+        if (activeNodePos === undefined) return null;
+
+        tr.setNodeAttribute(activeNodePos, "zIndex", findHighestZIndex(newState.doc) + 1);
       }
 
       return tr.docChanged ? tr : null;
@@ -572,4 +579,18 @@ function arePositionsEqual(
   }
 
   return true;
+}
+
+function findHighestZIndex(doc: Node) {
+  let highest = 0;
+  doc.descendants((node) => {
+    if (!supportsResize(node) && !supportsDrag(node)) {
+      return true;
+    }
+
+    highest = Math.max(highest, node.attrs["zIndex"] ?? 0);
+    return true;
+  });
+
+  return highest;
 }
