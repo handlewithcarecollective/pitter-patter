@@ -6,7 +6,7 @@
   },
   "rules": {
     "import/consistent-type-specifier-style": ["error", "prefer-inline"],
-    "no-console": ["error"]
+    "no-console": ["error", { "allow": ["error"] }]
   },
   "env": {
     "builtin": true
