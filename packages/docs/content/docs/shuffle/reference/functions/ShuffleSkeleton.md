@@ -9,7 +9,7 @@ function ShuffleSkeleton(props: { children: ReactNode }): Element;
 ```
 
 Defined in:
-[components/Skeleton.tsx:22](https://github.com/handlewithcarecollective/pitter-patter/blob/d00ae753d2a935e710d41912ca995347835cab1b/packages/shuffle/src/components/Skeleton.tsx#L22)
+[components/Skeleton.tsx:22](https://github.com/handlewithcarecollective/pitter-patter/blob/5f9831b289582242a2f8b7c6f9c1d64b034de5a9/packages/shuffle/src/components/Skeleton.tsx#L22)
 
 A React component that renders the grid skeleton. This component must be rendered for resize and
 reposition behaviors to work correctly. The component should be a direct parent of the
