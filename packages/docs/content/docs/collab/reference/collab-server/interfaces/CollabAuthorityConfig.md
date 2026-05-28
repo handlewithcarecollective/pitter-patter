@@ -5,7 +5,7 @@ title: CollabAuthorityConfig
 # Interface: CollabAuthorityConfig\<Transaction\>
 
 Defined in:
-[packages/collab-server/src/index.ts:35](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L35)
+[packages/collab-server/src/index.ts:32](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L32)
 
 The config for creating a CollabAuthority. Parameters that perform database operations should use
 the provided transaction or if a transaction is not provided, start a transaction and perform all
@@ -29,7 +29,7 @@ broadcastManager: {
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:98](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L98)
+[packages/collab-server/src/index.ts:89](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L89)
 
 The broadcast manager that will be used to listen for and send document updates.
 
@@ -85,7 +85,7 @@ getCommit: (tr: Transaction | null, docId: string, commitRef: string) => Promise
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:58](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L58)
+[packages/collab-server/src/index.ts:53](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L53)
 
 Given a docId and commitRef, retrieves the associated commit's steps and version from your database
 and returns a joined CommitJSON object.
@@ -117,7 +117,7 @@ getCommits: (tr: Transaction | null, docId: string, version: number) => Promise<
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:66](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L66)
+[packages/collab-server/src/index.ts:61](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L61)
 
 For the provided docId, retrieves all commits from the database with a version number strictly
 greater than the provided `version`.
@@ -154,7 +154,7 @@ getDoc: (tr: Transaction | null, docId: string) =>
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:46](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L46)
+[packages/collab-server/src/index.ts:41](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L41)
 
 Retrieves a document from your database by docId.
 
@@ -181,7 +181,7 @@ runWithTransaction: <Result>(callback: (tr: Transaction) => Promise<Result>) => 
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:40](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L40)
+[packages/collab-server/src/index.ts:37](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L37)
 
 This function should start a transaction on your database, execute the provided callback with it,
 and commit the transaction.
@@ -219,7 +219,7 @@ saveCommit: (
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:84](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L84)
+[packages/collab-server/src/index.ts:75](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L75)
 
 Saves a commit along with its version and ref to your database.
 
@@ -264,7 +264,7 @@ saveDoc: (
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:74](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L74)
+[packages/collab-server/src/index.ts:65](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L65)
 
 Saves a document along with its docId, version, and lastUpdatedTimestamp to your database.
 
@@ -303,4 +303,4 @@ schema: Schema;
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:36](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L36)
+[packages/collab-server/src/index.ts:33](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L33)

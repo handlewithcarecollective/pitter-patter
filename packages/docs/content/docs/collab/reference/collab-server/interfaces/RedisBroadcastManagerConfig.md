@@ -5,7 +5,7 @@ title: RedisBroadcastManagerConfig
 # Interface: RedisBroadcastManagerConfig
 
 Defined in:
-[packages/collab-server/src/index.ts:231](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L231)
+[packages/collab-server/src/index.ts:210](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L210)
 
 ## Properties
 
@@ -16,7 +16,7 @@ redisUrl: string;
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:235](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L235)
+[packages/collab-server/src/index.ts:214](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L214)
 
 the url for your Redis cluster
 
@@ -29,7 +29,7 @@ optional timeout?: number;
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:240](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L240)
+[packages/collab-server/src/index.ts:219](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L219)
 
 the maximum time the broadcast manager should listen for changes to a document before returning an
 empty result

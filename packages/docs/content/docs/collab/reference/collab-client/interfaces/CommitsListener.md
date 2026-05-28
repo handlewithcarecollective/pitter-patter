@@ -5,7 +5,7 @@ title: CommitsListener
 # Interface: CommitsListener
 
 Defined in:
-[packages/collab-client/src/index.ts:21](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L21)
+[packages/collab-client/src/index.ts:15](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L15)
 
 ## Properties
 
@@ -21,7 +21,7 @@ listen: (
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L22)
+[packages/collab-client/src/index.ts:16](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L16)
 
 #### Parameters
 

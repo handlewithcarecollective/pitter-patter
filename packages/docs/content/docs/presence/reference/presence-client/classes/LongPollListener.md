@@ -5,7 +5,7 @@ title: LongPollListener
 # Class: LongPollListener
 
 Defined in:
-[index.ts:121](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L121)
+[index.ts:121](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L121)
 
 An [IndicatorListener](/docs/presence/reference/presence-client/interfaces/IndicatorListener) that
 polls an endpoint for remote updates to a document's presence state. Intended to be used with an
@@ -22,7 +22,7 @@ new LongPollListener(url: URL, options?: LongPollListenerOptions): LongPollListe
 ```
 
 Defined in:
-[index.ts:128](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L128)
+[index.ts:128](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L128)
 
 #### Parameters
 
@@ -52,7 +52,7 @@ listen(clientId: string, options?: {
 ```
 
 Defined in:
-[index.ts:143](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L143)
+[index.ts:143](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L143)
 
 #### Parameters
 
@@ -81,7 +81,7 @@ update(headers: Record<string, string>): void;
 ```
 
 Defined in:
-[index.ts:139](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L139)
+[index.ts:139](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L139)
 
 Update the headers sent with long polling requests.
 

@@ -5,7 +5,7 @@ title: RedisPresenceBroadcastManagerConfig
 # Interface: RedisPresenceBroadcastManagerConfig
 
 Defined in:
-[index.ts:156](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L156)
+[index.ts:140](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L140)
 
 ## Properties
 
@@ -16,7 +16,7 @@ redisUrl: string;
 ```
 
 Defined in:
-[index.ts:157](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L157)
+[index.ts:141](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L141)
 
 ---
 
@@ -27,4 +27,4 @@ optional timeout?: number;
 ```
 
 Defined in:
-[index.ts:158](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L158)
+[index.ts:142](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L142)

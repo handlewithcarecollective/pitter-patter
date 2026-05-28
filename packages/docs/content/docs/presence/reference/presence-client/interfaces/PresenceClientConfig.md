@@ -5,7 +5,7 @@ title: PresenceClientConfig
 # Interface: PresenceClientConfig
 
 Defined in:
-[config.ts:5](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L5)
+[config.ts:5](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/config.ts#L5)
 
 ## Properties
 
@@ -16,7 +16,7 @@ listener: IndicatorListener;
 ```
 
 Defined in:
-[config.ts:20](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L20)
+[config.ts:20](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/config.ts#L20)
 
 ---
 
@@ -27,7 +27,7 @@ receiveIndicators: (indicators: Record<string, PresenceIndicator>) => void;
 ```
 
 Defined in:
-[config.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L19)
+[config.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/config.ts#L19)
 
 Receives an array of indicators and merges them into your local editor state. This function should
 use
@@ -54,7 +54,7 @@ sendIndicator: (clientId: string, indicator: PresenceIndicator) => Promise<void>
 ```
 
 Defined in:
-[config.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L13)
+[config.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/config.ts#L13)
 
 Sends local indicator state to a remote server to be merged into the remote presence state. The
 endpoint this function hits is defined by you, and should call the PresenceAuthority's
@@ -84,4 +84,4 @@ userId: string;
 ```
 
 Defined in:
-[config.ts:6](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L6)
+[config.ts:6](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/config.ts#L6)

@@ -5,7 +5,7 @@ title: PresenceAuthorityConfig
 # Interface: PresenceAuthorityConfig
 
 Defined in:
-[index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L22)
+[index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L22)
 
 ## Properties
 
@@ -20,7 +20,7 @@ broadcastManager: {
 ```
 
 Defined in:
-[index.ts:38](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L38)
+[index.ts:33](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L33)
 
 Creates listeners for updates to presence state and sends notifications to listeners when presence
 state is updated. See
@@ -82,7 +82,7 @@ persistenceManager: {
 ```
 
 Defined in:
-[index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L26)
+[index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L26)
 
 Saves and retrieves presence state. For example, see the
 [RedisPresencePersistenceManager](/docs/presence/reference/presence-server/classes/RedisPresencePersistenceManager)

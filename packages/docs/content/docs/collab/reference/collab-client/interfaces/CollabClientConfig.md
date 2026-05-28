@@ -5,7 +5,7 @@ title: CollabClientConfig
 # Interface: CollabClientConfig
 
 Defined in:
-[packages/collab-client/src/index.ts:28](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L28)
+[packages/collab-client/src/index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L22)
 
 ## Properties
 
@@ -16,7 +16,7 @@ listener: CommitsListener;
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:43](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L43)
+[packages/collab-client/src/index.ts:37](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L37)
 
 A listener for remote commits.
 
@@ -32,7 +32,7 @@ receiveCommits: (commits: Commit[]) => void;
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:64](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L64)
+[packages/collab-client/src/index.ts:58](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L58)
 
 Receives an array of commits and merges them into your local editor state.
 
@@ -69,7 +69,7 @@ sendCommit: (commit: Commit) => Promise<void>;
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:37](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L37)
+[packages/collab-client/src/index.ts:31](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L31)
 
 Sends local commits to a remote server to be merged into the remote document state. The endpoint
 this function hits is defined by you, and should call the CollabAuthority's

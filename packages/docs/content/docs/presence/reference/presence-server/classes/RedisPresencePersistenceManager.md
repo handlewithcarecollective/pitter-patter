@@ -5,7 +5,7 @@ title: RedisPresencePersistenceManager
 # Class: RedisPresencePersistenceManager
 
 Defined in:
-[index.ts:116](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L116)
+[index.ts:103](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L103)
 
 Stores and retrieves presence state in the specified redis cluster
 
@@ -18,7 +18,7 @@ new RedisPresencePersistenceManager(config: RedisPresencePersistenceManagerConfi
 ```
 
 Defined in:
-[index.ts:119](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L119)
+[index.ts:106](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L106)
 
 #### Parameters
 
@@ -39,7 +39,7 @@ connect(): Promise<void>;
 ```
 
 Defined in:
-[index.ts:125](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L125)
+[index.ts:112](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L112)
 
 #### Returns
 
@@ -56,7 +56,7 @@ getIndicators(docId: string): Promise<{
 ```
 
 Defined in:
-[index.ts:142](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L142)
+[index.ts:125](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L125)
 
 #### Parameters
 
@@ -77,7 +77,7 @@ saveIndicator(docId: string, indicator: PresenceIndicator): Promise<void>;
 ```
 
 Defined in:
-[index.ts:129](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L129)
+[index.ts:116](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L116)
 
 #### Parameters
 

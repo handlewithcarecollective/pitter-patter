@@ -5,7 +5,7 @@ title: LongPollListener
 # Class: LongPollListener
 
 Defined in:
-[packages/collab-client/src/index.ts:146](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L146)
+[packages/collab-client/src/index.ts:140](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L140)
 
 A CommitsListener that polls an endpoint for remote updates to a document. Intended to be used with
 an remote long polling endpoint that calls a Collab Authority's
@@ -21,7 +21,7 @@ new LongPollListener(url: URL, options?: LongPollListenerOptions): LongPollListe
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:153](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L153)
+[packages/collab-client/src/index.ts:147](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L147)
 
 #### Parameters
 
@@ -51,7 +51,7 @@ listen(editorState: EditorState, options?: {
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:168](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L168)
+[packages/collab-client/src/index.ts:162](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L162)
 
 #### Parameters
 
@@ -79,7 +79,7 @@ update(headers: HeadersInit): void;
 ```
 
 Defined in:
-[packages/collab-client/src/index.ts:164](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L164)
+[packages/collab-client/src/index.ts:158](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-client/src/index.ts#L158)
 
 Update the headers sent with long polling requests.
 

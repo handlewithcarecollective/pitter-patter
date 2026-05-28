@@ -5,7 +5,7 @@ title: PresenceAuthority
 # Class: PresenceAuthority
 
 Defined in:
-[index.ts:60](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L60)
+[index.ts:52](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L52)
 
 The PresenceAuthority manages most of Pitter Patter's server side presence operations.
 
@@ -24,7 +24,7 @@ new PresenceAuthority(config: PresenceAuthorityConfig): PresenceAuthority;
 ```
 
 Defined in:
-[index.ts:64](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L64)
+[index.ts:56](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L56)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ listenForPresence(
 ```
 
 Defined in:
-[index.ts:81](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L81)
+[index.ts:73](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L73)
 
 Listens for remote changes to a document's presence state and returns when changes are found or
 after a timeout specified in the PresenceAuthority's `broadcastManager`.
@@ -83,7 +83,7 @@ updatePresence(docId: string, indicator: PresenceIndicator): Promise<void>;
 ```
 
 Defined in:
-[index.ts:72](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L72)
+[index.ts:64](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-server/src/index.ts#L64)
 
 Saves new presence state for a client and notifies and listeners of the update.
 

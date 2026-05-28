@@ -5,7 +5,7 @@ title: CommitListener
 # Interface: CommitListener
 
 Defined in:
-[packages/collab-server/src/index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L26)
+[packages/collab-server/src/index.ts:23](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L23)
 
 ## Properties
 
@@ -16,7 +16,7 @@ abort: () => Promise<void>;
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:28](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L28)
+[packages/collab-server/src/index.ts:25](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L25)
 
 #### Returns
 
@@ -31,7 +31,7 @@ listen: () => Promise<boolean>;
 ```
 
 Defined in:
-[packages/collab-server/src/index.ts:27](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L27)
+[packages/collab-server/src/index.ts:24](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/collab-server/src/index.ts#L24)
 
 #### Returns
 

@@ -5,7 +5,7 @@ title: IndicatorListener
 # Interface: IndicatorListener
 
 Defined in:
-[index.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L13)
+[index.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L13)
 
 ## Properties
 
@@ -21,7 +21,7 @@ listen: (
 ```
 
 Defined in:
-[index.ts:14](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L14)
+[index.ts:14](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L14)
 
 #### Parameters
 
