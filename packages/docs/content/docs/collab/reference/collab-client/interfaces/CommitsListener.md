@@ -4,7 +4,7 @@ title: CommitsListener
 
 # Interface: CommitsListener
 
-Defined in: [packages/collab-client/src/index.ts:21](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/collab-client/src/index.ts#L21)
+Defined in: [packages/collab-client/src/index.ts:21](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L21)
 
 ## Properties
 
@@ -16,7 +16,7 @@ listen: (editorState: EditorState, options?: {
 }) => AsyncIterableIterator<Commit[]>;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/collab-client/src/index.ts#L22)
+Defined in: [packages/collab-client/src/index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L22)
 
 #### Parameters
 

@@ -88,7 +88,7 @@ export class PresenceClient {
   }
 
   /** 
-   * Have the client start listening for remote presence changes. This function should only be called once.
+   * Start listening for remote presence changes. This function should only be called once.
    */
   async listen(signal?: AbortSignal) {
     for await (const indicators of this.listener.listen(this.clientId, {

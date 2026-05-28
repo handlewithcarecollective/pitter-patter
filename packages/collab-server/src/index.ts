@@ -59,8 +59,7 @@ export interface CollabAuthorityConfig<Transaction> {
   }>;
   /**
    * Given a docId and commitRef, retrieves the associated commit's steps and version from your database
-   * and returns a joined CommitJSON object. Despite the name, CommitJSON is just a regular object with
-   * fields for a commit's ref, version, and steps.
+   * and returns a joined CommitJSON object.
    */
   getCommit: (
     tr: Transaction | null,
@@ -68,8 +67,7 @@ export interface CollabAuthorityConfig<Transaction> {
     commitRef: string,
   ) => Promise<CommitJSON | null>;
   /**
-   * For the provided docId, retrieves all commits from the database with a version number greater than,
-   * `>`, the provided `version`.
+   * For the provided docId, retrieves all commits from the database with a version number strictly greater than the provided `version`.
    */
   getCommits: (
     tr: Transaction | null,
@@ -101,8 +99,7 @@ export interface CollabAuthorityConfig<Transaction> {
   /**
    * The broadcast manager that will be used to listen for and send document updates.
    *
-   * Currently the only provided option is the {@link RedisBroadcastManager}. Inquire about support
-   * for realtime databases like Firestore and Convex at hello@handlewithcare.dev.
+   * Currently the only built-in option is the {@link RedisBroadcastManager}.
    */
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
@@ -237,13 +234,15 @@ export class CollabAuthority<Transaction> {
   }
 }
 
-/**
- * @param redisUrl - the url for your Redis cluster
- * @param timeout - the maximum time the broadcast manager should listen for changes
- * to a document before returning an empty result
- */
-interface RedisBroadcastManagerConfig {
+export interface RedisBroadcastManagerConfig {
+  /**
+   * the url for your Redis cluster
+   */
   redisUrl: string;
+  /**
+   * the maximum time the broadcast manager should listen for changes
+   * to a document before returning an empty result
+   */
   timeout?: number;
 }
 

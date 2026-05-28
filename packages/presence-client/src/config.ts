@@ -12,7 +12,7 @@ export interface PresenceClientConfig {
    */
   sendIndicator: (clientId: string, indicator: PresenceIndicator) => Promise<void>;
   /**
-   * Receives an array of commits and merges them into your local editor state. This function should
+   * Receives an array of indicators and merges them into your local editor state. This function should
    * use {@link https://pitter-patter.dev/docs/presence/reference/presence-client/functions/receivePresenceTransaction | receivePresenceTransaction}
    * to merge the indicators into the local editor state.
    */

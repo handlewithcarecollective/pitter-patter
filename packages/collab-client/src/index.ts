@@ -38,10 +38,7 @@ export interface CollabClientConfig {
   /**
    * A listener for remote commits.
    *
-   * Currently the only provided option is the {@link LongPollListener}.
-   *
-   * Support for realtime databases like Firestore and Convex is planned
-   * and can be expedited on request. Contact hello@handlewithcare.dev to inquire.
+   * Currently the only built-in option is the {@link LongPollListener}.
    */
   listener: CommitsListener;
   // Todo: The example in this doc rely's on some react context, how to show it otherwise
@@ -54,9 +51,13 @@ export interface CollabClientConfig {
    * @example
    * ```
    * import receiveCommitTransaction from "@stepwisehq/prosemirror-collab-commit/collab-commit";
-   *
-   * receiveIndicators: (indicators) => {
-   *   setState((prev) => prev.apply(receivePresenceTransaction(prev, indicators)));
+   * 
+   * receiveCommits: (commits) => {
+   *   view.dispatch(
+   *     view.state.apply(
+   *       commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev)
+   *     )
+   *   )
    * },
    * ```
    */
@@ -112,7 +113,7 @@ export class CollabClient {
   }
 
   /**
-   * Have the client start listening for remote commits. This function should only be called once.
+   * Start listening for remote commits. This function should only be called once.
    */
   async listen(editorState: EditorState, signal?: AbortSignal) {
     for await (const newCommits of this.listener.listen(editorState, {

@@ -14,3 +14,4 @@ title: "@pitter-patter/collab-server"
 
 - [CollabAuthorityConfig](/docs/collab/reference/collab-server/interfaces/CollabAuthorityConfig)
 - [CommitListener](/docs/collab/reference/collab-server/interfaces/CommitListener)
+- [RedisBroadcastManagerConfig](/docs/collab/reference/collab-server/interfaces/RedisBroadcastManagerConfig)
