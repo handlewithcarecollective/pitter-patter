@@ -4,7 +4,7 @@ title: RedisBroadcastManager
 
 # Class: RedisBroadcastManager
 
-Defined in: [packages/collab-server/src/index.ts:257](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L257)
+Defined in: [packages/collab-server/src/index.ts:251](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L251)
 
 A broadcast manager that uses a Redis cluster as a message broker via Redis's pub/sub.
 
@@ -21,7 +21,7 @@ that there is an update.
 new RedisBroadcastManager(config: RedisBroadcastManagerConfig): RedisBroadcastManager;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:262](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L262)
+Defined in: [packages/collab-server/src/index.ts:256](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L256)
 
 #### Parameters
 
@@ -41,7 +41,7 @@ Defined in: [packages/collab-server/src/index.ts:262](https://github.com/handlew
 broadcastCommit(docId: string, commitJSON: CommitJSON): Promise<void>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:279](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L279)
+Defined in: [packages/collab-server/src/index.ts:273](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L273)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ Defined in: [packages/collab-server/src/index.ts:279](https://github.com/handlew
 connect(): Promise<void>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:275](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L275)
+Defined in: [packages/collab-server/src/index.ts:269](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L269)
 
 #### Returns
 
@@ -82,7 +82,7 @@ createCommitListener(docId: string, version: number): Promise<{
 }>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:286](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L286)
+Defined in: [packages/collab-server/src/index.ts:280](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L280)
 
 #### Parameters
 

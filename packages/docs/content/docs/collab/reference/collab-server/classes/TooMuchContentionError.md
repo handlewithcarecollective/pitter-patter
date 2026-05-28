@@ -4,7 +4,7 @@ title: TooMuchContentionError
 
 # Class: TooMuchContentionError
 
-Defined in: [packages/collab-server/src/index.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L19)
+Defined in: [packages/collab-server/src/index.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L19)
 
 ## Extends
 
@@ -18,7 +18,7 @@ Defined in: [packages/collab-server/src/index.ts:19](https://github.com/handlewi
 new TooMuchContentionError(): TooMuchContentionError;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:20](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L20)
+Defined in: [packages/collab-server/src/index.ts:20](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L20)
 
 #### Returns
 

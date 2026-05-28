@@ -4,7 +4,7 @@ title: CollabAuthority
 
 # Class: CollabAuthority\<Transaction\>
 
-Defined in: [packages/collab-server/src/index.ts:122](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L122)
+Defined in: [packages/collab-server/src/index.ts:116](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L116)
 
 The CollabAuthority manages most of Pitter Patter's server side collaborative editing operations.
 
@@ -28,7 +28,7 @@ lambda, or cloud function instance.
 new CollabAuthority<Transaction>(config: CollabAuthorityConfig<Transaction>): CollabAuthority<Transaction>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:132](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L132)
+Defined in: [packages/collab-server/src/index.ts:126](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L126)
 
 #### Parameters
 
@@ -48,7 +48,7 @@ Defined in: [packages/collab-server/src/index.ts:132](https://github.com/handlew
 listenForCommit(docId: string, version: number): Promise<CommitJSON[]>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:211](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L211)
+Defined in: [packages/collab-server/src/index.ts:205](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L205)
 
 Listens for remote changes to a document's editor state and returns when changes
 are found or after a timeout specified in the CollabAuthority's `broadcastManager`.
@@ -75,7 +75,7 @@ are found or after a timeout specified in the CollabAuthority's `broadcastManage
 receiveCommit(docId: string, commitJSON: CommitJSON): Promise<void>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:161](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L161)
+Defined in: [packages/collab-server/src/index.ts:155](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L155)
 
 Receives a commit from a CollabClient and merges it into the remote
 editor state.
@@ -102,7 +102,7 @@ editor state.
 runWithTransactionRetries<Result>(callback: (tr: Transaction) => Promise<Result>): Promise<Result>;
 ```
 
-Defined in: [packages/collab-server/src/index.ts:143](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-server/src/index.ts#L143)
+Defined in: [packages/collab-server/src/index.ts:137](https://github.com/handlewithcarecollective/pitter-patter/blob/5abff4884ea00d47f8bdf1fb824a3105dd55becd/packages/collab-server/src/index.ts#L137)
 
 #### Type Parameters
 

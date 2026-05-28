@@ -36,18 +36,12 @@ export interface CollabAuthorityConfig<Transaction> {
   schema: Schema;
   /**
    * This function should start a transaction on your database, execute the provided callback with it, and commit the transaction.
-   *
-   * If you are using Sqlite as a database, runWithTransaction should open a transaction with `BEGIN IMMEDIATE`.
    */
   runWithTransaction: <Result>(
     callback: (tr: Transaction) => Promise<Result>,
   ) => Promise<Result>;
   /**
    * Retrieves a document from your database by docId.
-   *
-   * If you are using Postgres or MySql, getDoc should select the row holding the document with `SELECT FOR UPDATE`.
-   * This ensures that conflicting commits do not overwrite each other. We also recommend putting a unique constraint
-   * on the commit table for the fields docId and commit version.
    */
   getDoc: (
     tr: Transaction | null,
