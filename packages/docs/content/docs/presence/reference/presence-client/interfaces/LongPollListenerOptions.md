@@ -4,7 +4,7 @@ title: LongPollListenerOptions
 
 # Interface: LongPollListenerOptions
 
-Defined in: [index.ts:103](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/index.ts#L103)
+Defined in: [index.ts:103](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L103)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [index.ts:103](https://github.com/handlewithcarecollective/pitter-pa
 optional fetch?: (input: URL | RequestInfo, init?: RequestInit) => Promise<Response>;
 ```
 
-Defined in: [index.ts:113](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/index.ts#L113)
+Defined in: [index.ts:113](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L113)
 
 The fetch method to use when making requests. Defaults to the global fetch method.
 
@@ -42,6 +42,6 @@ The fetch method to use when making requests. Defaults to the global fetch metho
 optional headers?: Record<string, string>;
 ```
 
-Defined in: [index.ts:109](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/index.ts#L109)
+Defined in: [index.ts:109](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/index.ts#L109)
 
 Any headers that need to be included in requests to your long polling endpoint. Defaults to an empty object.

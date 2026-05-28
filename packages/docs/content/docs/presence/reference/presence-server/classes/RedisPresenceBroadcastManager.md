@@ -4,7 +4,7 @@ title: RedisPresenceBroadcastManager
 
 # Class: RedisPresenceBroadcastManager
 
-Defined in: [index.ts:169](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L169)
+Defined in: [index.ts:169](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L169)
 
 A broadcast manager that uses a Redis cluster as a message broker via Redis's pub/sub.
 
@@ -21,7 +21,7 @@ that there is an update.
 new RedisPresenceBroadcastManager(config: RedisPresenceBroadcastManagerConfig): RedisPresenceBroadcastManager;
 ```
 
-Defined in: [index.ts:174](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L174)
+Defined in: [index.ts:174](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L174)
 
 #### Parameters
 
@@ -41,7 +41,7 @@ Defined in: [index.ts:174](https://github.com/handlewithcarecollective/pitter-pa
 broadcastIndicator(docId: string, indicator: PresenceIndicator): Promise<void>;
 ```
 
-Defined in: [index.ts:188](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L188)
+Defined in: [index.ts:188](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L188)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ Defined in: [index.ts:188](https://github.com/handlewithcarecollective/pitter-pa
 connect(): Promise<void>;
 ```
 
-Defined in: [index.ts:184](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L184)
+Defined in: [index.ts:184](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L184)
 
 #### Returns
 
@@ -82,7 +82,7 @@ listenForPresence(
 refs: Record<string, string>): Promise<void>;
 ```
 
-Defined in: [index.ts:195](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L195)
+Defined in: [index.ts:195](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L195)
 
 #### Parameters
 

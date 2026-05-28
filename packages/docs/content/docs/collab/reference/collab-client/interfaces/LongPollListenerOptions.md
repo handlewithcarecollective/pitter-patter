@@ -4,7 +4,7 @@ title: LongPollListenerOptions
 
 # Interface: LongPollListenerOptions
 
-Defined in: [packages/collab-client/src/index.ts:127](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L127)
+Defined in: [packages/collab-client/src/index.ts:128](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L128)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [packages/collab-client/src/index.ts:127](https://github.com/handlew
 optional fetch?: (input: URL | RequestInfo, init?: RequestInit) => Promise<Response>;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:137](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L137)
+Defined in: [packages/collab-client/src/index.ts:138](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L138)
 
 The fetch method to use when making requests. Defaults to the global fetch method.
 
@@ -42,6 +42,6 @@ The fetch method to use when making requests. Defaults to the global fetch metho
 optional headers?: HeadersInit;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:133](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L133)
+Defined in: [packages/collab-client/src/index.ts:134](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L134)
 
 Any headers that need to be included in requests to your long polling endpoint. Defaults to an empty object.

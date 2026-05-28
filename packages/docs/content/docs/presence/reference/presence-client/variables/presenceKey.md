@@ -8,4 +8,4 @@ title: presenceKey
 const presenceKey: PluginKey<PresenceState>;
 ```
 
-Defined in: [plugin.ts:18](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/plugin.ts#L18)
+Defined in: [plugin.ts:18](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/plugin.ts#L18)

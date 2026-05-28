@@ -4,7 +4,7 @@ title: CollabClientConfig
 
 # Interface: CollabClientConfig
 
-Defined in: [packages/collab-client/src/index.ts:28](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L28)
+Defined in: [packages/collab-client/src/index.ts:28](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L28)
 
 ## Properties
 
@@ -14,14 +14,11 @@ Defined in: [packages/collab-client/src/index.ts:28](https://github.com/handlewi
 listener: CommitsListener;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:46](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L46)
+Defined in: [packages/collab-client/src/index.ts:43](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L43)
 
 A listener for remote commits.
 
-Currently the only provided option is the [LongPollListener](/docs/collab/reference/collab-client/classes/LongPollListener).
-
-Support for realtime databases like Firestore and Convex is planned
-and can be expedited on request. Contact hello@handlewithcare.dev to inquire.
+Currently the only built-in option is the [LongPollListener](/docs/collab/reference/collab-client/classes/LongPollListener).
 
 ***
 
@@ -31,7 +28,7 @@ and can be expedited on request. Contact hello@handlewithcare.dev to inquire.
 receiveCommits: (commits: Commit[]) => void;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:63](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L63)
+Defined in: [packages/collab-client/src/index.ts:64](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L64)
 
 Receives an array of commits and merges them into your local editor state.
 
@@ -50,8 +47,12 @@ Receives an array of commits and merges them into your local editor state.
 ```
 import receiveCommitTransaction from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 
-receiveIndicators: (indicators) => {
-  setState((prev) => prev.apply(receivePresenceTransaction(prev, indicators)));
+receiveCommits: (commits) => {
+  view.dispatch(
+    view.state.apply(
+      commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev)
+    )
+  )
 },
 ```
 
@@ -63,7 +64,7 @@ receiveIndicators: (indicators) => {
 sendCommit: (commit: Commit) => Promise<void>;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:37](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L37)
+Defined in: [packages/collab-client/src/index.ts:37](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L37)
 
 Sends local commits to a remote server to be merged into the remote document state.
 The endpoint this function hits is defined by you, and should call the

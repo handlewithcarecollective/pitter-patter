@@ -4,7 +4,7 @@ title: CollabClient
 
 # Class: CollabClient
 
-Defined in: [packages/collab-client/src/index.ts:70](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L70)
+Defined in: [packages/collab-client/src/index.ts:71](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L71)
 
 The client that manages sending local editor state changes to the remote server and merging
 remote changes into local editor state.
@@ -17,7 +17,7 @@ remote changes into local editor state.
 new CollabClient(config: CollabClientConfig): CollabClient;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:77](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L77)
+Defined in: [packages/collab-client/src/index.ts:78](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L78)
 
 #### Parameters
 
@@ -37,9 +37,9 @@ Defined in: [packages/collab-client/src/index.ts:77](https://github.com/handlewi
 listen(editorState: EditorState, signal?: AbortSignal): Promise<void>;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:117](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L117)
+Defined in: [packages/collab-client/src/index.ts:118](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L118)
 
-Have the client start listening for remote commits. This function should only be called once.
+Start listening for remote commits. This function should only be called once.
 
 #### Parameters
 
@@ -63,7 +63,7 @@ Have the client start listening for remote commits. This function should only be
 send(editorState: EditorState): Promise<void>;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:86](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L86)
+Defined in: [packages/collab-client/src/index.ts:87](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L87)
 
 Send local editor state changes to the remote server.
 
@@ -85,7 +85,7 @@ Send local editor state changes to the remote server.
 update(config: Partial<Omit<CollabClientConfig, "listener">>): void;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:109](https://github.com/handlewithcarecollective/pitter-patter/blob/b94327a2b900eb4da87f201cd6782be229f6bb20/packages/collab-client/src/index.ts#L109)
+Defined in: [packages/collab-client/src/index.ts:110](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L110)
 
 Updates the desired portion of the client's `CollabClientConfig`. For example, this can
 be used to update the auth headers used by `sendCommit`.

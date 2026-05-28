@@ -4,7 +4,7 @@ title: PresenceAuthority
 
 # Class: PresenceAuthority
 
-Defined in: [index.ts:60](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L60)
+Defined in: [index.ts:60](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L60)
 
 The PresenceAuthority manages most of Pitter Patter's server side presence operations.
 
@@ -22,7 +22,7 @@ lambda, or cloud function instance.
 new PresenceAuthority(config: PresenceAuthorityConfig): PresenceAuthority;
 ```
 
-Defined in: [index.ts:64](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L64)
+Defined in: [index.ts:64](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L64)
 
 #### Parameters
 
@@ -47,7 +47,7 @@ listenForPresence(
 }>;
 ```
 
-Defined in: [index.ts:81](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L81)
+Defined in: [index.ts:81](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L81)
 
 Listens for remote changes to a document's presence state and returns when changes
 are found or after a timeout specified in the PresenceAuthority's `broadcastManager`.
@@ -80,9 +80,9 @@ are found or after a timeout specified in the PresenceAuthority's `broadcastMana
 updatePresence(docId: string, indicator: PresenceIndicator): Promise<void>;
 ```
 
-Defined in: [index.ts:72](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L72)
+Defined in: [index.ts:72](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L72)
 
-saves new presence state for a client and notifies and listners of the update.
+Saves new presence state for a client and notifies and listeners of the update.
 
 #### Parameters
 

@@ -4,7 +4,7 @@ title: PresenceClientConfig
 
 # Interface: PresenceClientConfig
 
-Defined in: [config.ts:5](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/config.ts#L5)
+Defined in: [config.ts:5](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L5)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [config.ts:5](https://github.com/handlewithcarecollective/pitter-pat
 listener: IndicatorListener;
 ```
 
-Defined in: [config.ts:20](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/config.ts#L20)
+Defined in: [config.ts:20](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L20)
 
 ***
 
@@ -24,9 +24,9 @@ Defined in: [config.ts:20](https://github.com/handlewithcarecollective/pitter-pa
 receiveIndicators: (indicators: Record<string, PresenceIndicator>) => void;
 ```
 
-Defined in: [config.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/config.ts#L19)
+Defined in: [config.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L19)
 
-Receives an array of commits and merges them into your local editor state. This function should
+Receives an array of indicators and merges them into your local editor state. This function should
 use [receivePresenceTransaction](https://pitter-patter.dev/docs/presence/reference/presence-client/functions/receivePresenceTransaction)
 to merge the indicators into the local editor state.
 
@@ -48,7 +48,7 @@ to merge the indicators into the local editor state.
 sendIndicator: (clientId: string, indicator: PresenceIndicator) => Promise<void>;
 ```
 
-Defined in: [config.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/config.ts#L13)
+Defined in: [config.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L13)
 
 Sends local indicator state to a remote server to be merged into the remote presence state.
 The endpoint this function hits is defined by you, and should call the 
@@ -77,4 +77,4 @@ function.
 userId: string;
 ```
 
-Defined in: [config.ts:6](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-client/src/config.ts#L6)
+Defined in: [config.ts:6](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-client/src/config.ts#L6)

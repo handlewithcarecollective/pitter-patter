@@ -4,7 +4,7 @@ title: PresenceAuthorityConfig
 
 # Interface: PresenceAuthorityConfig
 
-Defined in: [index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L22)
+Defined in: [index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L22)
 
 ## Properties
 
@@ -17,9 +17,9 @@ broadcastManager: {
 };
 ```
 
-Defined in: [index.ts:38](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L38)
+Defined in: [index.ts:38](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L38)
 
-listens and notifies listeners of updates to presence state. See [RedisPresenceBroadcastManager](/docs/presence/reference/presence-server/classes/RedisPresenceBroadcastManager)
+Creates listeners for updates to presence state and sends notifications to listeners when presence state is updated. See [RedisPresenceBroadcastManager](/docs/presence/reference/presence-server/classes/RedisPresenceBroadcastManager)
 
 #### broadcastIndicator
 
@@ -76,9 +76,9 @@ persistenceManager: {
 };
 ```
 
-Defined in: [index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/07eceda4a58d50cdb03c8d2d3a81703a1376252d/packages/presence-server/src/index.ts#L26)
+Defined in: [index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L26)
 
-saves and retrieves presence state. For example, see the [RedisPresencePersistenceManager](/docs/presence/reference/presence-server/classes/RedisPresencePersistenceManager)
+Saves and retrieves presence state. For example, see the [RedisPresencePersistenceManager](/docs/presence/reference/presence-server/classes/RedisPresencePersistenceManager)
 
 #### getIndicators
 
