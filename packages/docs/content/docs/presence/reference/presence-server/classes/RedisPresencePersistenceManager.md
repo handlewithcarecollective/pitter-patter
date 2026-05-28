@@ -4,7 +4,8 @@ title: RedisPresencePersistenceManager
 
 # Class: RedisPresencePersistenceManager
 
-Defined in: [index.ts:116](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L116)
+Defined in:
+[index.ts:116](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L116)
 
 Stores and retrieves presence state in the specified redis cluster
 
@@ -16,7 +17,8 @@ Stores and retrieves presence state in the specified redis cluster
 new RedisPresencePersistenceManager(config: RedisPresencePersistenceManagerConfig): RedisPresencePersistenceManager;
 ```
 
-Defined in: [index.ts:119](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L119)
+Defined in:
+[index.ts:119](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L119)
 
 #### Parameters
 
@@ -36,13 +38,14 @@ Defined in: [index.ts:119](https://github.com/handlewithcarecollective/pitter-pa
 connect(): Promise<void>;
 ```
 
-Defined in: [index.ts:125](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L125)
+Defined in:
+[index.ts:125](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L125)
 
 #### Returns
 
 `Promise`\<`void`\>
 
-***
+---
 
 ### getIndicators()
 
@@ -52,7 +55,8 @@ getIndicators(docId: string): Promise<{
 }>;
 ```
 
-Defined in: [index.ts:142](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L142)
+Defined in:
+[index.ts:142](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L142)
 
 #### Parameters
 
@@ -62,11 +66,9 @@ Defined in: [index.ts:142](https://github.com/handlewithcarecollective/pitter-pa
 
 #### Returns
 
-`Promise`\<\{
-\[`k`: `string`\]: `any`;
-\}\>
+`Promise`\<\{ \[`k`: `string`\]: `any`; \}\>
 
-***
+---
 
 ### saveIndicator()
 
@@ -74,7 +76,8 @@ Defined in: [index.ts:142](https://github.com/handlewithcarecollective/pitter-pa
 saveIndicator(docId: string, indicator: PresenceIndicator): Promise<void>;
 ```
 
-Defined in: [index.ts:129](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L129)
+Defined in:
+[index.ts:129](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L129)
 
 #### Parameters
 

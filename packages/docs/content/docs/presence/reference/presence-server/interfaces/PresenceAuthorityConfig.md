@@ -4,7 +4,8 @@ title: PresenceAuthorityConfig
 
 # Interface: PresenceAuthorityConfig
 
-Defined in: [index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L22)
+Defined in:
+[index.ts:22](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L22)
 
 ## Properties
 
@@ -13,13 +14,17 @@ Defined in: [index.ts:22](https://github.com/handlewithcarecollective/pitter-pat
 ```ts
 broadcastManager: {
   broadcastIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
-  listenForPresence: (docId: string, clientId: string, refs: Record<string, string>) => Promise<void>;
-};
+  listenForPresence: (docId: string, clientId: string, refs: Record<string, string>) =>
+    Promise<void>;
+}
 ```
 
-Defined in: [index.ts:38](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L38)
+Defined in:
+[index.ts:38](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L38)
 
-Creates listeners for updates to presence state and sends notifications to listeners when presence state is updated. See [RedisPresenceBroadcastManager](/docs/presence/reference/presence-server/classes/RedisPresenceBroadcastManager)
+Creates listeners for updates to presence state and sends notifications to listeners when presence
+state is updated. See
+[RedisPresenceBroadcastManager](/docs/presence/reference/presence-server/classes/RedisPresenceBroadcastManager)
 
 #### broadcastIndicator
 
@@ -65,7 +70,7 @@ listenForPresence: (docId: string, clientId: string, refs: Record<string, string
 
 `Promise`\<`void`\>
 
-***
+---
 
 ### persistenceManager
 
@@ -73,12 +78,14 @@ listenForPresence: (docId: string, clientId: string, refs: Record<string, string
 persistenceManager: {
   getIndicators: (docId: string) => Promise<Record<string, PresenceIndicator>>;
   saveIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
-};
+}
 ```
 
-Defined in: [index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L26)
+Defined in:
+[index.ts:26](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L26)
 
-Saves and retrieves presence state. For example, see the [RedisPresencePersistenceManager](/docs/presence/reference/presence-server/classes/RedisPresencePersistenceManager)
+Saves and retrieves presence state. For example, see the
+[RedisPresencePersistenceManager](/docs/presence/reference/presence-server/classes/RedisPresencePersistenceManager)
 
 #### getIndicators
 
@@ -94,7 +101,8 @@ getIndicators: (docId: string) => Promise<Record<string, PresenceIndicator>>;
 
 ##### Returns
 
-`Promise`\<`Record`\<`string`, [`PresenceIndicator`](/docs/presence/reference/presence-server/interfaces/PresenceIndicator)\>\>
+`Promise`\<`Record`\<`string`,
+[`PresenceIndicator`](/docs/presence/reference/presence-server/interfaces/PresenceIndicator)\>\>
 
 #### saveIndicator
 

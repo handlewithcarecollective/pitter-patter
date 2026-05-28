@@ -1,8 +1,5 @@
 import { applyCommitJSON } from "@stepwisehq/prosemirror-collab-commit/apply-commit";
-import {
-  CommitJSON,
-  NodeJSON,
-} from "@stepwisehq/prosemirror-collab-commit/collab-commit";
+import { CommitJSON, NodeJSON } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { Schema } from "prosemirror-model";
 import { createClient, RedisClientType } from "redis";
 
@@ -37,9 +34,7 @@ export interface CollabAuthorityConfig<Transaction> {
   /**
    * This function should start a transaction on your database, execute the provided callback with it, and commit the transaction.
    */
-  runWithTransaction: <Result>(
-    callback: (tr: Transaction) => Promise<Result>,
-  ) => Promise<Result>;
+  runWithTransaction: <Result>(callback: (tr: Transaction) => Promise<Result>) => Promise<Result>;
   /**
    * Retrieves a document from your database by docId.
    */
@@ -63,11 +58,7 @@ export interface CollabAuthorityConfig<Transaction> {
   /**
    * For the provided docId, retrieves all commits from the database with a version number strictly greater than the provided `version`.
    */
-  getCommits: (
-    tr: Transaction | null,
-    docId: string,
-    version: number,
-  ) => Promise<CommitJSON[]>;
+  getCommits: (tr: Transaction | null, docId: string, version: number) => Promise<CommitJSON[]>;
   /**
    * Saves a document along with its docId, version, and lastUpdatedTimestamp to your database.
    */
@@ -97,10 +88,7 @@ export interface CollabAuthorityConfig<Transaction> {
    */
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
-    createCommitListener: (
-      docId: string,
-      version: number,
-    ) => Promise<CommitListener>;
+    createCommitListener: (docId: string, version: number) => Promise<CommitListener>;
   };
 }
 
@@ -153,45 +141,39 @@ export class CollabAuthority<Transaction> {
    * editor state.
    */
   async receiveCommit(docId: string, commitJSON: CommitJSON) {
-    const appliedCommitJSON = await this.runWithTransactionRetries(
-      async (tr) => {
-        // If we've already received this commit, skip it
-        if (await this.getCommit(tr, docId, commitJSON.ref)) {
-          return null;
-        }
-        const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(
-          tr,
-          docId,
-        );
-        const newCommits = await this.getCommits(tr, docId, commitJSON.version);
+    const appliedCommitJSON = await this.runWithTransactionRetries(async (tr) => {
+      // If we've already received this commit, skip it
+      if (await this.getCommit(tr, docId, commitJSON.ref)) {
+        return null;
+      }
+      const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(tr, docId);
+      const newCommits = await this.getCommits(tr, docId, commitJSON.version);
 
-        const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } =
-          applyCommitJSON(
-            version,
-            this.schema,
-            docJSON,
-            newCommits,
-            commitJSON,
-          );
+      const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } = applyCommitJSON(
+        version,
+        this.schema,
+        docJSON,
+        newCommits,
+        commitJSON,
+      );
 
-        await this.saveCommit(
-          tr,
-          docId,
-          appliedCommitJSON.ref,
-          appliedCommitJSON.version,
-          appliedCommitJSON.steps,
-        );
-        await this.saveDoc(
-          tr,
-          docId,
-          appliedDocJSON,
-          appliedCommitJSON.version,
-          lastUpdatedTimestamp,
-        );
+      await this.saveCommit(
+        tr,
+        docId,
+        appliedCommitJSON.ref,
+        appliedCommitJSON.version,
+        appliedCommitJSON.steps,
+      );
+      await this.saveDoc(
+        tr,
+        docId,
+        appliedDocJSON,
+        appliedCommitJSON.version,
+        lastUpdatedTimestamp,
+      );
 
-        return appliedCommitJSON;
-      },
-    );
+      return appliedCommitJSON;
+    });
 
     if (!appliedCommitJSON) return;
 
@@ -205,10 +187,7 @@ export class CollabAuthority<Transaction> {
   async listenForCommit(docId: string, version: number) {
     // Create listner to notify if commits are made. After this await, the listener is registered with
     // the notification service and will be notified if a commit is made.
-    const { listen, abort } = await this.broadcastManager.createCommitListener(
-      docId,
-      version,
-    );
+    const { listen, abort } = await this.broadcastManager.createCommitListener(docId, version);
 
     // Check if any commits were made between the last time this function was called and the
     // new commit listener being registered
@@ -271,10 +250,7 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.pub.publish(
-      `pitter-patter:collab:${docId}`,
-      commitJSON.version.toString(),
-    );
+    await this.pub.publish(`pitter-patter:collab:${docId}`, commitJSON.version.toString());
   }
 
   async createCommitListener(docId: string, version: number) {

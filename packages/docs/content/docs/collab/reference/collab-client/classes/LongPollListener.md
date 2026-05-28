@@ -4,10 +4,12 @@ title: LongPollListener
 
 # Class: LongPollListener
 
-Defined in: [packages/collab-client/src/index.ts:146](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L146)
+Defined in:
+[packages/collab-client/src/index.ts:146](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L146)
 
-A CommitsListener that polls an endpoint for remote updates to a document. Intended to be used
-with an remote long polling endpoint that calls a Collab Authority's [listenForCommit](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority#listenforcommit)
+A CommitsListener that polls an endpoint for remote updates to a document. Intended to be used with
+an remote long polling endpoint that calls a Collab Authority's
+[listenForCommit](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority#listenforcommit)
 function to efficiently listen for updates.
 
 ## Constructors
@@ -18,7 +20,8 @@ function to efficiently listen for updates.
 new LongPollListener(url: URL, options?: LongPollListenerOptions): LongPollListener;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:153](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L153)
+Defined in:
+[packages/collab-client/src/index.ts:153](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L153)
 
 #### Parameters
 
@@ -30,7 +33,8 @@ the url that polling requests will be sent to
 
 ##### options?
 
-[`LongPollListenerOptions`](/docs/collab/reference/collab-client/interfaces/LongPollListenerOptions) = `{}`
+[`LongPollListenerOptions`](/docs/collab/reference/collab-client/interfaces/LongPollListenerOptions)
+= `{}`
 
 #### Returns
 
@@ -46,7 +50,8 @@ listen(editorState: EditorState, options?: {
 }): AsyncGenerator<Commit[], void, unknown>;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:168](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L168)
+Defined in:
+[packages/collab-client/src/index.ts:168](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L168)
 
 #### Parameters
 
@@ -62,9 +67,10 @@ Defined in: [packages/collab-client/src/index.ts:168](https://github.com/handlew
 
 #### Returns
 
-`AsyncGenerator`\<[`Commit`](/docs/collab/reference/collab-client/classes/Commit)[], `void`, `unknown`\>
+`AsyncGenerator`\<[`Commit`](/docs/collab/reference/collab-client/classes/Commit)[], `void`,
+`unknown`\>
 
-***
+---
 
 ### update()
 
@@ -72,7 +78,8 @@ Defined in: [packages/collab-client/src/index.ts:168](https://github.com/handlew
 update(headers: HeadersInit): void;
 ```
 
-Defined in: [packages/collab-client/src/index.ts:164](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L164)
+Defined in:
+[packages/collab-client/src/index.ts:164](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/collab-client/src/index.ts#L164)
 
 Update the headers sent with long polling requests.
 

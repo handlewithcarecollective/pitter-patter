@@ -18,7 +18,7 @@ export interface IndicatorListener {
 }
 
 /**
- * The client that manages sending local presence state to the remote server and listening 
+ * The client that manages sending local presence state to the remote server and listening
  * for remote changes to presence state.
  */
 export class PresenceClient {
@@ -79,7 +79,7 @@ export class PresenceClient {
   }
 
   /**
-   * Updates the desired portion of the client's `PresenceClientConfig`. For example, this can 
+   * Updates the desired portion of the client's `PresenceClientConfig`. For example, this can
    * be used to update the auth headers used by `send`.
    */
   update(config: Partial<Omit<PresenceClientConfig, "listener">>) {
@@ -87,7 +87,7 @@ export class PresenceClient {
     if (config.receiveIndicators) this.receiveIndicators = config.receiveIndicators;
   }
 
-  /** 
+  /**
    * Start listening for remote presence changes. This function should only be called once.
    */
   async listen(signal?: AbortSignal) {
@@ -115,8 +115,8 @@ export interface LongPollListenerOptions {
 
 /**
  * An {@link IndicatorListener} that polls an endpoint for remote updates to a document's presence state. Intended to be used
- * with an remote long polling endpoint that call a Presence Authority's {@link https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority#listenforpresence | listenForPresence} 
- * function to efficiently listen for updates. 
+ * with an remote long polling endpoint that call a Presence Authority's {@link https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority#listenforpresence | listenForPresence}
+ * function to efficiently listen for updates.
  */
 export class LongPollListener {
   private headers: Record<string, string>;

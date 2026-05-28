@@ -4,7 +4,8 @@ title: CommitJSON
 
 # Interface: CommitJSON
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:4
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:4
 
 ## Properties
 
@@ -14,9 +15,10 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 ref: string;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:6
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:6
 
-***
+---
 
 ### steps
 
@@ -26,7 +28,8 @@ steps: {
 }[];
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:7
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:7
 
 #### Index Signature
 
@@ -34,7 +37,7 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 [key: string]: unknown
 ```
 
-***
+---
 
 ### version
 
@@ -42,4 +45,5 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 version: number;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:5
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:5

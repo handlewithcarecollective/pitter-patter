@@ -4,7 +4,8 @@ title: PresenceIndicator
 
 # Interface: PresenceIndicator
 
-Defined in: [index.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L13)
+Defined in:
+[index.ts:13](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L13)
 
 ## Properties
 
@@ -14,9 +15,10 @@ Defined in: [index.ts:13](https://github.com/handlewithcarecollective/pitter-pat
 anchor: number;
 ```
 
-Defined in: [index.ts:17](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L17)
+Defined in:
+[index.ts:17](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L17)
 
-***
+---
 
 ### clientId
 
@@ -24,9 +26,10 @@ Defined in: [index.ts:17](https://github.com/handlewithcarecollective/pitter-pat
 clientId: string;
 ```
 
-Defined in: [index.ts:15](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L15)
+Defined in:
+[index.ts:15](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L15)
 
-***
+---
 
 ### head
 
@@ -34,9 +37,10 @@ Defined in: [index.ts:15](https://github.com/handlewithcarecollective/pitter-pat
 head: number;
 ```
 
-Defined in: [index.ts:18](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L18)
+Defined in:
+[index.ts:18](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L18)
 
-***
+---
 
 ### ref
 
@@ -44,9 +48,10 @@ Defined in: [index.ts:18](https://github.com/handlewithcarecollective/pitter-pat
 ref: string;
 ```
 
-Defined in: [index.ts:14](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L14)
+Defined in:
+[index.ts:14](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L14)
 
-***
+---
 
 ### userId
 
@@ -54,9 +59,10 @@ Defined in: [index.ts:14](https://github.com/handlewithcarecollective/pitter-pat
 userId: string;
 ```
 
-Defined in: [index.ts:16](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L16)
+Defined in:
+[index.ts:16](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L16)
 
-***
+---
 
 ### version
 
@@ -64,4 +70,5 @@ Defined in: [index.ts:16](https://github.com/handlewithcarecollective/pitter-pat
 version: number;
 ```
 
-Defined in: [index.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L19)
+Defined in:
+[index.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/3e3fc8d8788e696a4e61d9b08391ecafd2284c3f/packages/presence-server/src/index.ts#L19)

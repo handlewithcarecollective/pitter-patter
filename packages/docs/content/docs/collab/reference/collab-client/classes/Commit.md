@@ -4,7 +4,8 @@ title: Commit
 
 # Class: Commit
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:14
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:14
 
 ## Constructors
 
@@ -12,12 +13,13 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 
 ```ts
 new Commit(
-   version: number, 
-   ref: string, 
+   version: number,
+   ref: string,
    steps: Step[]): Commit;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:18
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:18
 
 #### Parameters
 
@@ -45,9 +47,10 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 readonly ref: string;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:16
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:16
 
-***
+---
 
 ### steps
 
@@ -55,9 +58,10 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 readonly steps: Step[];
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:17
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:17
 
-***
+---
 
 ### version
 
@@ -65,7 +69,8 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 readonly version: number;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:15
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:15
 
 ## Methods
 
@@ -75,13 +80,14 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 toJSON(): CommitJSON;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:19
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:19
 
 #### Returns
 
 [`CommitJSON`](/docs/collab/reference/collab-client/interfaces/CommitJSON)
 
-***
+---
 
 ### toSchema()
 
@@ -89,7 +95,8 @@ Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-0
 toSchema(schema: Schema): Commit;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:21
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:21
 
 Return a new commit with the steps linked to the supplied schema.
 
@@ -103,7 +110,7 @@ Return a new commit with the steps linked to the supplied schema.
 
 `Commit`
 
-***
+---
 
 ### FromJSON()
 
@@ -111,7 +118,8 @@ Return a new commit with the steps linked to the supplied schema.
 static FromJSON(schema: Schema, spec: CommitJSON): Commit;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:23
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:23
 
 Return a commit based on the supplied JSON and schema.
 

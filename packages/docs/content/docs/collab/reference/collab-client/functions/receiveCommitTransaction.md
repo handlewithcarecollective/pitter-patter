@@ -6,14 +6,16 @@ title: receiveCommitTransaction
 
 ```ts
 function receiveCommitTransaction(
-   state: EditorState, 
-   commit: Commit, 
-   options?: {
-  mapSelectionBackward?: boolean;
-}): Transaction;
+  state: EditorState,
+  commit: Commit,
+  options?: {
+    mapSelectionBackward?: boolean;
+  },
+): Transaction;
 ```
 
-Defined in: node\_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:59
+Defined in:
+node_modules/.store/@stepwisehq-prosemirror-collab-commit-virtual-03dc2b656d/package/dist/collab-commit.d.ts:59
 
 ## Parameters
 
