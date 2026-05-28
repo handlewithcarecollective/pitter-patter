@@ -17,6 +17,10 @@ export interface IndicatorListener {
   ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
 }
 
+/**
+ * The client that manages sending local presence state to the remote server and listening 
+ * for remote changes to presence state.
+ */
 export class PresenceClient {
   private userId: string;
   private clientId: string;
@@ -34,6 +38,9 @@ export class PresenceClient {
     this.receiveIndicators = config.receiveIndicators;
   }
 
+  /**
+   * send updated presence state to the remote PresenceAuthority
+   */
   async send(editorState: EditorState) {
     const state = collabKey.getState(editorState);
 
@@ -71,11 +78,18 @@ export class PresenceClient {
     } catch {}
   }
 
+  /**
+   * Updates the desired portion of the client's `PresenceClientConfig`. For example, this can 
+   * be used to update the auth headers used by `send`.
+   */
   update(config: Partial<Omit<PresenceClientConfig, "listener">>) {
     if (config.sendIndicator) this.sendIndicator = config.sendIndicator;
     if (config.receiveIndicators) this.receiveIndicators = config.receiveIndicators;
   }
 
+  /** 
+   * Have the client start listening for remote presence changes. This function should only be called once.
+   */
   async listen(signal?: AbortSignal) {
     for await (const indicators of this.listener.listen(this.clientId, {
       signal,
@@ -87,15 +101,30 @@ export class PresenceClient {
 }
 
 export interface LongPollListenerOptions {
-  timeout?: number;
+  // Todo: the timeout option is not currently used in the LongPollListner. Add support for it.
+  // timeout?: number;
+  /**
+   * Any headers that need to be included in requests to your long polling endpoint. Defaults to an empty object.
+   */
   headers?: Record<string, string>;
+  /**
+   * The fetch method to use when making requests. Defaults to the global fetch method.
+   */
   fetch?: typeof globalThis.fetch;
 }
 
+/**
+ * An {@link IndicatorListener} that polls an endpoint for remote updates to a document's presence state. Intended to be used
+ * with an remote long polling endpoint that call a Presence Authority's {@link https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority#listenforpresence | listenForPresence} 
+ * function to efficiently listen for updates. 
+ */
 export class LongPollListener {
   private headers: Record<string, string>;
   private fetch: typeof globalThis.fetch;
 
+  /**
+   * @param url - the url that polling requests will be sent to
+   */
   constructor(
     private url: URL,
     options: LongPollListenerOptions = {},
@@ -104,6 +133,9 @@ export class LongPollListener {
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
   }
 
+  /**
+   * Update the headers send with long polling requests.
+   */
   update(headers: Record<string, string>) {
     this.headers = headers;
   }

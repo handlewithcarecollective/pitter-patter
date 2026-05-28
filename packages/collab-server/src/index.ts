@@ -1,5 +1,8 @@
 import { applyCommitJSON } from "@stepwisehq/prosemirror-collab-commit/apply-commit";
-import { CommitJSON, NodeJSON } from "@stepwisehq/prosemirror-collab-commit/collab-commit";
+import {
+  CommitJSON,
+  NodeJSON,
+} from "@stepwisehq/prosemirror-collab-commit/collab-commit";
 import { Schema } from "prosemirror-model";
 import { createClient, RedisClientType } from "redis";
 
@@ -25,9 +28,27 @@ export interface CommitListener {
   abort: () => Promise<void>;
 }
 
+/**
+ * The config for creating a CollabAuthority. Parameters that perform database operations should use the provided transaction
+ * or if a transaction is not provided, start a transaction and perform all operation in the fuction within it.
+ */
 export interface CollabAuthorityConfig<Transaction> {
   schema: Schema;
-  runWithTransaction: <Result>(callback: (tr: Transaction) => Promise<Result>) => Promise<Result>;
+  /**
+   * This function should starts a transaction on your database, execute the provided callback with it, and commit the transaction.
+   *
+   * If you are using Sqlite as a database, runWithTransaction should open a transaction with `BEGIN IMMEDIATE`.
+   */
+  runWithTransaction: <Result>(
+    callback: (tr: Transaction) => Promise<Result>,
+  ) => Promise<Result>;
+  /**
+   * Retrieves a document from your database by docId.
+   *
+   * If you are using Postgres or MySql, getDoc should select the row holding the document with `SELECT FOR UPDATE`.
+   * This ensures that conflicting commits do not overwrite each other. We also recommend putting a unique constraint
+   * on the commit table for the fields docId and commit version.
+   */
   getDoc: (
     tr: Transaction | null,
     docId: string,
@@ -36,12 +57,28 @@ export interface CollabAuthorityConfig<Transaction> {
     version: number;
     lastUpdatedTimestamp: number;
   }>;
+  /**
+   * Given a docId and commitRef, retrieves the associated commit's steps and version from your database
+   * and returns a joined CommitJSON object. Despite the name, CommitJSON is just a regular object with
+   * fields for a commit's ref, version, and steps.
+   */
   getCommit: (
     tr: Transaction | null,
     docId: string,
     commitRef: string,
   ) => Promise<CommitJSON | null>;
-  getCommits: (tr: Transaction | null, docId: string, version: number) => Promise<CommitJSON[]>;
+  /**
+   * For the provided docId, retrieves all commits from the database with a version number greater than,
+   * `>`, the provided `version`.
+   */
+  getCommits: (
+    tr: Transaction | null,
+    docId: string,
+    version: number,
+  ) => Promise<CommitJSON[]>;
+  /**
+   * Saves a document along with its docId, version, and lastUpdatedTimestamp to your database.
+   */
   saveDoc: (
     tr: Transaction | null,
     docId: string,
@@ -49,6 +86,9 @@ export interface CollabAuthorityConfig<Transaction> {
     version: number,
     lastUpdatedTimestamp: number,
   ) => Promise<void>;
+  /**
+   * Saves a commit along with its version and ref to your database.
+   */
   saveCommit: (
     tr: Transaction | null,
     docId: string,
@@ -58,12 +98,30 @@ export interface CollabAuthorityConfig<Transaction> {
       [key: string]: unknown;
     }[],
   ) => Promise<void>;
+  /**
+   * The broadcast manager that will be used to send and listen for document updates.
+   *
+   * Current the only provided option is the {@link RedisBroadcastManager}. Inquire about support
+   * for realtime databases like Firestore and Convex at hello@handlewithcare.dev.
+   */
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
-    createCommitListener: (docId: string, version: number) => Promise<CommitListener>;
+    createCommitListener: (
+      docId: string,
+      version: number,
+    ) => Promise<CommitListener>;
   };
 }
 
+/**
+ * CollabAuthority manages most of Pitter Patter's server side collaborative editing operations.
+ *
+ * You create endpoints that call the appropriate CollabAuthority functions to integrate with
+ * a CollabClient.
+ *
+ * A CollabAuthority is designed to be stateless, so you can create a new one on every server,
+ * lambda, or cloud function instance.
+ */
 export class CollabAuthority<Transaction> {
   private schema: CollabAuthorityConfig<Transaction>["schema"];
   private runWithTransaction: CollabAuthorityConfig<Transaction>["runWithTransaction"];
@@ -99,50 +157,67 @@ export class CollabAuthority<Transaction> {
     throw new TooMuchContentionError();
   }
 
+  /**
+   * receives a commit from a CollabClient and merges it into the remote
+   * editor state.
+   */
   async receiveCommit(docId: string, commitJSON: CommitJSON) {
-    const appliedCommitJSON = await this.runWithTransactionRetries(async (tr) => {
-      // If we've already received this commit, skip it
-      if (await this.getCommit(tr, docId, commitJSON.ref)) {
-        return null;
-      }
-      const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(tr, docId);
-      const newCommits = await this.getCommits(tr, docId, commitJSON.version);
+    const appliedCommitJSON = await this.runWithTransactionRetries(
+      async (tr) => {
+        // If we've already received this commit, skip it
+        if (await this.getCommit(tr, docId, commitJSON.ref)) {
+          return null;
+        }
+        const { docJSON, version, lastUpdatedTimestamp } = await this.getDoc(
+          tr,
+          docId,
+        );
+        const newCommits = await this.getCommits(tr, docId, commitJSON.version);
 
-      const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } = applyCommitJSON(
-        version,
-        this.schema,
-        docJSON,
-        newCommits,
-        commitJSON,
-      );
+        const { commitJSON: appliedCommitJSON, docJSON: appliedDocJSON } =
+          applyCommitJSON(
+            version,
+            this.schema,
+            docJSON,
+            newCommits,
+            commitJSON,
+          );
 
-      await this.saveCommit(
-        tr,
-        docId,
-        appliedCommitJSON.ref,
-        appliedCommitJSON.version,
-        appliedCommitJSON.steps,
-      );
-      await this.saveDoc(
-        tr,
-        docId,
-        appliedDocJSON,
-        appliedCommitJSON.version,
-        lastUpdatedTimestamp,
-      );
+        await this.saveCommit(
+          tr,
+          docId,
+          appliedCommitJSON.ref,
+          appliedCommitJSON.version,
+          appliedCommitJSON.steps,
+        );
+        await this.saveDoc(
+          tr,
+          docId,
+          appliedDocJSON,
+          appliedCommitJSON.version,
+          lastUpdatedTimestamp,
+        );
 
-      return appliedCommitJSON;
-    });
+        return appliedCommitJSON;
+      },
+    );
 
     if (!appliedCommitJSON) return;
 
     await this.broadcastManager.broadcastCommit(docId, appliedCommitJSON);
   }
 
+  /**
+   * Listens for remote changes to a document's editor state and returns when changes
+   * are found or after a timeout specified in the CollabAuthority's `broadcastManager`.
+   */
   async listenForCommit(docId: string, version: number) {
     // Create listner to notify if commits are made. After this await, the listener is registered with
     // the notification service and will be notified if a commit is made.
-    const { listen, abort } = await this.broadcastManager.createCommitListener(docId, version);
+    const { listen, abort } = await this.broadcastManager.createCommitListener(
+      docId,
+      version,
+    );
 
     // Check if any commits were made between the last time this function was called and the
     // new commit listener being registered
@@ -162,11 +237,24 @@ export class CollabAuthority<Transaction> {
   }
 }
 
+/**
+ * @param redisUrl - the url for your Redis cluster
+ * @param timeout - the maximum time the broadcast manager should listen for changes
+ * to a document before returning an empty result
+ */
 interface RedisBroadcastManagerConfig {
   redisUrl: string;
   timeout?: number;
 }
 
+/**
+ * A broadcast manager that uses a Redis cluster as a message broker via Redis's pub/sub.
+ *
+ * When a client connects it specifies the document id to listen to.
+ *
+ * When changes are submitted to a document all listeners for that document id are notified
+ * that there is an update.
+ */
 export class RedisBroadcastManager {
   private pub: RedisClientType;
   private sub: RedisClientType;
@@ -190,7 +278,10 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.pub.publish(`pitter-patter:collab:${docId}`, commitJSON.version.toString());
+    await this.pub.publish(
+      `pitter-patter:collab:${docId}`,
+      commitJSON.version.toString(),
+    );
   }
 
   async createCommitListener(docId: string, version: number) {
