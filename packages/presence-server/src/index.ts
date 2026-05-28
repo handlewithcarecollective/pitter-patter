@@ -20,10 +20,16 @@ export interface PresenceIndicator {
 }
 
 export interface PresenceAuthorityConfig {
+  /**
+   * Saves and retrieves presence state. For example, see the {@link RedisPresencePersistenceManager}
+   */
   persistenceManager: {
     saveIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
     getIndicators: (docId: string) => Promise<Record<string, PresenceIndicator>>;
   };
+  /**
+   * Creates listeners for updates to presence state and sends notifications to listeners when presence state is updated. See {@link RedisPresenceBroadcastManager}
+   */
   broadcastManager: {
     broadcastIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
     listenForPresence: (
@@ -34,6 +40,15 @@ export interface PresenceAuthorityConfig {
   };
 }
 
+/**
+ * The PresenceAuthority manages most of Pitter Patter's server side presence operations.
+ *
+ * You create endpoints that call the appropriate PresenceAuthority functions to integrate with
+ * a PresenceClient.
+ *
+ * A PresenceAuthority is designed to be stateless, so you can create a new one on every server,
+ * lambda, or cloud function instance.
+ */
 export class PresenceAuthority {
   private persistenceManager: PresenceAuthorityConfig["persistenceManager"];
   private broadcastManager: PresenceAuthorityConfig["broadcastManager"];
@@ -43,11 +58,18 @@ export class PresenceAuthority {
     this.broadcastManager = config.broadcastManager;
   }
 
+  /**
+   * Saves new presence state for a client and notifies and listeners of the update.
+   */
   async updatePresence(docId: string, indicator: PresenceIndicator) {
     await this.persistenceManager.saveIndicator(docId, indicator);
     await this.broadcastManager.broadcastIndicator(docId, indicator);
   }
 
+  /**
+   * Listens for remote changes to a document's presence state and returns when changes
+   * are found or after a timeout specified in the PresenceAuthority's `broadcastManager`.
+   */
   async listenForPresence(
     docId: string,
     excludeClientId: string,
@@ -75,6 +97,9 @@ export interface RedisPresencePersistenceManagerConfig {
   redisUrl: string;
 }
 
+/**
+ * Stores and retrieves presence state in the specified redis cluster
+ */
 export class RedisPresencePersistenceManager {
   private kv: RedisClientType;
 
@@ -117,6 +142,14 @@ export interface RedisPresenceBroadcastManagerConfig {
   timeout?: number;
 }
 
+/**
+ * A broadcast manager that uses a Redis cluster as a message broker via Redis's pub/sub.
+ *
+ * When a client connects it specifies the document id to listen to.
+ *
+ * When presence state changes for a document all listeners for that document id are notified
+ * that there is an update.
+ */
 export class RedisPresenceBroadcastManager {
   private pub: RedisClientType;
   private sub: RedisClientType;

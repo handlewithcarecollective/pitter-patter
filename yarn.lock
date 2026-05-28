@@ -2660,6 +2660,10 @@ __metadata:
     prosemirror-model: "npm:^1.25.3"
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
+    typedoc: "npm:^0.28.19"
+    typedoc-plugin-frontmatter: "npm:^1.3.1"
+    typedoc-plugin-markdown: "npm:^4.11.0"
+    typescript: "npm:^6.0.3"
   peerDependencies:
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
@@ -2678,6 +2682,10 @@ __metadata:
     prosemirror-state: "npm:^1.4.3"
     prosemirror-transform: "npm:^1.10.4"
     redis: "npm:^5.8.2"
+    typedoc: "npm:^0.28.19"
+    typedoc-plugin-frontmatter: "npm:^1.3.1"
+    typedoc-plugin-markdown: "npm:^4.11.0"
+    typescript: "npm:^6.0.3"
   peerDependencies:
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
@@ -2834,6 +2842,10 @@ __metadata:
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-reconciler: "npm:^0.32.0"
+    typedoc: "npm:^0.28.19"
+    typedoc-plugin-frontmatter: "npm:^1.3.1"
+    typedoc-plugin-markdown: "npm:^4.11.0"
+    typescript: "npm:^6.0.3"
   peerDependencies:
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
@@ -2849,6 +2861,10 @@ __metadata:
     "@tsconfig/strictest": "npm:^2.0.5"
     "@typescript/native-preview": "npm:7.0.0-dev.20260421.2"
     redis: "npm:^5.8.2"
+    typedoc: "npm:^0.28.19"
+    typedoc-plugin-frontmatter: "npm:^1.3.1"
+    typedoc-plugin-markdown: "npm:^4.11.0"
+    typescript: "npm:^6.0.3"
   languageName: unknown
   linkType: soft
 

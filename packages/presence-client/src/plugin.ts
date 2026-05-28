@@ -17,6 +17,9 @@ export interface PresenceState {
 
 export const presenceKey = new PluginKey<PresenceState>("@pitter-patter/presence-client/presence");
 
+/**
+ * Merges updated presence indicators into an editor state.
+ */
 export function receivePresenceTransaction(
   editorState: EditorState,
   presence: Record<string, PresenceIndicator>,
