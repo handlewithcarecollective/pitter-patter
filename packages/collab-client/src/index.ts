@@ -20,11 +20,48 @@ export interface CommitsListener {
 }
 
 export interface CollabClientConfig {
+  /**
+   * Sends local commits to a remote server to be merged into the remote document state.
+   * The endpoint this function hits is defined by you, and should call the
+   * CollabAuthority's {@link https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority#receivecommit | receiveCommit}
+   * function.
+   *
+   * @param commit - the latest prosemirror commit made by the local user
+   */
   sendCommit: (commit: Commit) => Promise<void>;
+  /**
+   * A listener for remote commits.
+   *
+   * Currently the only built-in option is the {@link LongPollListener}.
+   */
   listener: CommitsListener;
+  // Todo: The example in this doc rely's on some react context, how to show it otherwise
+  //       It feels useful to show that you use receiveCommitTransaction to merge the editor
+  //       state, but that might just be because I wouldn't know how to do it otherwise.
+  //       See the doc in the Presence client config's receiveIndicators for an alternative approach.
+  /**
+   * Receives an array of commits and merges them into your local editor state.
+   *
+   * @example
+   * ```
+   * import receiveCommitTransaction from "@stepwisehq/prosemirror-collab-commit/collab-commit";
+   *
+   * receiveCommits: (commits) => {
+   *   view.dispatch(
+   *     view.state.apply(
+   *       commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), prev)
+   *     )
+   *   )
+   * },
+   * ```
+   */
   receiveCommits: (commits: Commit[]) => void;
 }
 
+/**
+ * The client that manages sending local editor state changes to the remote server and merging
+ * remote changes into local editor state.
+ */
 export class CollabClient {
   private sending: null | string = null;
 
@@ -38,6 +75,9 @@ export class CollabClient {
     this.listener = config.listener;
   }
 
+  /**
+   * Send local editor state changes to the remote server.
+   */
   async send(editorState: EditorState) {
     const commit = sendableCommit(editorState);
     if (!commit) return;
@@ -57,11 +97,18 @@ export class CollabClient {
     }
   }
 
+  /**
+   * Updates the desired portion of the client's `CollabClientConfig`. For example, this can
+   * be used to update the auth headers used by `sendCommit`.
+   */
   update(config: Partial<Omit<CollabClientConfig, "listener">>) {
     if (config.sendCommit) this.sendCommit = config.sendCommit;
     if (config.receiveCommits) this.receiveCommits = config.receiveCommits;
   }
 
+  /**
+   * Start listening for remote commits. This function should only be called once.
+   */
   async listen(editorState: EditorState, signal?: AbortSignal) {
     for await (const newCommits of this.listener.listen(editorState, {
       signal,
@@ -73,15 +120,30 @@ export class CollabClient {
 }
 
 export interface LongPollListenerOptions {
-  timeout?: number;
+  // Todo: the timeout option is not currently used in the LongPollListner. Add support for it.
+  // timeout?: number;
+  /**
+   * Any headers that need to be included in requests to your long polling endpoint. Defaults to an empty object.
+   */
   headers?: HeadersInit;
+  /**
+   * The fetch method to use when making requests. Defaults to the global fetch method.
+   */
   fetch?: typeof globalThis.fetch;
 }
 
+/**
+ * A CommitsListener that polls an endpoint for remote updates to a document. Intended to be used
+ * with an remote long polling endpoint that calls a Collab Authority's {@link https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority#listenforcommit | listenForCommit}
+ * function to efficiently listen for updates.
+ */
 export class LongPollListener {
   private headers: HeadersInit;
   private fetch: typeof globalThis.fetch;
 
+  /**
+   * @param url - the url that polling requests will be sent to
+   */
   constructor(
     private url: URL,
     options: LongPollListenerOptions = {},
@@ -90,6 +152,9 @@ export class LongPollListener {
     this.fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
   }
 
+  /**
+   * Update the headers sent with long polling requests.
+   */
   update(headers: HeadersInit) {
     this.headers = headers;
   }
