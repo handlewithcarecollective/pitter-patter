@@ -39,7 +39,7 @@ export class PresenceClient {
   }
 
   /**
-   * send updated presence state to the remote PresenceAuthority
+   * Send updated presence state to the remote PresenceAuthority.
    */
   async send(editorState: EditorState) {
     const state = collabKey.getState(editorState);
@@ -134,7 +134,7 @@ export class LongPollListener {
   }
 
   /**
-   * Update the headers send with long polling requests.
+   * Update the headers sent with long polling requests.
    */
   update(headers: Record<string, string>) {
     this.headers = headers;

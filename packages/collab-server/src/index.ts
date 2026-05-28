@@ -30,12 +30,12 @@ export interface CommitListener {
 
 /**
  * The config for creating a CollabAuthority. Parameters that perform database operations should use the provided transaction
- * or if a transaction is not provided, start a transaction and perform all operation in the fuction within it.
+ * or if a transaction is not provided, start a transaction and perform all database operations inside it.
  */
 export interface CollabAuthorityConfig<Transaction> {
   schema: Schema;
   /**
-   * This function should starts a transaction on your database, execute the provided callback with it, and commit the transaction.
+   * This function should start a transaction on your database, execute the provided callback with it, and commit the transaction.
    *
    * If you are using Sqlite as a database, runWithTransaction should open a transaction with `BEGIN IMMEDIATE`.
    */
@@ -99,9 +99,9 @@ export interface CollabAuthorityConfig<Transaction> {
     }[],
   ) => Promise<void>;
   /**
-   * The broadcast manager that will be used to send and listen for document updates.
+   * The broadcast manager that will be used to listen for and send document updates.
    *
-   * Current the only provided option is the {@link RedisBroadcastManager}. Inquire about support
+   * Currently the only provided option is the {@link RedisBroadcastManager}. Inquire about support
    * for realtime databases like Firestore and Convex at hello@handlewithcare.dev.
    */
   broadcastManager: {
@@ -114,7 +114,7 @@ export interface CollabAuthorityConfig<Transaction> {
 }
 
 /**
- * CollabAuthority manages most of Pitter Patter's server side collaborative editing operations.
+ * The CollabAuthority manages most of Pitter Patter's server side collaborative editing operations.
  *
  * You create endpoints that call the appropriate CollabAuthority functions to integrate with
  * a CollabClient.
@@ -158,7 +158,7 @@ export class CollabAuthority<Transaction> {
   }
 
   /**
-   * receives a commit from a CollabClient and merges it into the remote
+   * Receives a commit from a CollabClient and merges it into the remote
    * editor state.
    */
   async receiveCommit(docId: string, commitJSON: CommitJSON) {

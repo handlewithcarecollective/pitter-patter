@@ -21,7 +21,7 @@ export interface PresenceIndicator {
 
 export interface PresenceAuthorityConfig {
   /**
-   * saves and retrieves presence state. For example, see the {@link RedisPresencePersistenceManager}
+   * Saves and retrieves presence state. For example, see the {@link RedisPresencePersistenceManager}
    */
   persistenceManager: {
     saveIndicator: (
@@ -33,7 +33,7 @@ export interface PresenceAuthorityConfig {
     ) => Promise<Record<string, PresenceIndicator>>;
   };
   /**
-   * listens and notifies listeners of updates to presence state. See {@link RedisPresenceBroadcastManager}
+   * Creates listeners for updates to presence state and sends notifications to listeners when presence state is updated. See {@link RedisPresenceBroadcastManager}
    */
   broadcastManager: {
     broadcastIndicator: (
@@ -67,7 +67,7 @@ export class PresenceAuthority {
   }
 
   /**
-  * saves new presence state for a client and notifies and listners of the update.
+  * Saves new presence state for a client and notifies and listeners of the update.
   */
   async updatePresence(docId: string, indicator: PresenceIndicator) {
     await this.persistenceManager.saveIndicator(docId, indicator);

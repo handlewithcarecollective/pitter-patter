@@ -30,7 +30,7 @@ export interface CollabClientConfig {
    * Sends local commits to a remote server to be merged into the remote document state.
    * The endpoint this function hits is defined by you, and should call the
    * CollabAuthority's {@link https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority#receivecommit | receiveCommit}
-   * function
+   * function.
    *
    * @param commit - the latest prosemirror commit made by the local user
    */
@@ -38,7 +38,7 @@ export interface CollabClientConfig {
   /**
    * A listener for remote commits.
    *
-   * Currently the only option is the {@link LongPollListener}.
+   * Currently the only provided option is the {@link LongPollListener}.
    *
    * Support for realtime databases like Firestore and Convex is planned
    * and can be expedited on request. Contact hello@handlewithcare.dev to inquire.
@@ -81,7 +81,7 @@ export class CollabClient {
   }
 
   /**
-   * send local editor state changes to the remote server
+   * Send local editor state changes to the remote server.
    */
   async send(editorState: EditorState) {
     const commit = sendableCommit(editorState);
@@ -158,7 +158,7 @@ export class LongPollListener {
   }
 
   /**
-   * Update the headers send with long polling requests.
+   * Update the headers sent with long polling requests.
    */
   update(headers: HeadersInit) {
     this.headers = headers;
