@@ -25,7 +25,6 @@
   grid-column-start: 1;
   grid-column-end: 15;
   row-gap: var(--shuffle-row-gap, 1rem);
-  align-items: center;
 }
 
 .row > * {

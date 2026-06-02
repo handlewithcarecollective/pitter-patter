@@ -25,6 +25,8 @@ export const shuffleAttrs = {
   },
 } satisfies NodeSpec["attrs"];
 
+export type ShuffleAlignment = "center" | "start" | "end" | "stretch";
+
 /**
  * A node spec for a container node. A container is a vertical group, meant to wrap other block nodes,
  * such as paragraphs.
@@ -32,7 +34,15 @@ export const shuffleAttrs = {
  * Containers are resizable and draggable.
  */
 export const container: NodeSpec = {
-  attrs: shuffleAttrs,
+  attrs: {
+    ...shuffleAttrs,
+    alignment: {
+      default: "center",
+      validate(value) {
+        return ["center", "start", "end", "stretch"].includes(value);
+      },
+    },
+  },
   defining: true,
   isolating: true,
   parseDOM: [{ tag: 'div[data-node-type="shuffle-container"]' }],
@@ -52,6 +62,14 @@ export const container: NodeSpec = {
  * other.
  */
 export const row: NodeSpec = {
+  attrs: {
+    alignment: {
+      default: "center",
+      validate(value) {
+        return ["center", "start", "end", "stretch"].includes(value);
+      },
+    },
+  },
   parseDOM: [{ tag: 'div[data-node-type="shuffle-row"]' }],
   defining: true,
   isolating: true,

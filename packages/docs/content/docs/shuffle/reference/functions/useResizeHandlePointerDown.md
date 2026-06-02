@@ -9,7 +9,7 @@ function useResizeHandlePointerDown(pos: number, side: "start" | "end"): (...arg
 ```
 
 Defined in:
-[components/ResizeHandles.tsx:188](https://github.com/handlewithcarecollective/pitter-patter/blob/5f9831b289582242a2f8b7c6f9c1d64b034de5a9/packages/shuffle/src/components/ResizeHandles.tsx#L188)
+[components/ResizeHandles.tsx:188](https://github.com/handlewithcarecollective/pitter-patter/blob/9ec4cd60f040e2134c47209a80da4fdb85ebb21f/packages/shuffle/src/components/ResizeHandles.tsx#L188)
 
 A React hook that can be used to build a custom resize handles component. It takes the position of
 the selected node and whether to create a handler for the start or end handler.
