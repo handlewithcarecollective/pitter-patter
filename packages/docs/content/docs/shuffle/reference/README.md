@@ -11,6 +11,10 @@ title: "@pitter-patter/shuffle"
 - [ShufflePluginOptions](/docs/shuffle/reference/interfaces/ShufflePluginOptions)
 - [ShufflePluginState](/docs/shuffle/reference/interfaces/ShufflePluginState)
 
+## Type Aliases
+
+- [ShuffleAlignment](/docs/shuffle/reference/type-aliases/ShuffleAlignment)
+
 ## Variables
 
 - [container](/docs/shuffle/reference/variables/container)
@@ -24,6 +28,7 @@ title: "@pitter-patter/shuffle"
 - [DragHandle](/docs/shuffle/reference/functions/DragHandle)
 - [DragHandles](/docs/shuffle/reference/functions/DragHandles)
 - [ResizeHandles](/docs/shuffle/reference/functions/ResizeHandles)
+- [setShuffleAlignment](/docs/shuffle/reference/functions/setShuffleAlignment)
 - [setShuffleColumns](/docs/shuffle/reference/functions/setShuffleColumns)
 - [setShuffleZIndex](/docs/shuffle/reference/functions/setShuffleZIndex)
 - [shuffle](/docs/shuffle/reference/functions/shuffle)
