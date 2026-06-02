@@ -58,19 +58,27 @@ async function main() {
 
   const unreleasedWorkspaces: Workspace[] = [];
 
-  for (const versionFile of versionFiles) {
-    for (const workspace of versionFile.changedWorkspaces) {
-      if (!workspace.manifest.version) continue;
-      if (versionFile?.releases.has(workspace)) continue;
-      const diff = execSync(
-        `git diff origin/main -- ${join(workspace.relativeCwd, "package.json")}`,
-        {
-          encoding: "utf-8",
-        },
-      );
-      const hasBeenUpgraded = /^\+\s*"version":/gm.test(diff);
-      if (!hasBeenUpgraded) unreleasedWorkspaces.push(workspace);
+  if (versionFiles.length) {
+    for (const versionFile of versionFiles) {
+      for (const workspace of versionFile.changedWorkspaces) {
+        if (!workspace.manifest.version) continue;
+        if (versionFile?.releases.has(workspace)) continue;
+        const diff = execSync(
+          `git diff origin/main -- ${join(workspace.relativeCwd, "package.json")}`,
+          {
+            encoding: "utf-8",
+          },
+        );
+        const hasBeenUpgraded = /^\+\s*"version":/gm.test(diff);
+        if (!hasBeenUpgraded) unreleasedWorkspaces.push(workspace);
+      }
     }
+  } else {
+    const changedWorkspaces = await gitUtils.fetchChangedWorkspaces({
+      ref: "origin/main",
+      project,
+    });
+    unreleasedWorkspaces.push(...Array.from(changedWorkspaces).filter((w) => w.manifest.version));
   }
 
   if (unreleasedWorkspaces.length) {
