@@ -4,6 +4,8 @@
   color: #351900;
   padding-top: 2rem;
   min-height: 800px;
+
+  --tw-prose-headings: #351900;
 }
 
 img {
@@ -58,11 +60,15 @@ img {
   gap: 0.5rem;
   padding: 0.5rem;
   justify-content: start;
+  position: sticky;
+  top: 0;
+  z-index: 10000;
 }
 
-.card-deck-inflatable {
+.inflatable {
   background-color: #f3efea;
   color: #351900;
   padding: 1rem;
   border-radius: 0.25rem;
+  border: #351900 solid thin;
 }

@@ -1,7 +1,7 @@
 import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
-import { Plugin, PluginKey } from "prosemirror-state";
+import { NodeSelection, Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import throttle from "raf-throttle";
 
@@ -332,11 +332,17 @@ export function startDragOnPointerDown(
   clientX: number,
   clientY: number,
 ) {
-  view.dispatch(
-    view.state.tr.setMeta(shufflePluginKey, {
-      type: "start",
-    } satisfies ShufflePluginMeta),
-  );
+  const startTr = view.state.tr;
+
+  startTr.setMeta(shufflePluginKey, {
+    type: "start",
+  } satisfies ShufflePluginMeta);
+
+  if (pos !== null) {
+    startTr.setSelection(NodeSelection.create(view.state.doc, pos));
+  }
+
+  view.dispatch(startTr);
 
   const domRect = dom.getBoundingClientRect();
 
@@ -401,11 +407,12 @@ export function startDragOnPointerDown(
 
     if (currentAnimation?.began && !currentAnimation.completed) return;
 
-    const tr = before
-      ? (autogroup(view, before, e.clientX, e.clientY) ??
-        reorder(view, before, e.clientX, e.clientY) ??
-        reposition(view, before, clone.getBoundingClientRect()))
-      : inflate(view, clone, e.clientX, e.clientY);
+    const tr =
+      before != null
+        ? (autogroup(view, before, e.clientX, e.clientY) ??
+          reorder(view, before, e.clientX, e.clientY) ??
+          reposition(view, before, clone.getBoundingClientRect()))
+        : inflate(view, clone, e.clientX, e.clientY);
 
     if (!tr) return;
 
