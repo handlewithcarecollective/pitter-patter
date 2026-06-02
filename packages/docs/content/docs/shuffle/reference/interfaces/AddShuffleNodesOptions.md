@@ -5,7 +5,7 @@ title: AddShuffleNodesOptions
 # Interface: AddShuffleNodesOptions
 
 Defined in:
-[schema.ts:77](https://github.com/handlewithcarecollective/pitter-patter/blob/5f9831b289582242a2f8b7c6f9c1d64b034de5a9/packages/shuffle/src/schema.ts#L77)
+[schema.ts:95](https://github.com/handlewithcarecollective/pitter-patter/blob/9ec4cd60f040e2134c47209a80da4fdb85ebb21f/packages/shuffle/src/schema.ts#L95)
 
 Options to be passed to `addShuffleNodes`. Can be used to override the default `shuffleStart` and
 `shuffleEnd` attribute values.
@@ -19,7 +19,7 @@ optional defaultEnd?: number;
 ```
 
 Defined in:
-[schema.ts:79](https://github.com/handlewithcarecollective/pitter-patter/blob/5f9831b289582242a2f8b7c6f9c1d64b034de5a9/packages/shuffle/src/schema.ts#L79)
+[schema.ts:97](https://github.com/handlewithcarecollective/pitter-patter/blob/9ec4cd60f040e2134c47209a80da4fdb85ebb21f/packages/shuffle/src/schema.ts#L97)
 
 ---
 
@@ -30,4 +30,4 @@ optional defaultStart?: number;
 ```
 
 Defined in:
-[schema.ts:78](https://github.com/handlewithcarecollective/pitter-patter/blob/5f9831b289582242a2f8b7c6f9c1d64b034de5a9/packages/shuffle/src/schema.ts#L78)
+[schema.ts:96](https://github.com/handlewithcarecollective/pitter-patter/blob/9ec4cd60f040e2134c47209a80da4fdb85ebb21f/packages/shuffle/src/schema.ts#L96)

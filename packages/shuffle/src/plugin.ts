@@ -76,7 +76,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
       init(_, state) {
         const decorations: Decoration[] = [];
         state.doc.descendants((node, pos, _parent, index) => {
-          const { shuffleStart, shuffleEnd, zIndex } = node.attrs;
+          const { shuffleStart, shuffleEnd, zIndex, alignment } = node.attrs;
 
           if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
@@ -87,7 +87,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
               ...(!isShuffleRow(node) && {
                 class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
               }),
-              style: `grid-row: ${index + 1}; z-index: ${zIndex}`,
+              style: `grid-row: ${index + 1}; z-index: ${zIndex ?? 0};${alignment ? ` align-items: ${alignment};` : "center"}`,
             }),
           );
 
@@ -126,7 +126,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
 
         const decorations: Decoration[] = [];
         tr.doc.descendants((node, pos, _parent, index) => {
-          const { shuffleStart, shuffleEnd, zIndex } = node.attrs;
+          const { shuffleStart, shuffleEnd, zIndex, alignment } = node.attrs;
 
           if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
             return true;
@@ -137,7 +137,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
               ...(!isShuffleRow(node) && {
                 class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
               }),
-              style: `grid-row: ${index + 1}; z-index: ${zIndex}`,
+              style: `grid-row: ${index + 1}; z-index: ${zIndex ?? 0};${alignment ? ` align-items: ${alignment};` : ""}`,
             }),
           );
 
