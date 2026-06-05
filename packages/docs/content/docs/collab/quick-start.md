@@ -14,7 +14,7 @@ To set up your backend with Pitter Patter collab, you first create a
 The code below assumes that you have
 
 1. a database with support for ACID transactions
-2. a redis cluster accessible at `REDIS_URL`
+2. a Redis cluster accessible at `REDIS_URL`
 3. a prosemirror editor schema, `schema`.
 
 ```ts
@@ -56,7 +56,7 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
   }
 ```
 
-Next you need to provide two endpoints. One for clients to submit commits on a document and one for
+Next, create two endpoints. One for clients to submit commits on a document and one for
 clients to listen for commits on a document.
 
 ```ts
@@ -90,7 +90,7 @@ app.get("/api/docs/:docId/commits", async (req, res) => {
 npm i @pitter-patter/collab-client
 ```
 
-To configure your frontend editor with collab, you first add the collab plugin when creating your
+To configure your frontend editor with Collab, you first add the collab plugin when creating your
 editor state
 
 ```ts
@@ -108,7 +108,7 @@ Then create a
 This client uses the endpoints you created above to send and listen for commits.
 
 ```ts
-// The LongPollListner listens for document changes at the GET
+// The LongPollListener listens for document changes at the GET
 // endpoint `/api/docs/:docId/commits` you created above
 const longPollListner = new LongPollListener(
   new URL(
