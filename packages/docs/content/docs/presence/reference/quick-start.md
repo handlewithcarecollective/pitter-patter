@@ -12,7 +12,9 @@ explanation, see the [Presence Guide](https://pitter-patter.dev/docs/guides/pres
 npm i @pitter-patter/presence-server
 ```
 
-First create a [PresenceAuthority](https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority). The code below assumes you have a Redis cluster accessible at `REDIS_URL`
+First create a
+[PresenceAuthority](https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority).
+The code below assumes you have a Redis cluster accessible at `REDIS_URL`
 
 ```ts
 import {
@@ -36,8 +38,8 @@ const presenceAuthority = new PresenceAuthority({
 });
 ```
 
-Next, create two endpoints. One for clients to submit their presence indicator and one for
-clients to listen for updated presence indicators.
+Next, create two endpoints. One for clients to submit their presence indicator and one for clients
+to listen for updated presence indicators.
 
 ```ts
 // Endpoint that clients will use to send their updated indicator to the PresenceAuthority
@@ -61,15 +63,14 @@ app.post("/api/docs/:docId/presence", async (req, res) => {
 });
 ```
 
-
 ## Configure your frontend
 
 ```npm
 npm i @pitter-patter/presence-client
 ```
 
-To configure your frontend editor with Presence, you first add the presence plugin when creating your
-editor state
+To configure your frontend editor with Presence, you first add the presence plugin when creating
+your editor state
 
 ```ts
 import { EditorState } from "prosemirror-state";
@@ -95,10 +96,7 @@ This client uses the endpoints you created above to send and listen for indicato
 // The PresenceListener listens for indicator changes at the
 // `/api/docs/:docId/presence` endpoint you created above
 const presenceListener = new PresenceListener(
-  new URL(
-    `/api/docs/${doc.id}/presence`,
-    typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
-  ),
+  new URL(`/api/docs/${doc.id}/presence`, "http://localhost:3000"),
 );
 
 const presenceClient = new PresenceClient({
@@ -114,13 +112,17 @@ const presenceClient = new PresenceClient({
 });
 ```
 
-Tell the [PresenceClient](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/PresenceClient) to listen for updates
+Tell the
+[PresenceClient](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/PresenceClient)
+to listen for updates
+
 ```ts
 const abortController = new AbortController();
 presenceClient.listen(abortController.signal).catch((e) => console.error(e));
 ```
 
 And send your client's indicator state when it updates
+
 ```ts
 presenceClient.send(state).catch((e) => console.error(e));
 ```

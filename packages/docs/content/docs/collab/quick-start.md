@@ -116,10 +116,7 @@ This client uses the endpoints you created above to send and listen for commits.
 // The LongPollListener listens for document changes at the GET
 // endpoint `/api/docs/:docId/commits` you created above
 const longPollListner = new LongPollListener(
-  new URL(
-    `/api/docs/${doc.id}/commits`,
-    typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
-  ),
+  new URL(`/api/docs/${doc.id}/commits`, "http://localhost:3000"),
 );
 
 const collabClient = new CollabClient({
