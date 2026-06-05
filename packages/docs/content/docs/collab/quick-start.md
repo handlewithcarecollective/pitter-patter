@@ -3,6 +3,9 @@ title: Quick start
 description: Install and configure Collab
 ---
 
+This quick start provides a summary of a Pitter Patter Collab configuration. For a more in depth
+explanation, see the [Collab Guide](https://pitter-patter.dev/docs/guides/collab/).
+
 ## Configure your backend
 
 ```npm
@@ -122,10 +125,18 @@ const collabClient = new CollabClient({
     // send `commit` to the POST endpoint `/api/docs/:docId/commits` you created above
   },
   receiveCommits: (commits) => {
-    // merge the provided commits into your local editor state
+    // merge a new set of commits into your editor state for example:
+    // const newEditorState = commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), oldEditorState),
   },
   listner: commitListener,
 });
+```
+
+Tell the client to start listening for changes
+
+```ts
+const abortController = new AbortController();
+collabClient.listen(initialState, abortController.signal).catch((e) => console.error(e));
 ```
 
 When the local editor state changes, you need to tell the

@@ -3,6 +3,9 @@ title: Quick start
 description: Install and configure Presence
 ---
 
+This quick start provides a summary of a Pitter Patter Presence configuration. For a more in depth
+explanation, see the [Presence Guide](https://pitter-patter.dev/docs/guides/presence/).
+
 ## Configure your backend
 
 ```npm
