@@ -89,10 +89,14 @@ CREATE INDEX commits_version_idx ON commits (doc_id, version);
 
 ## The backend
 
-To set up your backend with Pitter Patter collab, you first create a [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority).
-[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority) is stateless, so you can create one in every server instance or function invocation
-your backend uses. The [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority) contains most of Pitter Patter's collaborative editing logic,
-and requires a few inputs from you to work:
+To set up your backend with Pitter Patter collab, you first create a
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority).
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+is stateless, so you can create one in every server instance or function invocation your backend
+uses. The
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+contains most of Pitter Patter's collaborative editing logic, and requires a few inputs from you to
+work:
 
 1. functions to interface with your database
 2. a broadcast manager
@@ -100,8 +104,10 @@ and requires a few inputs from you to work:
 
 ### Database interface functions
 
-The [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority) does not know anything about your database or data model. Instead, you provide
-it the following set of functions that perform any required operations on your database
+The
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+does not know anything about your database or data model. Instead, you provide it the following set
+of functions that perform any required operations on your database
 
 #### [runWithTransaction](https://pitter-patter.dev/docs/collab/reference/collab-server/interfaces/CollabAuthorityConfig#runwithtransaction)
 
@@ -268,7 +274,8 @@ This is just the schema for your Prosemirror document.
 
 ### All together
 
-With all of the required variables defined, we can create our server's [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+With all of the required variables defined, we can create our server's
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
 
 ```ts
 const collabAuthority = new CollabAuthority<Transaction<DB>>({
@@ -285,12 +292,16 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>({
 
 ## Connecting the Client and Server
 
-Your server now has a [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority) that can interact with the editor state in your database and
-send and receive update notifications. You now need to create endpoints that allow your frontend
-clients to communicate with the [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority).
+Your server now has a
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+that can interact with the editor state in your database and send and receive update notifications.
+You now need to create endpoints that allow your frontend clients to communicate with the
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority).
 
-You need two endpoints. One to send commits to the [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority) and one to listen for commits
-from the [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority).
+You need two endpoints. One to send commits to the
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+and one to listen for commits from the
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority).
 
 First, make a sendCommit endpoint that clients can send their local commits to.
 
@@ -311,15 +322,21 @@ app.post("/api/docs/:docId/commits", async (req, res) => {
 
 The path of this endpoint is up to you. The only requirement is that the docId associated with the
 commits is included in the path or as a query parameter. The body of the request is defined by the
-client side [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient) that we will define later and contains only the commit data.
+client side
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient)
+that we will define later and contains only the commit data.
 
 In the body of this endpoint we:
-1. submit the commit to the [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+
+1. submit the commit to the
+   [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
 2. return a 409 error if there is too much contention on the document
 3. return a 204 success if the commit is written successfully.
 
-The [CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority) does the work of saving the new commit to the database and notifing any
-listening clients of the changes.
+The
+[CollabAuthority](https://pitter-patter.dev/docs/collab/reference/collab-server/classes/CollabAuthority)
+does the work of saving the new commit to the database and notifing any listening clients of the
+changes.
 
 Next make a getCommits endpoint where clients can listen for remote changes.
 
@@ -333,22 +350,26 @@ app.get("/api/docs/:docId/commits", async (req, res) => {
 });
 ```
 
-The path of this endpoint is up to you. The only requirement is that the `docId` and `version` of the
-latest document already received by the client are included in the request. We will construct this
-request in the frontend [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient) below. In this example, we include the `docId` in the
-endpoint's path and the latest `version` as a query parameter.
+The path of this endpoint is up to you. The only requirement is that the `docId` and `version` of
+the latest document already received by the client are included in the request. We will construct
+this request in the frontend
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient)
+below. In this example, we include the `docId` in the endpoint's path and the latest `version` as a
+query parameter.
 
 The function body just calls the CollabAuthority's listenForCommit function and returns any commits
 that are found. listenForCommit check for any new commits, and return if new commits are found. If
 new commits are not immediately found, it listens for a new commit notification from the
 BroadcastManager. If a notification is received, the commits are retrieved and returned immediately.
-If no notification is received before a maximum [timeout](https://pitter-patter.dev/docs/collab/reference/collab-server/interfaces/RedisBroadcastManagerConfig/#timeout) (eg. 15 seconds), an empty array is
-returned.
+If no notification is received before a maximum
+[timeout](https://pitter-patter.dev/docs/collab/reference/collab-server/interfaces/RedisBroadcastManagerConfig/#timeout)
+(eg. 15 seconds), an empty array is returned.
 
 ## Creating the client
 
-You can now connect your frontend editor to the collab backend. PitterPatter's [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient) manages
-synchronizing state between your frontend and backend.
+You can now connect your frontend editor to the collab backend. PitterPatter's
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient)
+manages synchronizing state between your frontend and backend.
 
 First create an EditorState. In this example, we are using Prosemirror's basic schema and are
 starting with an empty document.
@@ -363,12 +384,12 @@ const state = EditorState.create({
 })
 ```
 
-Next we need to create a listener for commit changes. The built-in [LongPollListener](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/LongPollListener) (long) polls the getCommits endpoint you implmented above for those changes.
+Next we need to create a listener for commit changes. The built-in
+[LongPollListener](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/LongPollListener)
+(long) polls the getCommits endpoint you implmented above for those changes.
 
 ```ts
-import {
-  LongPollListener as CollabLongPollListener,
-} from "@pitter-patter/collab-client";
+import { LongPollListener as CollabLongPollListener } from "@pitter-patter/collab-client";
 
 const commitListener = new CollabLongPollListener(
   new URL(
@@ -378,22 +399,25 @@ const commitListener = new CollabLongPollListener(
 );
 ```
 
-The [LongPollListener](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/LongPollListener) also accepts optional headers to include in your request (an auth token for
-example). These can be updated with the listener's [update](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/LongPollListener#update) function.
+The
+[LongPollListener](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/LongPollListener)
+also accepts optional headers to include in your request (an auth token for example). These can be
+updated with the listener's
+[update](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/LongPollListener#update)
+function.
 
-Next create a config for the [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient). The config contains the listener created above and two
-functions that the [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient) will use to interact with your backend and your local editor state,
-sendCommit and receiveCommits.
+Next create a config for the
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient).
+The config contains the listener created above and two functions that the
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient)
+will use to interact with your backend and your local editor state, sendCommit and receiveCommits.
 
 - **sendCommit**: takes a new commit as an argument and sends it to the sendCommits endpoint you
   created above.
 - **receiveCommits**: takes an array of commits and merges them into your local editor state
 
 ```ts
-import {
-  CollabClientConfig,
-  receiveCommitTransaction,
-} from "@pitter-patter/collab-client";
+import { CollabClientConfig, receiveCommitTransaction } from "@pitter-patter/collab-client";
 
 const collabConfig = {
   sendCommit: async (commit) => {
@@ -411,7 +435,9 @@ const collabConfig = {
 };
 ```
 
-Then you create a [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient) with the config and tell it to start listening for updates
+Then you create a
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient)
+with the config and tell it to start listening for updates
 
 ```ts
 const collabClient = new CollabClient(collabConfig);

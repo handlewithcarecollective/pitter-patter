@@ -66,7 +66,7 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
       getCommit: async (tr, docId, commitRef) => {
         return (await getCommitByRef(tr, docId, commitRef)) ?? null;
       },
-      // Todo: make the role of this function more clear to external users. getCommitsAfter 
+      // Todo: make the role of this function more clear to external users. getCommitsAfter
       //       could work
       getCommits: async (tr, docId, version) => {
         return await getCommitsAfter(tr, docId, version);
