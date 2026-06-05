@@ -103,8 +103,9 @@ const state = EditorState.create({
 })
 ```
 
-Then create a `CollabClient`. This client uses the endpoints you created above to send and listen
-for commits.
+Then create a
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient).
+This client uses the endpoints you created above to send and listen for commits.
 
 ```ts
 // The LongPollListner listens for document changes at the GET
@@ -118,7 +119,7 @@ const longPollListner = new LongPollListener(
 
 const collabClient = new CollabClient({
   sendCommit: async (commit) => {
-    // send a commit to the POST endpoint `/api/docs/:docId/commits` you created above
+    // send `commit` to the POST endpoint `/api/docs/:docId/commits` you created above
   },
   receiveCommits: (commits) => {
     // merge the provided commits into your local editor state
@@ -127,8 +128,9 @@ const collabClient = new CollabClient({
 });
 ```
 
-When the local editor state changes, you need to tell the `CollabClient` to create and send a new
-commit.
+When the local editor state changes, you need to tell the
+[CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient)
+to create and send a new commit.
 
 ```ts
 collabClient.send(state).catch((e) => console.error(e));
