@@ -2,6 +2,8 @@
 title: Collab
 ---
 
+TODO: Move to guides section and link to guide from collab and presence quick starts
+
 Pitter Patter Collab adds collaborative editing to your existing prosemirror editor. It is designed
 to plug into your existing system design, so you can add collaborative editing to your product,
 while keeping all state in a database you own and trust.
