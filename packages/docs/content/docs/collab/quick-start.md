@@ -56,8 +56,8 @@ const collabAuthority = new CollabAuthority<Transaction<DB>>(
   }
 ```
 
-Next, create two endpoints. One for clients to submit commits on a document and one for
-clients to listen for commits on a document.
+Next, create two endpoints. One for clients to submit commits on a document and one for clients to
+listen for commits on a document.
 
 ```ts
 // Endpoint that clients will use to send commits to the CollabAuthority
