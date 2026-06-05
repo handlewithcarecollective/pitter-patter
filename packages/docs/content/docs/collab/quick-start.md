@@ -100,9 +100,11 @@ editor state
 import { EditorState } from "prosemirror-state";
 import { collab } from "@pitter-patter/collab-client";
 
+const document = await fetch(`/api/docs/${docId}`).then((r) => r.json())
+
 const state = EditorState.create({
-  doc: // your initial prosemirror schema and document
-  plugins: [collab({ version: /* the initial version number for your document */ })],
+  doc: Node.fromJSON(schema, document.content)
+  plugins: [collab({ version: document.version })],
 })
 ```
 
