@@ -1,4 +1,4 @@
-git import { renderRequest } from "@parcel/rsc/node";
+import { renderRequest } from "@parcel/rsc/node";
 import express from "express";
 import { Migrator, Transaction } from "kysely";
 import { TSFileMigrationProvider } from "kysely-ctl";
