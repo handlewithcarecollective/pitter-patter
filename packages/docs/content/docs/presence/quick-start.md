@@ -1,0 +1,128 @@
+---
+title: Quick start
+description: Install and configure Presence
+---
+
+This quick start provides a summary of a Pitter Patter Presence configuration. For a more in depth
+explanation, see the [Presence Guide](https://pitter-patter.dev/docs/guides/presence/).
+
+## Configure your backend
+
+```npm
+npm i @pitter-patter/presence-server
+```
+
+First create a
+[PresenceAuthority](https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority).
+The code below assumes you have a Redis cluster accessible at `REDIS_URL`
+
+```ts
+import {
+  PresenceAuthority,
+  PresenceIndicator,
+  RedisPresenceBroadcastManager,
+  RedisPresencePersistenceManager,
+} from "@pitter-patter/presence-server";
+
+const presenceBroadcaster = new RedisPresenceBroadcastManager({
+  redisUrl: process.env["REDIS_URL"] ?? "redis://localhost:6379",
+});
+
+const presencePersister = new RedisPresencePersistenceManager({
+  redisUrl: process.env["REDIS_URL"] ?? "redis://localhost:6379",
+});
+
+const presenceAuthority = new PresenceAuthority({
+  persistenceManager: presencePersister,
+  broadcastManager: presenceBroadcaster,
+});
+```
+
+Next, create two endpoints. One for clients to submit their presence indicator and one for clients
+to listen for updated presence indicators.
+
+```ts
+// Endpoint that clients will use to send their updated indicator to the PresenceAuthority
+app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
+  const indicator = req.body as PresenceIndicator;
+  await presenceAuthority.updatePresence(req.params.docId, indicator);
+
+  res.status(204).send(null);
+});
+
+// Endpoint that clients will use to listen for indicators from the PresenceAuthority
+app.post("/api/docs/:docId/presence", async (req, res) => {
+  const { refs, clientId } = req.body as {
+    refs: Record<string, string> | undefined;
+    clientId: string;
+  };
+
+  const presence = await presenceAuthority.listenForPresence(req.params.docId, clientId, refs);
+
+  res.status(200).send(presence);
+});
+```
+
+## Configure your frontend
+
+```npm
+npm i @pitter-patter/presence-client
+```
+
+To configure your frontend editor with Presence, you first add the presence plugin when creating
+your editor state
+
+```ts
+import { EditorState } from "prosemirror-state";
+import {
+  presence,
+  PresenceClient,
+  receivePresenceTransaction,
+  LongPollListener as PresenceLongPollListener,
+  PresenceClientConfig,
+} from "@pitter-patter/presence-client";
+
+const state = EditorState.create({
+  doc: // your initial prosemirror schema and document
+  plugins: [presence()],
+})
+```
+
+Then create a
+[PresenceClient](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/PresenceClient).
+This client uses the endpoints you created above to send and listen for indicators.
+
+```ts
+// The PresenceListener listens for indicator changes at the
+// `/api/docs/:docId/presence` endpoint you created above
+const presenceListener = new PresenceListener(
+  new URL(`/api/docs/${doc.id}/presence`, "http://localhost:3000"),
+);
+
+const presenceClient = new PresenceClient({
+  userId,
+  sendIndicator: async (indicator) => {
+    // send `indicator` to the `/api/docs/:docId/presence/:clientId` endpoint you created above
+  },
+  receiveIndicators: (indicators) => {
+    // merge a new set of indicators into your editor state for example
+    // const newEditorState = oldEditorState.apply(receivePresenceTransaction(oldEditorState, indicators)));
+  },
+  listener: presenceListener,
+});
+```
+
+Tell the
+[PresenceClient](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/PresenceClient)
+to listen for updates
+
+```ts
+const abortController = new AbortController();
+presenceClient.listen(abortController.signal).catch((e) => console.error(e));
+```
+
+And send your client's indicator state when it updates
+
+```ts
+presenceClient.send(state).catch((e) => console.error(e));
+```
