@@ -26,6 +26,9 @@ jobs:
       - name: Install corepack
         run: npm i -g corepack
 
+      - name: Show yarn version
+        run: yarn --version
+
       - name: Install dependencies
         run: yarn
 
