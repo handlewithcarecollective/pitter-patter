@@ -1,0 +1,13 @@
+releases:
+  "@pitter-patter/collab-client": patch
+  "@pitter-patter/collab-server": patch
+  "@pitter-patter/presence-client": patch
+  "@pitter-patter/presence-server": patch
+  "@pitter-patter/refs": patch
+
+declined:
+  - "@pitter-patter/comments-client"
+  - "@pitter-patter/comments-server"
+  - "@pitter-patter/shuffle"
+  - "@pitter-patter/version-history-client"
+  - "@pitter-patter/version-history-server"
