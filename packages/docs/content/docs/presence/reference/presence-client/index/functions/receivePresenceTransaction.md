@@ -11,8 +11,7 @@ function receivePresenceTransaction(
 ): Transaction;
 ```
 
-Defined in:
-[plugin.ts:23](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/plugin.ts#L23)
+Defined in: basePlugin.ts:19
 
 Merges updated presence indicators into an editor state.
 
@@ -25,7 +24,7 @@ Merges updated presence indicators into an editor state.
 ### presence
 
 `Record`\<`string`,
-[`PresenceIndicator`](/docs/presence/reference/presence-client/interfaces/PresenceIndicator)\>
+[`PresenceIndicator`](/docs/presence/reference/presence-client/index/interfaces/PresenceIndicator)\>
 
 ## Returns
 

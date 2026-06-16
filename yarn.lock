@@ -2848,10 +2848,23 @@ __metadata:
     typedoc-plugin-markdown: "npm:^4.11.0"
     typescript: "npm:^6.0.3"
   peerDependencies:
+    "@handlewithcare/react-prosemirror": ^3.0.6
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
     prosemirror-transform: ^1.0.0
     prosemirror-view: ^1.0.0
+    react: ^19.2.0
+    react-dom: ^19.2.0
+    react-reconciler: ^0.32.0
+  peerDependenciesMeta:
+    "@handlewithcare/react-prosemirror":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+    react-reconciler:
+      optional: true
   languageName: unknown
   linkType: soft
 
