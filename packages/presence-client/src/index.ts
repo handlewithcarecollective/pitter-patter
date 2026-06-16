@@ -4,9 +4,11 @@ import { collabKey } from "@pitter-patter/collab-client";
 import { randomRef } from "@pitter-patter/refs";
 
 import { type PresenceClientConfig, type IndicatorListener } from "./config.ts";
-import { type PresenceIndicator } from "./PresenceIndicator.tsx";
+import { type PresenceIndicator } from "./PresenceIndicator.ts";
 
-export { presence, presenceKey, receivePresenceTransaction } from "./plugin.ts";
+export { type PresenceState, presenceKey, receivePresenceTransaction } from "./basePlugin.ts";
+
+export { presence } from "./vanillaPlugin.ts";
 
 export { type PresenceIndicator, type PresenceClientConfig, type IndicatorListener };
 

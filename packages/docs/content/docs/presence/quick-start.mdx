@@ -65,6 +65,12 @@ app.post("/api/docs/:docId/presence", async (req, res) => {
 
 ## Configure your frontend
 
+<Callout title="Using React?" type="idea">
+  If you’re using `@handlewithcare/react-prosemirror` to render your ProseMirror editor with React,
+  you should import the `presence` plugin from `@pitter-patter/presence-client/react`, instead of
+  `@pitter-patter/presence-client`!
+</Callout>
+
 ```npm
 npm i @pitter-patter/presence-client
 ```

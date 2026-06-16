@@ -5,7 +5,7 @@ title: PresenceClient
 # Class: PresenceClient
 
 Defined in:
-[index.ts:24](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L24)
+[index.ts:19](https://github.com/handlewithcarecollective/pitter-patter/blob/5d0afded00b080a66ff242336c2afe1d7fdbb5a7/packages/presence-client/src/index.ts#L19)
 
 The client that manages sending local presence state to the remote server and listening for remote
 changes to presence state.
@@ -19,13 +19,13 @@ new PresenceClient(config: PresenceClientConfig): PresenceClient;
 ```
 
 Defined in:
-[index.ts:33](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L33)
+[index.ts:28](https://github.com/handlewithcarecollective/pitter-patter/blob/5d0afded00b080a66ff242336c2afe1d7fdbb5a7/packages/presence-client/src/index.ts#L28)
 
 #### Parameters
 
 ##### config
 
-[`PresenceClientConfig`](/docs/presence/reference/presence-client/interfaces/PresenceClientConfig)
+[`PresenceClientConfig`](/docs/presence/reference/presence-client/index/interfaces/PresenceClientConfig)
 
 #### Returns
 
@@ -40,7 +40,7 @@ listen(signal?: AbortSignal): Promise<void>;
 ```
 
 Defined in:
-[index.ts:93](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L93)
+[index.ts:88](https://github.com/handlewithcarecollective/pitter-patter/blob/5d0afded00b080a66ff242336c2afe1d7fdbb5a7/packages/presence-client/src/index.ts#L88)
 
 Start listening for remote presence changes. This function should only be called once.
 
@@ -63,7 +63,7 @@ send(editorState: EditorState): Promise<void>;
 ```
 
 Defined in:
-[index.ts:44](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L44)
+[index.ts:39](https://github.com/handlewithcarecollective/pitter-patter/blob/5d0afded00b080a66ff242336c2afe1d7fdbb5a7/packages/presence-client/src/index.ts#L39)
 
 Send updated presence state to the remote PresenceAuthority.
 
@@ -86,7 +86,7 @@ update(config: Partial<Omit<PresenceClientConfig, "listener">>): void;
 ```
 
 Defined in:
-[index.ts:85](https://github.com/handlewithcarecollective/pitter-patter/blob/81896664a0707dea093e9edc81dae89a35a20ad2/packages/presence-client/src/index.ts#L85)
+[index.ts:80](https://github.com/handlewithcarecollective/pitter-patter/blob/5d0afded00b080a66ff242336c2afe1d7fdbb5a7/packages/presence-client/src/index.ts#L80)
 
 Updates the desired portion of the client's `PresenceClientConfig`. For example, this can be used to
 update the auth headers used by `send`.
@@ -95,7 +95,7 @@ update the auth headers used by `send`.
 
 ##### config
 
-`Partial`\<`Omit`\<[`PresenceClientConfig`](/docs/presence/reference/presence-client/interfaces/PresenceClientConfig),
+`Partial`\<`Omit`\<[`PresenceClientConfig`](/docs/presence/reference/presence-client/index/interfaces/PresenceClientConfig),
 `"listener"`\>\>
 
 #### Returns
