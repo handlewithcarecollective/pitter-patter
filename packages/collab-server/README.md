@@ -1,8 +1,6 @@
-<p align="center">
-  <a href="https://pitter-patter.dev/"><img src="https://raw.githubusercontent.com/handlewithcarecollective/pitter-patter/refs/heads/main/readme-assets/pitter-patter-logo.png" alt="" height="75"/></a>
-</p>
-
-<h3 align="center">Pitter Patter</h3>
+<h3 align="center">
+  <a href="https://pitter-patter.dev/"><img src="https://raw.githubusercontent.com/handlewithcarecollective/pitter-patter/refs/heads/main/readme-assets/pitter-patter-logo.png" alt="Pitter Patter" height="75"/></a>
+</h3>
 
 <p align="center">
   <strong>An open source collaborative rich editing toolkit.</strong>
