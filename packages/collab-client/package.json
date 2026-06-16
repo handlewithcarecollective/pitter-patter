@@ -1,6 +1,9 @@
 {
   "name": "@pitter-patter/collab-client",
   "version": "0.1.0",
+  "files": [
+    "./dist"
+  ],
   "type": "module",
   "exports": "./src/index.ts",
   "publishConfig": {
