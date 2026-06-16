@@ -1,9 +1,9 @@
 import { Node } from "prosemirror-model";
 import { EditorView } from "prosemirror-view";
 
-import { shufflePluginKey } from "../plugin.js";
+import { shufflePluginKey } from "../plugin.ts";
 
-import { findGap } from "./reorder.js";
+import { findGap } from "./reorder.ts";
 
 export function inflate(view: EditorView, clone: HTMLElement, clientX: number, clientY: number) {
   const editorRect = view.dom.getBoundingClientRect();
