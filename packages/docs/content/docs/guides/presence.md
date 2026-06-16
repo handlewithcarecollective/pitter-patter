@@ -107,22 +107,16 @@ You can now connect your frontend client to the presence backend using PitterPat
 Like with the
 [CollabClient](https://pitter-patter.dev/docs/collab/reference/collab-client/classes/CollabClient),
 you create a listener for presence state updates with Presence's built-in
-[LongPollListner](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/LongPollListener).
+[LongPollListener](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/LongPollListener).
 
 ```ts
 const [presenceListener] = useState(
-  () =>
-    new PresenceListener(
-      new URL(
-        `/api/docs/${doc.id}/presence`,
-        typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
-      ),
-    ),
+  () => new LongPollListener(new URL(`/api/docs/${doc.id}/presence`, "http://localhost:3000")),
 );
 ```
 
 The
-[LongPollListner](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/LongPollListener)
+[LongPollListener](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/LongPollListener)
 takes the url of the getPresence endpoint, as well as optional headers for requests to that
 endpoint. These headers can be updated with the listener's
 [update](https://pitter-patter.dev/docs/presence/reference/presence-client/classes/LongPollListener#update)

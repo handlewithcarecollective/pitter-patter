@@ -1,0 +1,51 @@
+---
+title: Overview
+description:
+  A ProseMirror plugin and backend implementation for fast, simple live presence indicators.
+---
+
+[Simple collaborative editing](/docs/collab/overview) is great, but without presence indicators it
+quickly gets confusing.
+
+**Pitter Patter Presence takes care of both the client and server implementation, and guides you
+through the relevant API decisions as well.**
+
+## How it works
+
+You can add Pitter Patter Presence to your existing stack. You provide the API, and it manages the
+presence state and synchronization.
+
+### Simple client configuration
+
+Just provide your client with the endpoints for sending and listening for indicators. Presence
+handles the rest!
+
+### Long-polling clients
+
+Long-polling provides instant updates, is resilient to intermittent connections, and trivially
+supports horizontal autoscaling on the server side. No need to worry about sticky sessions or
+reconnecting websockets!
+
+### Redis/Valkey (or whatever you like!) for pub/sub
+
+Out of the box, we support Redis/Valkey for server-side pub/sub. This allows your horizontally
+scaled backend servers to notify each other of changes to documents that clients are subscribed to.
+
+Already using another pub/sub provider? No problem! The broadcast manager is fully configurable —
+you can build your own. It only needs to implement three methods: broadcast, listen, and abort!
+
+### BYODB
+
+Presence doesn’t have any opinions about your persistent datastore. Out of the box, we support
+Redis/Valkey for server-side persistence, because presence state generally doesn’t need to be truly
+persistent. But you can use any datastore you like by implementing your own persistence manager. If
+you’re looking for guidance for a specific datastore, start a
+[Discussion](https://github.com/handlewithcarecollective/pitter-patter/discussions)!
+
+<Cards>
+  <Card href="/docs/guides/presence" title="Guide">
+    Set up Presence full-stack, step-by-step.
+  </Card>
+  <Card href="/docs/presence/reference/presence-client/README" title="Client API Reference" />
+  <Card href="/docs/presence/reference/presence-server/README" title="Server API Reference" />
+</Cards>

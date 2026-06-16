@@ -27,17 +27,25 @@ export function collab(config: Parameters<typeof base>[0]) {
         baseState.stepMaps = [];
         return baseState;
       },
-      apply(tr, ...args) {
-        const baseState = baseSpec.state!.apply(tr, ...args) as CollabState;
-        baseState.stepMaps ??= [];
-        const meta = tr.getMeta(collabKey) as BaseCollabState | undefined;
-        if (meta?.commit) {
-          baseState.stepMaps.push({
-            version: meta.commit.version,
-            mappables: meta.commit.steps.map((step) => step.getMap()),
+      apply(tr, value, ...args) {
+        const next = baseSpec.state!.apply(tr, value, ...args) as CollabState;
+        next.stepMaps ??= [...value.stepMaps];
+        if (!tr.docChanged && value.version === next.version) return next;
+
+        const lastMap = next.stepMaps[next.stepMaps.length - 1];
+
+        if (lastMap?.version !== next.version) {
+          next.stepMaps.push({
+            version: next.version,
+            mappables: tr.steps.map((step) => step.getMap()),
           });
+
+          return next;
         }
-        return baseState;
+
+        lastMap.mappables.push(...tr.steps.map((step) => step.getMap()));
+
+        return next;
       },
     },
     historyPreserveItems: true,

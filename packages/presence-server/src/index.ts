@@ -10,6 +10,11 @@ function PromiseWithResolvers<T>() {
   return { promise, resolve, reject };
 }
 
+export interface PresenceListener {
+  listen: () => Promise<boolean>;
+  abort: () => Promise<void>;
+}
+
 export interface PresenceIndicator {
   ref: string;
   clientId: string;
@@ -32,11 +37,11 @@ export interface PresenceAuthorityConfig {
    */
   broadcastManager: {
     broadcastIndicator: (docId: string, indicator: PresenceIndicator) => Promise<void>;
-    listenForPresence: (
+    createPresenceListener: (
       docId: string,
       clientId: string,
       refs: Record<string, string>,
-    ) => Promise<void>;
+    ) => Promise<PresenceListener>;
   };
 }
 
@@ -75,17 +80,28 @@ export class PresenceAuthority {
     excludeClientId: string,
     refs: Record<string, string> = {},
   ) {
+    const { listen, abort } = await this.broadcastManager.createPresenceListener(
+      docId,
+      excludeClientId,
+      refs,
+    );
+
     const prePresence = await this.persistenceManager.getIndicators(docId);
     const upToDate = Object.values(prePresence).every(
       (indicator) =>
         indicator.clientId === excludeClientId || refs[indicator.clientId] === indicator.ref,
     );
+
     if (!upToDate) {
+      await abort();
       return Object.fromEntries(
         Object.entries(prePresence).filter(([clientId]) => clientId !== excludeClientId),
       );
     }
-    await this.broadcastManager.listenForPresence(docId, excludeClientId, refs);
+
+    const presenceChanged = await listen();
+    if (!presenceChanged) return {};
+
     const postPresence = await this.persistenceManager.getIndicators(docId);
     return Object.fromEntries(
       Object.entries(postPresence).filter(([clientId]) => clientId !== excludeClientId),
@@ -176,8 +192,12 @@ export class RedisPresenceBroadcastManager {
     );
   }
 
-  async listenForPresence(docId: string, excludeClientId: string, refs: Record<string, string>) {
-    const { promise, resolve } = PromiseWithResolvers<void>();
+  async createPresenceListener(
+    docId: string,
+    excludeClientId: string,
+    refs: Record<string, string>,
+  ) {
+    const { promise, resolve } = PromiseWithResolvers<boolean>();
 
     function listener(message: string) {
       const { ref, clientId } = JSON.parse(message) as {
@@ -186,19 +206,27 @@ export class RedisPresenceBroadcastManager {
       };
 
       if (ref !== refs[clientId] && clientId !== excludeClientId) {
-        resolve();
+        resolve(true);
       }
     }
 
     await this.sub.subscribe(`pitter-patter:presence:${docId}`, listener);
 
-    return await Promise.race([
-      promise,
-      new Promise<void>((resolve) => {
-        setTimeout(resolve, this.timeout);
-      }),
-    ]).finally(async () => {
+    const listen = async () => {
+      return await Promise.race([
+        promise,
+        new Promise<boolean>((resolve) => {
+          setTimeout(() => resolve(false), this.timeout);
+        }),
+      ]).finally(async () => {
+        await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
+      });
+    };
+
+    const abort = async () => {
       await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
-    });
+    };
+
+    return { listen, abort };
   }
 }

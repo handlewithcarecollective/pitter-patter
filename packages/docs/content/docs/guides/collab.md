@@ -137,8 +137,7 @@ const runWithTransaction = async (callback) => {
 
 Saves a document along with its docId, version, and lastUpdatedTimestamp to your database.
 
-If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
-database operations in this function should still be performed as an atomic unit.
+If a transaction `tr` is provided, it must be used for all database operations.
 
 ```ts
 const saveDoc = async (tr, docId, docJSON, version) => {
@@ -167,8 +166,7 @@ If you are using Postgres or MySql, getDoc should select the row holding the doc
 `SELECT FOR UPDATE`. This ensures that conflicting commits do not overwrite each other. We also
 recommend putting a unique constraint on the commit table for the fields docId and commit version.
 
-If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
-database operations in this function should still be performed as an atomic unit.
+If a transaction `tr` is provided, it must be used for all database operations.
 
 ```ts
 const getDoc = async (tr, docId) => {
@@ -190,8 +188,7 @@ export async function getDocument(tr: Transaction<DB> | null, id: string) {
 
 Saves a commit along with its version and ref to your database.
 
-If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
-database operations in this function should still be performed as an atomic unit.
+If a transaction `tr` is provided, it must be used for all database operations.
 
 ```ts
 const saveCommit = async (tr, docId, commitRef, commitVersion, commitSteps) => {
@@ -215,8 +212,7 @@ export async function createCommit(tr: Transaction<DB> | null, commit: Insertabl
 Given a docId and commitRef, retrieves the associated commit's steps and version from your database
 and returns a joined CommitJSON object.
 
-If a transaction `tr` is provided, it must be used for all database operations. If `tr` is null, all
-database operations in this function should still be performed as an atomic unit.
+If a transaction `tr` is provided, it must be used for all database operations.
 
 ```ts
 const getCommit = async (tr, docId, commitRef) => {
@@ -270,7 +266,7 @@ const broadcastManager = new RedisBroadcastManager({
 
 ### [Schema](https://pitter-patter.dev/docs/collab/reference/collab-server/interfaces/CollabAuthorityConfig#schema)
 
-This is just the schema for your Prosemirror document.
+This is just the schema for your ProseMirror document.
 
 ### All together
 
@@ -392,10 +388,7 @@ Next we need to create a listener for commit changes. The built-in
 import { LongPollListener as CollabLongPollListener } from "@pitter-patter/collab-client";
 
 const commitListener = new CollabLongPollListener(
-  new URL(
-    `/api/docs/${doc.id}/commits`,
-    typeof window !== "undefined" ? window.location.href : "http://localhost:3000",
-  ),
+  new URL(`/api/docs/${doc.id}/commits`, "http://localhost:3000"),
 );
 ```
 
@@ -429,7 +422,8 @@ const collabConfig = {
   },
   receiveCommits: (commits) => {
     // merge a new set of commits into your editor state for example:
-    // const newEditorState = commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), oldEditorState),
+    // const newEditorState = commits.reduce((acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)), oldEditorState)
+    // view.setState(newEditorState)
   },
   listener: commitListener,
 };
@@ -451,4 +445,4 @@ When the local editor state changes, you need to tell collabClient to create and
 collabClient.send(state).catch((e) => console.error(e));
 ```
 
-That's it! Your document can now be edited collaboratively by mulitiple simultaneous users.
+That's it! Your document can now be edited collaboratively by multiple simultaneous users.
