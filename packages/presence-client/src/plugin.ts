@@ -125,8 +125,6 @@ export function presence(
           );
         }
 
-        console.log(nextDecorations);
-
         return {
           decorations: DecorationSet.create(editorState.doc, nextDecorations),
           indicators: nextIndicators,

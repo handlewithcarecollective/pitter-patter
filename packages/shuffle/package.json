@@ -15,11 +15,11 @@
     "./style/shuffle.css": "./style/shuffle.css"
   },
   "publishConfig": {
-    "access": "public",
     "exports": {
       ".": "./dist/index.js",
       "./style/shuffle.css": "./style/shuffle.css"
-    }
+    },
+    "access": "public"
   },
   "scripts": {
     "gen:ref": "typedoc",

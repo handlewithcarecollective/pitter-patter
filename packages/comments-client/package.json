@@ -11,11 +11,11 @@
     "./styles.css": "./styles.css"
   },
   "publishConfig": {
-    "access": "public",
     "exports": {
       ".": "./dist/index.js",
       "./styles.css": "./styles.css"
-    }
+    },
+    "access": "public"
   },
   "dependencies": {
     "@handlewithcare/react-prosemirror": "^3.0.6",
