@@ -7,11 +7,11 @@
   "type": "module",
   "scripts": {
     "check:format": "yarn oxfmt --check",
-    "check:lint": "yarn oxlint **/*.ts **/*.tsx **/*.mts",
+    "check:lint": "yarn oxlint scripts/ packages/",
     "check:types": "yarn tsgo --build .",
     "check": "yarn check:format && yarn check:types && yarn check:lint",
     "fix:format": "yarn oxfmt",
-    "fix:lint": "yarn oxlint --fix **/*.ts **/*.tsx **/*.mts",
+    "fix:lint": "yarn oxlint --fix scripts/ packages/",
     "fix": "yarn fix:format && yarn fix:lint",
     "demo:full": "yarn check:types && yarn workspace @pitter-patter/demo start",
     "dev:docs": "yarn workspace @pitter-patter/docs dev",
@@ -30,9 +30,9 @@
     "@yarnpkg/plugin-version": "^4.2.0",
     "@yarnpkg/sdks": "^3.2.3",
     "es-toolkit": "^1.46.1",
-    "oxfmt": "^0.47.0",
-    "oxlint": "^1.62.0",
-    "oxlint-tsgolint": "^0.22.1",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0",
+    "oxlint-tsgolint": "^0.23.0",
     "semver": "^7.8.0"
   },
   "resolutions": {

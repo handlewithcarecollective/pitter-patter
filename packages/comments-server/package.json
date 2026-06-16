@@ -4,8 +4,8 @@
   "type": "module",
   "exports": "./src/index.ts",
   "publishConfig": {
-    "access": "public",
-    "exports": "./dist/index.js"
+    "exports": "./dist/index.js",
+    "access": "public"
   },
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^",
