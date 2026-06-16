@@ -7,14 +7,14 @@ export {
   supportsResize,
   supportsDrag,
   type ShuffleAlignment,
-} from "./schema.js";
+} from "./schema.ts";
 export {
   shuffle,
   type ShufflePluginOptions,
   type ShufflePluginState,
   shufflePluginKey,
-} from "./plugin.js";
-export { ShuffleSkeleton } from "./components/Skeleton.js";
-export { ResizeHandles, useResizeHandlePointerDown } from "./components/ResizeHandles.js";
-export { type DragHandleProps, DragHandles, DragHandle } from "./components/DragHandles.js";
-export { setShuffleColumns, setShuffleZIndex, setShuffleAlignment } from "./commands.js";
+} from "./plugin.ts";
+export { ShuffleSkeleton } from "./components/Skeleton.tsx";
+export { ResizeHandles, useResizeHandlePointerDown } from "./components/ResizeHandles.tsx";
+export { type DragHandleProps, DragHandles, DragHandle } from "./components/DragHandles.tsx";
+export { setShuffleColumns, setShuffleZIndex, setShuffleAlignment } from "./commands.ts";

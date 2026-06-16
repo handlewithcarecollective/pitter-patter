@@ -10,7 +10,7 @@ import { EditorState } from "prosemirror-state";
 
 export { receiveCommitTransaction, getVersion, Commit, type CommitJSON, type NodeJSON };
 
-export { collab, collabKey } from "./plugin";
+export { collab, collabKey } from "./plugin.ts";
 
 export interface CommitsListener {
   listen: (

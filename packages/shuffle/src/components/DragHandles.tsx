@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 
-import { shufflePluginKey, startDragOnPointerDown, ViewDesc } from "../plugin.js";
+import { shufflePluginKey, startDragOnPointerDown, ViewDesc } from "../plugin.ts";
 
 export interface DragHandleProps {
   style: { top: number; left: number };

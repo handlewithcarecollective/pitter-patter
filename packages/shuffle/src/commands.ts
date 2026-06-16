@@ -1,8 +1,8 @@
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
-import { shufflePluginKey, ShufflePluginMeta } from "./plugin";
-import { ShuffleAlignment } from "./schema.js";
+import { shufflePluginKey, ShufflePluginMeta } from "./plugin.ts";
+import { ShuffleAlignment } from "./schema.ts";
 
 export function setShuffleColumns(pos: number, start: number, end: number) {
   return function setShuffleColumnsCommand(state: EditorState, dispatch?: EditorView["dispatch"]) {

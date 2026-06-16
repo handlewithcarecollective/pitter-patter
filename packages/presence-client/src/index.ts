@@ -3,19 +3,12 @@ import { EditorState } from "prosemirror-state";
 import { collabKey } from "@pitter-patter/collab-client";
 import { randomRef } from "@pitter-patter/refs";
 
-import { type PresenceClientConfig } from "./config";
-import { type PresenceIndicator } from "./PresenceIndicator";
+import { type PresenceClientConfig, type IndicatorListener } from "./config.ts";
+import { type PresenceIndicator } from "./PresenceIndicator.tsx";
 
-export { presence, presenceKey, receivePresenceTransaction } from "./plugin";
+export { presence, presenceKey, receivePresenceTransaction } from "./plugin.ts";
 
-export { type PresenceIndicator, type PresenceClientConfig };
-
-export interface IndicatorListener {
-  listen: (
-    clientId: string,
-    options?: { signal?: AbortSignal | undefined },
-  ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
-}
+export { type PresenceIndicator, type PresenceClientConfig, type IndicatorListener };
 
 /**
  * The client that manages sending local presence state to the remote server and listening

@@ -1,7 +1,7 @@
 import { Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
-import { setShuffleColumns } from "../commands";
+import { setShuffleColumns } from "../commands.ts";
 
 export function resize(
   view: EditorView,
