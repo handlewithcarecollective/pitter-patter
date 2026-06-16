@@ -1,0 +1,61 @@
+---
+title: Overview
+description: A ProseMirror plugin and backend implementation for fast, simple collaborative editing.
+---
+
+Collaborative editing in rich text is, in a word, hard. But ProseMirror was designed for it from the
+ground up, and even has a first-party collaboration plugin (`prosemirror-collab`).
+
+Unfortunately, `prosemirror-collab` only handles the _client_ collaboration implementation. It can
+be challenging to get the server-side constraints right, and even managing the client-side state and
+effects correctly isn’t trivial.
+
+**Pitter Patter Collab takes care of both the client and server implementation, and guides you
+through the relevant database and API decisions as well.**
+
+## How it works
+
+Pitter Patter Collab is based on
+[`prosemirror-collab-commit`](https://github.com/stepwisehq/prosemirror-collab-commit), an
+alternative `prosemirror-collab` implementation that provides improved throughput and fairness over
+the default implementation. This means that it uses ProseMirror steps as the unit of change, just
+like `prosemirror-collab` (and just like non-collaborative ProseMirror), which makes it
+straightforward to inspect, debug, and analyze.
+
+You can add Pitter Patter Collab to your existing stack. You provide the database and API, and it
+manages the collaboration state and synchronization.
+
+### Simple client configuration
+
+Just provide your client with the endpoints for sending and listening for changes. Collab handles
+the rest!
+
+### Long-polling clients
+
+Long-polling provides instant updates, is resilient to intermittent connections, and trivially
+supports horizontal autoscaling on the server side. No need to worry about sticky sessions or
+reconnecting websockets!
+
+### Redis/Valkey (or whatever you like!) for pub/sub
+
+Out of the box, we support Redis/Valkey for server-side pub/sub. This allows your horizontally
+scaled backend servers to notify each other of changes to documents that clients are subscribed to.
+
+Already using another pub/sub provider? No problem! The broadcast manager is fully configurable —
+you can build your own. It only needs to implement three methods: broadcast, listen, and abort!
+
+### BYODB
+
+Collab doesn’t have any opinions about your persistent datastore. We have guidance for various SQL
+databases in our step-by-step [guide](/docs/guides/collab), but NoSQL databases that support
+transactions (or thoughtfully crafted primary keys!) can be used as well. If you’re looking for
+guidance for a specific datastore, start a
+[Discussion](https://github.com/handlewithcarecollective/pitter-patter/discussions)!
+
+<Cards>
+  <Card href="/docs/guides/collab" title="Guide">
+    Set up Collab full-stack, step-by-step.
+  </Card>
+  <Card href="/docs/collab/reference/collab-client/README" title="Client API Reference" />
+  <Card href="/docs/collab/reference/collab-server/README" title="Server API Reference" />
+</Cards>

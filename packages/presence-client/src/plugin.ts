@@ -89,17 +89,17 @@ export function presence(
             continue;
           }
 
-          const confirmedMappables = stepMaps
-            .filter(({ version }) => version > indicator.version)
-            .flatMap(({ mappables }) => mappables);
+          const confirmedMaps = stepMaps.filter(({ version }) => version > indicator.version);
 
           // This indicator may predate when we started tracking stepMaps.
           // If so, we have to ignore it, because we can't map it forward.
-          if (confirmedMappables.length < version - indicator.version) {
+          if (confirmedMaps.length < version - indicator.version) {
             continue;
           }
 
-          const mappables = confirmedMappables.concat(unconfirmed.map(({ step }) => step.getMap()));
+          const mappables = confirmedMaps
+            .flatMap(({ mappables }) => mappables)
+            .concat(unconfirmed.map(({ step }) => step.getMap()));
 
           const anchor = mappables.reduce((acc, mappable) => mappable.map(acc), indicator.anchor);
           const head = mappables.reduce((acc, mappable) => mappable.map(acc), indicator.head);
@@ -125,9 +125,11 @@ export function presence(
           );
         }
 
+        console.log(nextDecorations);
+
         return {
           decorations: DecorationSet.create(editorState.doc, nextDecorations),
-          indicators,
+          indicators: nextIndicators,
           stepMaps,
         };
       },
