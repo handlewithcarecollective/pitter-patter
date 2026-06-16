@@ -1,6 +1,11 @@
-import { type PresenceIndicator } from "./PresenceIndicator";
+import { type PresenceIndicator } from "./PresenceIndicator.tsx";
 
-import { IndicatorListener } from ".";
+export interface IndicatorListener {
+  listen: (
+    clientId: string,
+    options?: { signal?: AbortSignal | undefined },
+  ) => AsyncIterableIterator<Record<string, PresenceIndicator>>;
+}
 
 export interface PresenceClientConfig {
   userId: string;

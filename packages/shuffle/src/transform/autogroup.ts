@@ -3,8 +3,8 @@ import { Transaction } from "prosemirror-state";
 import { findWrapping } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
 
-import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
-import { getShuffleRowType, isShuffleRow } from "../schema";
+import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
+import { getShuffleRowType, isShuffleRow } from "../schema.ts";
 
 export function autogroup(
   view: EditorView,

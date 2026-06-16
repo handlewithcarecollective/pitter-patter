@@ -7,12 +7,12 @@ import throttle from "raf-throttle";
 
 import { randomRef } from "@pitter-patter/refs";
 
-import { isShuffleRow, supportsDrag, supportsResize } from "./schema";
-import { autogroup } from "./transform/autogroup";
-import { inflate } from "./transform/inflate.js";
-import { reorder } from "./transform/reorder";
-import { reposition } from "./transform/reposition";
-import { TranslateCalculator } from "./translation.js";
+import { isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
+import { autogroup } from "./transform/autogroup.ts";
+import { inflate } from "./transform/inflate.ts";
+import { reorder } from "./transform/reorder.ts";
+import { reposition } from "./transform/reposition.ts";
+import { TranslateCalculator } from "./translation.ts";
 
 interface ShufflePluginStartMeta {
   type: "start";

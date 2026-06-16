@@ -16,9 +16,9 @@ import {
   useState,
 } from "react";
 
-import { shufflePluginKey, ShufflePluginMeta } from "../plugin";
-import { supportsResize } from "../schema";
-import { resize } from "../transform/resize";
+import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
+import { supportsResize } from "../schema.ts";
+import { resize } from "../transform/resize.ts";
 
 /**
  * A React component that renders the resize handles. This component will render a single set of resize

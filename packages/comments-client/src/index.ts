@@ -1,9 +1,14 @@
 import { type NodeJSON } from "@pitter-patter/collab-client";
 import { randomRef } from "@pitter-patter/refs";
 
-export { comments, commentsKey, createCommentThreadMark, removeCommentThreadMarks } from "./plugin";
+export {
+  comments,
+  commentsKey,
+  createCommentThreadMark,
+  removeCommentThreadMarks,
+} from "./plugin.ts";
 
-export { comment } from "./schema";
+export { comment } from "./schema.ts";
 
 export interface Comment {
   userId: string;

@@ -1,7 +1,7 @@
 import { Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
-import { setShuffleColumns } from "../commands";
+import { setShuffleColumns } from "../commands.ts";
 
 export function reposition(view: EditorView, before: number, rect: DOMRect): Transaction | null {
   const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");

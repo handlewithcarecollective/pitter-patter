@@ -7,8 +7,8 @@ import { collabKey } from "@pitter-patter/collab-client";
 import {
   PresenceAnchor,
   getPresenceColor as defaultGetPresenceColor,
-} from "./decorations/PresenceAnchor";
-import { PresenceIndicator } from "./PresenceIndicator";
+} from "./decorations/PresenceAnchor.tsx";
+import { PresenceIndicator } from "./PresenceIndicator.tsx";
 
 export interface PresenceState {
   decorations: DecorationSet;

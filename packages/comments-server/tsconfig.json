@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/strictest",
   "compilerOptions": {
+    "rewriteRelativeImportExtensions": true,
     "composite": true,
     "declaration": true,
     "outDir": "dist",
