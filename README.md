@@ -1,12 +1,14 @@
-<p align="center">
-  <a href="https://pitter-patter.dev/"><img src="https://raw.githubusercontent.com/handlewithcarecollective/pitter-patter/refs/heads/main/readme-assets/pitter-patter-logo.png" alt="" height="75"/></a>
-</p>
-
-<h1 align="center">Pitter Patter</h1>
+<h1 align="center">
+  <a href="https://pitter-patter.dev/"><img src="https://raw.githubusercontent.com/handlewithcarecollective/pitter-patter/refs/heads/main/readme-assets/pitter-patter-logo.png" alt="Pitter Patter" height="75"/></a>
+</h1>
 
 <p align="center">
   <strong>An open source collaborative rich editing toolkit.</strong>
 </p>
+
+## Documentation
+
+Full documentation for Pitter Patter can be found [here](https://pitter-patter.dev/).
 
 ## What is Pitter Patter?
 
