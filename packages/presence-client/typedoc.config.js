@@ -1,6 +1,6 @@
 /** @type {import('typedoc').TypeDocOptions & import('typedoc-plugin-markdown').PluginOptions} */
 const config = {
-  entryPoints: ["./src/index.ts"],
+  entryPoints: ["./src/index.ts", "./src/react.ts"],
   plugin: [
     "typedoc-plugin-markdown",
     "typedoc-plugin-frontmatter",

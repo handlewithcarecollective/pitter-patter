@@ -15,12 +15,12 @@ import {
   collab,
 } from "@pitter-patter/collab-client";
 import {
-  presence,
   PresenceClient,
   receivePresenceTransaction,
   LongPollListener as PresenceLongPollListener,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
+import { presence } from "@pitter-patter/presence-client/react";
 import {
   Snapshot,
   VersionHistoryClient,
