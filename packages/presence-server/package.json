@@ -1,6 +1,6 @@
 {
   "name": "@pitter-patter/presence-server",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "files": [
     "./dist"
   ],
@@ -11,7 +11,9 @@
     "access": "public"
   },
   "scripts": {
-    "gen:ref": "typedoc"
+    "gen:ref": "typedoc",
+    "prepack": "yarn check:types",
+    "prepublish": "yarn check:format && yarn check:lint"
   },
   "dependencies": {
     "redis": "^5.8.2"
