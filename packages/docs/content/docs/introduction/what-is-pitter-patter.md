@@ -9,7 +9,7 @@ description:
 
 That would be us, [Handle with Care](https://handlewithcare.dev/). We’re a cooperatively owned
 product development collective, comprised of software engineers and product managers. We are all
-equal owners and have equal decision-making power deciding what we work on.
+equal owners and have equal decision-making power.
 
 We’re funded in two ways:
 
