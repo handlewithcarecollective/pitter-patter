@@ -4,7 +4,11 @@ import { DB } from "./schema";
 
 let dbInstance: Kysely<DB> | null = null;
 
-async function initializeDb(): Promise<Kysely<DB>> {
+async function initializeDbFromEnv(): Promise<Kysely<DB>> {
+  return initializeDb(process.env["DATABASE_PATH"] ?? ":memory:");
+}
+
+async function initializeDb(dbPath: string): Promise<Kysely<DB>> {
   if (dbInstance) {
     return dbInstance;
   }
@@ -12,7 +16,7 @@ async function initializeDb(): Promise<Kysely<DB>> {
   // Gross hack so that parcel doesn't try to bundle better-sqlite3
   // oxlint-disable-next-line no-eval
   const Database = eval("require")("better-sqlite3");
-  const database = new Database(process.env["DATABASE_PATH"] ?? ":memory:");
+  const database = new Database(dbPath);
 
   dbInstance = new Kysely<DB>({
     log(event) {
@@ -34,5 +38,5 @@ async function initializeDb(): Promise<Kysely<DB>> {
 }
 
 export async function getDb(): Promise<Kysely<DB>> {
-  return await initializeDb();
+  return await initializeDbFromEnv();
 }
