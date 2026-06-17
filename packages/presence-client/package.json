@@ -1,6 +1,6 @@
 {
   "name": "@pitter-patter/presence-client",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "files": [
     "./styles.css",
     "./dist"
@@ -20,7 +20,9 @@
     "access": "public"
   },
   "scripts": {
-    "gen:ref": "typedoc"
+    "gen:ref": "typedoc",
+    "prepack": "yarn check:types",
+    "prepublish": "yarn check:format && yarn check:lint"
   },
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^",
