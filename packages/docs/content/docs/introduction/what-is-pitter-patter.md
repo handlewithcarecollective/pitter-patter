@@ -7,9 +7,9 @@ description:
 
 ## Who builds it?
 
-That would be us, [Handle with Care](https://handlewithcare.dev/). We’re a cooperatively owned
-product development collective. That means that we don’t have employees or managers — we’re all
-equal owners and have equal decision-making power.
+That would be us, [Handle with Care](https://handlewithcare.dev/). We're a cooperatively owned
+product development collective, comprised of software engineers and product managers. We are all
+equal owners and have equal decision-making power deciding what we work on.
 
 We’re funded in two ways:
 
