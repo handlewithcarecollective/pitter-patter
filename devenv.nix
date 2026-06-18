@@ -18,9 +18,8 @@
   services = {
     redis = {
       enable = true;
-      # databases: Set the max selectable database number to 2^53 for testing
-      # \n databases 9007199254740992
-      extraConfig = "save \"\"";
+      # databases: 2147483647 is the maximum allowed index for databases
+      extraConfig = "save \"\" \n databases 214";
       port = 6379;
     };
   };

@@ -122,19 +122,20 @@ export interface RedisPresencePersistenceManagerConfig {
  */
 export class RedisPresencePersistenceManager {
   private kv: RedisClientType;
+  private databaseIndex: number | undefined;
 
   constructor(config: RedisPresencePersistenceManagerConfig) {
     this.kv = createClient({
       url: config.redisUrl,
     });
-
-    if (config.databaseIndex) {
-      this.kv.select(config.databaseIndex);
-    }
+    this.databaseIndex = config.databaseIndex;
   }
 
   async connect() {
     await this.kv.connect();
+    if (this.databaseIndex) {
+      await this.kv.select(this.databaseIndex);
+    }
   }
 
   async saveIndicator(docId: string, indicator: PresenceIndicator) {
