@@ -251,7 +251,7 @@ export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
   };
 }
 
-async function startServer(demoDeployment: DemoDeployment, port: number) {
+export async function startServer(demoDeployment: DemoDeployment, port: number) {
   const db = await demoDeployment.sqliteInstance.getDb();
 
   const migrator = new Migrator({
@@ -274,6 +274,7 @@ async function startServer(demoDeployment: DemoDeployment, port: number) {
   demoDeployment.app.listen(port, () => {
     console.log(`Listening on port ${port}`);
   });
+  console.log("FINISHED CREATING SERVER");
 }
 
 const demoDeployment = createDeployment({
