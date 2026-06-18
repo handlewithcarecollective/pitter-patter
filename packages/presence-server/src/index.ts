@@ -111,6 +111,10 @@ export class PresenceAuthority {
 
 export interface RedisPresencePersistenceManagerConfig {
   redisUrl: string;
+  /**
+   * An optional database index that the redis client will select
+   */
+  databaseIndex?: number;
 }
 
 /**
@@ -123,6 +127,10 @@ export class RedisPresencePersistenceManager {
     this.kv = createClient({
       url: config.redisUrl,
     });
+
+    if (config.databaseIndex) {
+      this.kv.select(config.databaseIndex);
+    }
   }
 
   async connect() {
@@ -130,19 +138,12 @@ export class RedisPresencePersistenceManager {
   }
 
   async saveIndicator(docId: string, indicator: PresenceIndicator) {
-    await this.kv.hSet(
-      `pitter-patter:presence:${docId}`,
-      indicator.clientId,
-      JSON.stringify(indicator),
-    );
-    await this.kv.hExpire(`pitter-patter:presence:${docId}`, indicator.clientId, 30);
+    await this.kv.hSet(this.docKey(docId), indicator.clientId, JSON.stringify(indicator));
+    await this.kv.hExpire(this.docKey(docId), indicator.clientId, 30);
   }
 
   async getIndicators(docId: string) {
-    const result = (await this.kv.hGetAll(`pitter-patter:presence:${docId}`)) as Record<
-      string,
-      string
-    >;
+    const result = (await this.kv.hGetAll(this.docKey(docId))) as Record<string, string>;
 
     return Object.fromEntries(
       Object.entries(result).map(([clientId, indicatorString]) => [
@@ -151,11 +152,26 @@ export class RedisPresencePersistenceManager {
       ]),
     );
   }
+
+  private docKey(docId: string): string {
+    return `pitter-patter:presence:${docId}`;
+  }
 }
 
 export interface RedisPresenceBroadcastManagerConfig {
+  /**
+   * the url for your Redis cluster
+   */
   redisUrl: string;
+  /**
+   * the maximum time the broadcast manager should listen for changes
+   * to a document before returning an empty result
+   */
   timeout?: number;
+  /**
+   * an optional prefix added to notification channels
+   */
+  channelPrefix?: string;
 }
 
 /**
@@ -170,6 +186,7 @@ export class RedisPresenceBroadcastManager {
   private pub: RedisClientType;
   private sub: RedisClientType;
   private timeout: number;
+  private channelPrefix: string | undefined;
 
   constructor(config: RedisPresenceBroadcastManagerConfig) {
     this.pub = createClient({
@@ -179,6 +196,8 @@ export class RedisPresenceBroadcastManager {
       url: config.redisUrl,
     });
     this.timeout = config.timeout ?? 5_000;
+
+    this.channelPrefix = config.channelPrefix;
   }
 
   async connect() {
@@ -187,7 +206,7 @@ export class RedisPresenceBroadcastManager {
 
   async broadcastIndicator(docId: string, indicator: PresenceIndicator) {
     await this.pub.publish(
-      `pitter-patter:presence:${docId}`,
+      this.channel(docId),
       JSON.stringify({ ref: indicator.ref, clientId: indicator.clientId }),
     );
   }
@@ -210,7 +229,7 @@ export class RedisPresenceBroadcastManager {
       }
     }
 
-    await this.sub.subscribe(`pitter-patter:presence:${docId}`, listener);
+    await this.sub.subscribe(this.channel(docId), listener);
 
     const listen = async () => {
       return await Promise.race([
@@ -219,14 +238,22 @@ export class RedisPresenceBroadcastManager {
           setTimeout(() => resolve(false), this.timeout);
         }),
       ]).finally(async () => {
-        await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
+        await this.sub.unsubscribe(this.channel(docId), listener);
       });
     };
 
     const abort = async () => {
-      await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
+      await this.sub.unsubscribe(this.channel(docId), listener);
     };
 
     return { listen, abort };
+  }
+
+  private channel(docId: string): string {
+    if (this.channelPrefix) {
+      return `${this.channelPrefix}:pitter-patter:presence:${docId}`;
+    } else {
+      return `pitter-patter:presence:${docId}`;
+    }
   }
 }
