@@ -18,9 +18,9 @@
   services = {
     redis = {
       enable = true;
+      # databases: Set the max selectable database number to 2^53 for testing
+      # \n databases 9007199254740992
       extraConfig = "save \"\"";
-      # Set the max selectable database number to 2^53 for testing
-      extraConfig = "databases 9007199254740992";
       port = 6379;
     };
   };
