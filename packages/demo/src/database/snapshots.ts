@@ -1,10 +1,8 @@
-import { Insertable, Transaction } from "kysely";
+import { Insertable, Kysely, Transaction } from "kysely";
 
-import { getDb } from "./db";
 import { DB } from "./schema";
 
-export async function getLatestSnapshot(tr: Transaction<DB> | null, docId: string) {
-  const db = tr ?? (await getDb());
+export async function getLatestSnapshot(db: Transaction<DB> | Kysely<DB>, docId: string) {
   return await db
     .selectFrom("snapshot")
     .select(["id", "version", "createdAt"])
@@ -14,8 +12,11 @@ export async function getLatestSnapshot(tr: Transaction<DB> | null, docId: strin
     .executeTakeFirstOrThrow();
 }
 
-export async function getSnapshots(tr: Transaction<DB> | null, docId: string, version?: number) {
-  const db = tr ?? (await getDb());
+export async function getSnapshots(
+  db: Transaction<DB> | Kysely<DB>,
+  docId: string,
+  version?: number,
+) {
   return await db
     .selectFrom("snapshot")
     .selectAll()
@@ -25,7 +26,9 @@ export async function getSnapshots(tr: Transaction<DB> | null, docId: string, ve
     .execute();
 }
 
-export async function createSnapshot(tr: Transaction<DB> | null, doc: Insertable<DB["snapshot"]>) {
-  const db = tr ?? (await getDb());
+export async function createSnapshot(
+  db: Transaction<DB> | Kysely<DB>,
+  doc: Insertable<DB["snapshot"]>,
+) {
   return await db.insertInto("snapshot").values(doc).execute();
 }

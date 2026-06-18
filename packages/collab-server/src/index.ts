@@ -217,6 +217,10 @@ export interface RedisBroadcastManagerConfig {
    * to a document before returning an empty result
    */
   timeout?: number;
+  /**
+   * an optional prefix added to notification channels
+   */
+  channelPrefix?: string;
 }
 
 /**
@@ -231,6 +235,7 @@ export class RedisBroadcastManager {
   private pub: RedisClientType;
   private sub: RedisClientType;
   private timeout: number;
+  private channelPrefix: string | undefined;
 
   constructor(config: RedisBroadcastManagerConfig) {
     this.pub = createClient({
@@ -243,6 +248,8 @@ export class RedisBroadcastManager {
     this.timeout = config.timeout ?? 5_000;
 
     this.broadcastCommit = this.broadcastCommit.bind(this);
+
+    this.channelPrefix = config.channelPrefix;
   }
 
   async connect() {
@@ -250,7 +257,7 @@ export class RedisBroadcastManager {
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
-    await this.pub.publish(`pitter-patter:collab:${docId}`, commitJSON.version.toString());
+    await this.pub.publish(this.channel(docId), commitJSON.version.toString());
   }
 
   async createCommitListener(docId: string, version: number) {
@@ -258,7 +265,7 @@ export class RedisBroadcastManager {
     function listener(message: string) {
       if (parseInt(message, 10) >= version) resolve(true);
     }
-    await this.sub.subscribe(`pitter-patter:collab:${docId}`, listener);
+    await this.sub.subscribe(this.channel(docId), listener);
 
     const listen = async () => {
       return await Promise.race([
@@ -267,14 +274,22 @@ export class RedisBroadcastManager {
           setTimeout(() => resolve(false), this.timeout);
         }),
       ]).finally(async () => {
-        await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
+        await this.sub.unsubscribe(this.channel(docId), listener);
       });
     };
 
     const abort = async () => {
-      await this.sub.unsubscribe(`pitter-patter:collab:${docId}`, listener);
+      await this.sub.unsubscribe(this.channel(docId), listener);
     };
 
     return { listen, abort };
   }
+
+  private channel(docId: string): string {
+    if (this.channelPrefix) {
+      return `${this.channelPrefix}:pitter-patter:collab:${docId}`;
+    } else {
+      return `pitter-patter:collab:${docId}`;
+    }
+  } 
 }

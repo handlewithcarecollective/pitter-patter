@@ -2,41 +2,44 @@ import { CamelCasePlugin, Kysely, ParseJSONResultsPlugin, SqliteDialect } from "
 
 import { DB } from "./schema";
 
-let dbInstance: Kysely<DB> | null = null;
+export class SqliteInstance {
+  private dbPath: string;
+  private dbInstance: Kysely<DB> | null;
 
-async function initializeDbFromEnv(): Promise<Kysely<DB>> {
-  return initializeDb(process.env["DATABASE_PATH"] ?? ":memory:");
-}
-
-async function initializeDb(dbPath: string): Promise<Kysely<DB>> {
-  if (dbInstance) {
-    return dbInstance;
+  constructor(dbPath: string) {
+    this.dbPath = dbPath;
+    this.dbInstance = null;
   }
 
-  // Gross hack so that parcel doesn't try to bundle better-sqlite3
-  // oxlint-disable-next-line no-eval
-  const Database = eval("require")("better-sqlite3");
-  const database = new Database(dbPath);
+  private async initializeDb(): Promise<Kysely<DB>> {
+    // Gross hack so that parcel doesn't try to bundle better-sqlite3
+    // oxlint-disable-next-line no-eval
+    const Database = eval("require")("better-sqlite3");
+    const database = new Database(this.dbPath);
 
-  dbInstance = new Kysely<DB>({
-    log(event) {
-      // console.log(event.query.sql)
-      // console.log(event.query.parameters)
-      // console.log(`Completed in ${event.queryDurationMillis}ms`)
-      if (event.level === "error") {
-        console.error(event.query.sql);
-        console.error(event.error);
-      }
-    },
-    dialect: new SqliteDialect({
-      database,
-    }),
-    plugins: [new CamelCasePlugin(), new ParseJSONResultsPlugin()],
-  });
+    this.dbInstance = new Kysely<DB>({
+      log(event) {
+        // console.log(event.query.sql)
+        // console.log(event.query.parameters)
+        // console.log(`Completed in ${event.queryDurationMillis}ms`)
+        if (event.level === "error") {
+          console.error(event.query.sql);
+          console.error(event.error);
+        }
+      },
+      dialect: new SqliteDialect({
+        database,
+      }),
+      plugins: [new CamelCasePlugin(), new ParseJSONResultsPlugin()],
+    });
 
-  return dbInstance;
-}
+    return this.dbInstance;
+  }
 
-export async function getDb(): Promise<Kysely<DB>> {
-  return await initializeDbFromEnv();
+  async getDb(): Promise<Kysely<DB>> {
+    if (this.dbInstance) {
+      return this.dbInstance;
+    }
+    return await this.initializeDb();
+  }
 }
