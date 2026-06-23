@@ -189,6 +189,8 @@ export function useResizeHandlePointerDown(pos: number, side: "start" | "end") {
   return useEditorEventCallback((view) => {
     if (!view.editable) return;
 
+    view.root.shuffleDragging = true;
+
     let layout: AutoLayout | null = null;
     let currentAnimation: Timeline | null = null;
     let skeletonOn = false;
@@ -217,8 +219,11 @@ export function useResizeHandlePointerDown(pos: number, side: "start" | "end") {
     });
 
     function handleUp() {
+      document.removeEventListener("mousedown", preventSelection);
+      document.removeEventListener("mousedown", preventSelection);
       document.removeEventListener("pointermove", handleMove);
       document.removeEventListener("pointerup", handleUp);
+      view.root.shuffleDragging = false;
 
       const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
       if (!gridWrapper) return;
@@ -234,7 +239,13 @@ export function useResizeHandlePointerDown(pos: number, side: "start" | "end") {
       );
     }
 
+    const preventSelection = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
     document.addEventListener("pointermove", handleMove);
     document.addEventListener("pointerup", handleUp);
+    document.addEventListener("mousedown", preventSelection);
+    document.addEventListener("mousemove", preventSelection);
   });
 }
