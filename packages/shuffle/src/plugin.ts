@@ -8,7 +8,7 @@ import throttle from "raf-throttle";
 import { randomRef } from "@pitter-patter/refs";
 
 import { isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
-import { ScrollCalculator } from "./scroll.ts";
+import { AutoScroller, ScrollCalculator } from "./scroll.ts";
 import { autogroup } from "./transform/autogroup.ts";
 import { inflate } from "./transform/inflate.ts";
 import { reorder } from "./transform/reorder.ts";
@@ -398,6 +398,8 @@ export function startDragOnPointerDown(
   function move(x: number, y: number) {
     if (!clone || !layout) return;
     if (!(dom instanceof HTMLElement)) return;
+
+    autoScroller.start(dom, x, y);
 
     const { transform, transformOrigin } = translateCalc.slide(x, y);
 
