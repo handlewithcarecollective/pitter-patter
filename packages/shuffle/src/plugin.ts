@@ -8,6 +8,7 @@ import throttle from "raf-throttle";
 import { randomRef } from "@pitter-patter/refs";
 
 import { isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
+import { ScrollCalculator } from "./scroll.ts";
 import { autogroup } from "./transform/autogroup.ts";
 import { inflate } from "./transform/inflate.ts";
 import { reorder } from "./transform/reorder.ts";
@@ -383,12 +384,54 @@ export function startDragOnPointerDown(
     parseInt(domStyle.marginTop, 10),
   );
 
+  const scrollCalc = new ScrollCalculator();
+
+  const autoScroller = new AutoScroller();
+
   let clone: HTMLElement | null = null;
   let initialStyles: InitialStyles | null = null;
 
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
   let skeletonOn = false;
+
+  function move(x: number, y: number) {
+    if (!clone || !layout) return;
+    if (!(dom instanceof HTMLElement)) return;
+
+    const { transform, transformOrigin } = translateCalc.slide(x, y);
+
+    clone.style.transform = transform;
+    clone.style.transformOrigin = transformOrigin;
+
+    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (currentAnimation?.began && !currentAnimation.completed) return;
+
+    const tr =
+      before != null
+        ? (autogroup(view, before, x, y) ??
+          reorder(view, before, x, y) ??
+          reposition(view, before, clone.getBoundingClientRect()))
+        : inflate(view, clone, x, y);
+
+    if (!tr) return;
+
+    currentAnimation = layout.update(() => {
+      view.dispatch(tr);
+    });
+
+    const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
+
+    if (updatedBefore === undefined) return;
+
+    const nodeDom = view.nodeDOM(updatedBefore);
+    if (nodeDom === dom) return;
+    if (!(nodeDom instanceof HTMLElement)) return;
+
+    dom = nodeDom;
+    dom.dataset["shuffleActive"] = "true";
+  }
 
   const onMove = throttle(function onMove(e: PointerEvent) {
     if (!skeletonOn || !clone || !initialStyles || !layout) {
@@ -416,40 +459,8 @@ export function startDragOnPointerDown(
       animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       layout = createLayout(view.dom, { duration: 150 });
     }
-    if (!(dom instanceof HTMLElement)) return;
 
-    const { transform, transformOrigin } = translateCalc.slide(e.clientX, e.clientY);
-
-    clone.style.transform = transform;
-    clone.style.transformOrigin = transformOrigin;
-
-    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-    if (currentAnimation?.began && !currentAnimation.completed) return;
-
-    const tr =
-      before != null
-        ? (autogroup(view, before, e.clientX, e.clientY) ??
-          reorder(view, before, e.clientX, e.clientY) ??
-          reposition(view, before, clone.getBoundingClientRect()))
-        : inflate(view, clone, e.clientX, e.clientY);
-
-    if (!tr) return;
-
-    currentAnimation = layout.update(() => {
-      view.dispatch(tr);
-    });
-
-    const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-    if (updatedBefore === undefined) return;
-
-    const nodeDom = view.nodeDOM(updatedBefore);
-    if (nodeDom === dom) return;
-    if (!(nodeDom instanceof HTMLElement)) return;
-
-    dom = nodeDom;
-    dom.dataset["shuffleActive"] = "true";
+    move(e.clientX, e.clientY);
   });
 
   function endDrag(domRect?: DOMRect) {
@@ -477,6 +488,10 @@ export function startDragOnPointerDown(
     view.root.removeEventListener("mousemove", preventSelection);
     (view.root as Document).removeEventListener("pointermove", onMove);
     view.root.removeEventListener("pointerup", onUp);
+    view.root.removeEventListener("scroll", onScroll);
+
+    autoScroller.stop();
+
     view.root.shuffleDragging = false;
 
     const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
@@ -514,10 +529,17 @@ export function startDragOnPointerDown(
     e.preventDefault();
   };
 
+  function onScroll() {
+    const { x, y } = scrollCalc.diff();
+    translateCalc.scroll(x, y);
+    move(translateCalc.lastSlideX, translateCalc.lastSlideY);
+  }
+
   (view.root as Document).addEventListener("pointermove", onMove);
   view.root.addEventListener("pointerup", onUp);
   view.root.addEventListener("mousedown", preventSelection);
   view.root.addEventListener("mousemove", preventSelection);
+  view.root.addEventListener("scroll", onScroll);
 
   return true;
 }
