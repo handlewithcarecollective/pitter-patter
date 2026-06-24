@@ -12,7 +12,7 @@ function Home() {
   return (
     <HomeLayout {...baseOptions()}>
       <div className="flex flex-col items-center justify-center text-center flex-1">
-        <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col items-start gap-4 max-w-4/5">
           <p>
             by{" "}
             <span className="font-handle text-lg leading-[0.9] font-extralight uppercase md:text-xl">
@@ -20,10 +20,10 @@ function Home() {
             </span>
           </p>
           <h1 className="font-medium text-6xl mb-4">
-            <PitterPatterLogo />
+            <PitterPatterLogo className="max-w-[80vw]" />
           </h1>
-          <p>An open source collaborative rich editing toolkit.</p>
-          <p>Built with React and ProseMirror.</p>
+          <p className="text-left">An open source collaborative rich editing toolkit.</p>
+          <p className="text-left">Built with React and ProseMirror.</p>
           <Link
             to="/docs/$"
             params={{
