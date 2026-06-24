@@ -14,6 +14,16 @@ import { reorder } from "./transform/reorder.ts";
 import { reposition } from "./transform/reposition.ts";
 import { TranslateCalculator } from "./translation.ts";
 
+declare global {
+  interface Document {
+    shuffleDragging: boolean;
+  }
+
+  interface ShadowRoot {
+    shuffleDragging: boolean;
+  }
+}
+
 interface ShufflePluginStartMeta {
   type: "start";
 }
@@ -305,9 +315,18 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
 
       view.root.addEventListener("pointerdown", handleInflatePointerDown as EventListener);
 
+      function handleTouchMove(event: TouchEvent) {
+        if (view.root.shuffleDragging) {
+          event.preventDefault();
+        }
+      }
+
+      view.root.addEventListener("touchmove", handleTouchMove as EventListener, { passive: false });
+
       return {
         destroy() {
           view.root.removeEventListener("pointerdown", handleInflatePointerDown as EventListener);
+          view.root.removeEventListener("touchmove", handleTouchMove as EventListener);
         },
       };
     },
@@ -343,6 +362,7 @@ export function startDragOnPointerDown(
   }
 
   view.dispatch(startTr);
+  view.root.shuffleDragging = true;
 
   const domRect = dom.getBoundingClientRect();
 
@@ -453,10 +473,11 @@ export function startDragOnPointerDown(
   }
 
   function onUp() {
-    document.removeEventListener("mousedown", preventSelection);
-    document.removeEventListener("mousedown", preventSelection);
-    document.removeEventListener("pointermove", onMove);
-    document.removeEventListener("pointerup", onUp);
+    view.root.removeEventListener("mousedown", preventSelection);
+    view.root.removeEventListener("mousemove", preventSelection);
+    (view.root as Document).removeEventListener("pointermove", onMove);
+    view.root.removeEventListener("pointerup", onUp);
+    view.root.shuffleDragging = false;
 
     const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
     if (!gridWrapper) return;
@@ -489,14 +510,14 @@ export function startDragOnPointerDown(
     return endDrag(domRect);
   }
 
-  const preventSelection = (e: MouseEvent) => {
+  const preventSelection = (e: Event) => {
     e.preventDefault();
   };
 
-  document.addEventListener("pointermove", onMove);
-  document.addEventListener("pointerup", onUp);
-  document.addEventListener("mousedown", preventSelection);
-  document.addEventListener("mousemove", preventSelection);
+  (view.root as Document).addEventListener("pointermove", onMove);
+  view.root.addEventListener("pointerup", onUp);
+  view.root.addEventListener("mousedown", preventSelection);
+  view.root.addEventListener("mousemove", preventSelection);
 
   return true;
 }
