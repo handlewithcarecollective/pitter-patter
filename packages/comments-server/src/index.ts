@@ -2,7 +2,7 @@ import { createClient, RedisClientType } from "redis";
 
 import { type NodeJSON } from "@pitter-patter/collab-client";
 
-export function PromiseWithResolvers<T>() {
+function PromiseWithResolvers<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
   let reject!: (reason?: any) => void;
   const promise = new Promise<T>((res, rej) => {
