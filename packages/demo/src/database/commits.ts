@@ -11,7 +11,11 @@ export async function getCommitByRef(db: Transaction<DB> | Kysely<DB>, docId: st
     .executeTakeFirst();
 }
 
-export async function getCommitsAfter(db: Transaction<DB> | Kysely<DB>, docId: string, version: number) {
+export async function getCommitsAfter(
+  db: Transaction<DB> | Kysely<DB>,
+  docId: string,
+  version: number,
+) {
   return await db
     .selectFrom("commit")
     .selectAll()
@@ -20,6 +24,9 @@ export async function getCommitsAfter(db: Transaction<DB> | Kysely<DB>, docId: s
     .execute();
 }
 
-export async function createCommit(db: Transaction<DB> | Kysely<DB>, commit: Insertable<DB["commit"]>) {
+export async function createCommit(
+  db: Transaction<DB> | Kysely<DB>,
+  commit: Insertable<DB["commit"]>,
+) {
   return await db.insertInto("commit").values(commit).execute();
 }

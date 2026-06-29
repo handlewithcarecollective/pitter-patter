@@ -28,11 +28,7 @@ test("Test collab", async () => {
   const doc1 = await getDoc(await deployment.db.getDb(), docId);
   const doc2 = await getDoc(await deployment.db.getDb(), docId);
 
-  const { client: client1, stateBox: stateBox1 } = await createCollabClient(
-    serverUrl,
-    docId,
-    doc1,
-  );
+  const { client: client1, stateBox: stateBox1 } = await createCollabClient(serverUrl, docId, doc1);
   const { client: _client2, stateBox: stateBox2 } = await createCollabClient(
     serverUrl,
     docId,

@@ -2,15 +2,18 @@ import { TextSelection } from "prosemirror-state";
 // Todo: should the test files be named differently?
 import { assert, expect, test } from "vitest";
 
-import {
-  presenceKey,
-} from "@pitter-patter/presence-client";
+import { presenceKey } from "@pitter-patter/presence-client";
 
 import { getDoc } from "../database/docs";
 import { randomRef } from "../editor/Editor";
 import { createDeployment, startServer } from "../server-base";
 
-import { createCollabClient, createPresenceClient, generateTestDeploymentConfig, sleep } from "./utils";
+import {
+  createCollabClient,
+  createPresenceClient,
+  generateTestDeploymentConfig,
+  sleep,
+} from "./utils";
 
 const TEST_PORT = 10002;
 
@@ -83,4 +86,3 @@ test("Test collab", async () => {
   expect(indicator.anchor).toBe(2);
   expect(indicator.head).toBe(2);
 });
-

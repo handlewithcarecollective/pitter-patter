@@ -202,7 +202,6 @@ export class CollabAuthority<Transaction> {
       const postCommits = await this.getCommits(null, docId, version);
       return postCommits;
     }
-
     return [];
   }
 }
