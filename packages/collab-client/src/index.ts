@@ -79,7 +79,6 @@ export class CollabClient {
    * Send local editor state changes to the remote server.
    */
   async send(editorState: EditorState) {
-    console.error("SENDING STATE");
     const commit = sendableCommit(editorState);
     if (!commit) return;
     // Avoid unnecessary network traffic by skipping commits
@@ -88,9 +87,7 @@ export class CollabClient {
 
     this.sending = commit.ref;
     try {
-      console.error("CALLING sendCommit");
       await this.sendCommit(commit);
-      console.error("SENT COMMIT");
     } catch {
       // If the send fails, then unset the
       // sending ref so that it's possible

@@ -4,8 +4,7 @@ import { assert, expect, test } from "vitest";
 import { getDoc } from "../database/docs";
 import { createDeployment, startServer } from "../server-base";
 
-import { createCollabClient,
-generateTestDeploymentConfig, sleep } from "./utils";
+import { createCollabClient, generateTestDeploymentConfig, sleep } from "./utils";
 
 const TEST_PORT = 10001;
 
@@ -33,13 +32,11 @@ test("Test collab", async () => {
     serverUrl,
     docId,
     doc1,
-    "client1",
   );
   const { client: _client2, stateBox: stateBox2 } = await createCollabClient(
     serverUrl,
     docId,
     doc2,
-    "client2",
   );
 
   const tr = stateBox1.state.tr.insertText("hello");
@@ -51,4 +48,3 @@ test("Test collab", async () => {
 
   expect(stateBox1.state.doc.content).toStrictEqual(stateBox2.state.doc.content);
 });
-

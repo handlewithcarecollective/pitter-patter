@@ -11,9 +11,15 @@ import {
   receiveCommitTransaction,
   collab,
 } from "@pitter-patter/collab-client";
+import {
+  PresenceClient,
+  PresenceClientConfig,
+  LongPollListener as PresenceLongPollListener,
+  receivePresenceTransaction,
+} from "@pitter-patter/presence-client";
+import { presence } from "@pitter-patter/presence-client/react";
 
 import { DemoDeploymentConfig } from "../server-base";
-
 
 // function randomRedisDatabaseIndex(): number {
 //   return Math.round(Math.random() * 2147483647);
@@ -50,12 +56,11 @@ export async function createCollabClient(
   serverUrl: string,
   docId: string,
   doc: Doc,
-  tag: string,
 ): Promise<{ client: CollabClient; stateBox: StateBox }> {
   const stateBox = {
     state: EditorState.create({
       doc: Node.fromJSON(schema, doc.content),
-      plugins: [collab({ version: doc.version })],
+      plugins: [collab({ version: doc.version }), presence()],
     }),
   };
 
@@ -69,7 +74,6 @@ export async function createCollabClient(
     },
     listener: new CollabLongPollListener(new URL(`${serverUrl}/api/docs/${docId}/commits`)),
     receiveCommits: (commits) => {
-      console.log(`${tag}: RECEIVING COMMITS`);
       for (const commit of commits) {
         stateBox.state = stateBox.state.apply(receiveCommitTransaction(stateBox.state, commit));
       }
@@ -77,6 +81,37 @@ export async function createCollabClient(
   };
   const client = new CollabClient(clientConfig);
   client.listen(stateBox.state);
+
+  return { client, stateBox };
+}
+
+export async function createPresenceClient(
+  serverUrl: string,
+  userId: string,
+  doc: Doc,
+  stateBox: StateBox,
+): Promise<{ client: PresenceClient; stateBox: StateBox }> {
+  const presenceListener = new PresenceLongPollListener(
+    new URL(`${serverUrl}/api/docs/${doc.id}/presence`),
+  );
+
+  const presenceConfig: PresenceClientConfig = {
+    userId,
+    sendIndicator: async (clientId, indicator) => {
+      await fetch(`${serverUrl}/api/docs/${doc.id}/presence/${clientId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(indicator),
+      });
+    },
+    receiveIndicators: (indicators) => {
+      stateBox.state = stateBox.state.apply(receivePresenceTransaction(stateBox.state, indicators));
+    },
+    listener: presenceListener,
+  };
+
+  const client = new PresenceClient(presenceConfig);
+  client.listen();
 
   return { client, stateBox };
 }
