@@ -80,7 +80,7 @@ export async function createCollabClient(
     },
   };
   const client = new CollabClient(clientConfig);
-  client.listen(stateBox.state);
+  client.listen(stateBox.state).catch(console.error);
 
   return { client, stateBox };
 }
@@ -111,7 +111,7 @@ export async function createPresenceClient(
   };
 
   const client = new PresenceClient(presenceConfig);
-  client.listen();
+  client.listen().catch(console.error);
 
   return { client, stateBox };
 }
