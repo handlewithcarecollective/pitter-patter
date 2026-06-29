@@ -42,5 +42,16 @@ test("Test collab", async () => {
   // We could pass a channel into the client's receive function as well
   await sleep(500);
 
-  expect(stateBox1.state.doc.content).toStrictEqual(stateBox2.state.doc.content);
+  const expectedContent = [
+    {
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "hello",
+        },
+      ],
+    },
+  ];
+  expect(stateBox1.state.doc.content.toJSON()).toStrictEqual(expectedContent);
 });
