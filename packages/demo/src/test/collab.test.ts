@@ -53,5 +53,5 @@ test("Test collab", async () => {
       ],
     },
   ];
-  expect(stateBox1.state.doc.content.toJSON()).toStrictEqual(expectedContent);
+  expect(stateBox2.state.doc.content.toJSON()).toStrictEqual(expectedContent);
 });
