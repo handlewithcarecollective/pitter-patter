@@ -171,7 +171,6 @@ export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
   });
 
   app.get("/api/docs/:docId/commits", async (req, res) => {
-    console.error("SERVER LISTENING FOR COMMIT");
     const commits = await collabAuthority.listenForCommit(
       req.params.docId,
       parseInt(req.query["version"] as string, 10),
@@ -199,7 +198,6 @@ export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
 
   app.post("/api/docs/:docId/commits", async (req, res) => {
     try {
-      console.log("SERVER HAS RECEIVED A COMMIT");
       await collabAuthority.receiveCommit(req.params.docId, req.body);
     } catch (e) {
       if (e instanceof TooMuchContentionError) {
