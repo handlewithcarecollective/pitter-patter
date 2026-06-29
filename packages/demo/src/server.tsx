@@ -14,7 +14,7 @@ function addReact(deployment: DemoDeployment) {
   });
 
   deployment.app.get("/editor/:docId", async (req, res) => {
-    const db = await deployment.sqliteInstance.getDb();
+    const db = await deployment.db.getDb();
     const doc = await getDoc(db, req.params.docId);
     await renderRequest(req, res, <EditorPage doc={doc} />, {
       component: EditorPage as ComponentType,
