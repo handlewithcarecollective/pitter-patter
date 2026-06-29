@@ -176,7 +176,7 @@ export class CollabAuthority<Transaction> {
     });
 
     if (!appliedCommitJSON) return;
-
+    console.error("AUTHORITY IS BROADCASTING COMMIT");
     await this.broadcastManager.broadcastCommit(docId, appliedCommitJSON);
   }
 
@@ -185,6 +185,7 @@ export class CollabAuthority<Transaction> {
    * are found or after a timeout specified in the CollabAuthority's `broadcastManager`.
    */
   async listenForCommit(docId: string, version: number) {
+    console.error("AUTHORITY IS LISTENING FOR COMMIT");
     // Create listner to notify if commits are made. After this await, the listener is registered with
     // the notification service and will be notified if a commit is made.
     const { listen, abort } = await this.broadcastManager.createCommitListener(docId, version);
@@ -193,16 +194,23 @@ export class CollabAuthority<Transaction> {
     // new commit listener being registered
     const preCommits = await this.getCommits(null, docId, version);
     if (preCommits.length) {
+      console.error("RETURNING EARLY WITH COMMITS");
       await abort();
       return preCommits;
     }
 
+    console.error("LISTENING FOR COMMMITS");
     // Await and return any incoming commits
     let commitsFound = await listen();
     if (commitsFound) {
+      console.error("FOUND COMMMITS");
+
       const postCommits = await this.getCommits(null, docId, version);
       return postCommits;
     }
+
+    console.error("FOUND NO COMMMITS");
+
     return [];
   }
 }
@@ -291,5 +299,5 @@ export class RedisBroadcastManager {
     } else {
       return `pitter-patter:collab:${docId}`;
     }
-  } 
+  }
 }

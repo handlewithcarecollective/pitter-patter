@@ -36,7 +36,9 @@ interface Props {
   doc: Selectable<DB["doc"]>;
 }
 
-function randomRef() {
+// Todo: Can we just use a uuid here instead or does it have to be a specific shorter
+//       byte structure? If the latter, this function should probably be available to users
+export function randomRef() {
   try {
     const bytes = new Uint32Array(2);
     globalThis.crypto.getRandomValues(bytes);

@@ -38,7 +38,7 @@ export interface DemoDeployment {
   presenceBroadcaster: RedisPresenceBroadcastManager;
   presencePersister: RedisPresencePersistenceManager;
   presenceAuthority: PresenceAuthority;
-  sqliteInstance: SqliteInstance;
+  db: SqliteInstance;
 }
 
 export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
@@ -171,6 +171,7 @@ export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
   });
 
   app.get("/api/docs/:docId/commits", async (req, res) => {
+    console.error("SERVER LISTENING FOR COMMIT");
     const commits = await collabAuthority.listenForCommit(
       req.params.docId,
       parseInt(req.query["version"] as string, 10),
@@ -198,6 +199,7 @@ export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
 
   app.post("/api/docs/:docId/commits", async (req, res) => {
     try {
+      console.log("SERVER HAS RECEIVED A COMMIT");
       await collabAuthority.receiveCommit(req.params.docId, req.body);
     } catch (e) {
       if (e instanceof TooMuchContentionError) {
@@ -238,12 +240,12 @@ export function createDeployment(config: DemoDeploymentConfig): DemoDeployment {
     presenceBroadcaster,
     presencePersister,
     presenceAuthority,
-    sqliteInstance,
+    db: sqliteInstance,
   };
 }
 
-export async function startServer(demoDeployment: DemoDeployment, port: number) {
-  const db = await demoDeployment.sqliteInstance.getDb();
+export async function startServer(demoDeployment: DemoDeployment, port: number): Promise<void> {
+  const db = await demoDeployment.db.getDb();
 
   const migrator = new Migrator({
     db,
@@ -262,7 +264,25 @@ export async function startServer(demoDeployment: DemoDeployment, port: number) 
     demoDeployment.presencePersister.connect(),
   ]);
 
-  demoDeployment.app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+  const { promise, resolve, reject } = PromiseWithResolvers<void>();
+  demoDeployment.app.listen(port, (error) => {
+    if (error) {
+      console.log(`Server error: ${JSON.stringify(error)}`);
+      reject(error);
+    } else {
+      console.log(`Listening on port ${port}`);
+      resolve();
+    }
   });
+  return promise;
+}
+
+function PromiseWithResolvers<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: any) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
 }

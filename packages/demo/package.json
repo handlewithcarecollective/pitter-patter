@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "start": "parcel",
-    "build": "parcel build"
+    "build": "parcel build",
+    "test": "vitest run"
   },
   "dependencies": {
     "@handlewithcare/react-prosemirror": "^3.0.6",
