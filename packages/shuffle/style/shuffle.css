@@ -607,5 +607,11 @@
   position: absolute;
   background-color: lightblue;
   transform: translateY(-100%);
-  z-index: 10000;
+  transition: background-color 150ms linear;
+  cursor: grab;
+  padding: 0.125rem 0.25rem;
+}
+
+.shuffle-drag-handle:hover {
+  background-color: #82c3d9;
 }

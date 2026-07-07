@@ -18,7 +18,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.6",
+    "@handlewithcare/react-prosemirror": "^3.2.4",
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/refs": "workspace:^",
     "classnames": "^2.5.1",

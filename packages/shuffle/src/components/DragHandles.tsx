@@ -1,22 +1,33 @@
 import {
   useEditorEffect,
   useEditorEventCallback,
-  useEditorState,
+  useEditorStateSelector,
 } from "@handlewithcare/react-prosemirror";
+import { sentenceCase } from "change-case";
 import { Node } from "prosemirror-model";
 import {
   ComponentType,
   EventHandler,
-  useMemo,
+  MouseEvent,
   PointerEvent as SyntheticPointerEvent,
+  useMemo,
   useState,
 } from "react";
 
 import { shufflePluginKey, startDragOnPointerDown, ViewDesc } from "../plugin.ts";
 
+const EMPTY: { from: number; to: number }[] = [];
+
+type Offsets = {
+  left: number;
+  top: number;
+} | null;
+
 export interface DragHandleProps {
-  style: { top: number; left: number };
+  style: { top: number; left: number; zIndex: number };
   onPointerDown: EventHandler<SyntheticPointerEvent>;
+  onMouseEnter: EventHandler<MouseEvent>;
+  onMouseLeave: EventHandler<MouseEvent>;
   node: Node;
 }
 
@@ -42,16 +53,63 @@ export interface DragHandleProps {
  */
 export function DragHandles(props: { handleComponent?: ComponentType<DragHandleProps> }) {
   const { handleComponent } = props;
-  const editorState = useEditorState();
 
-  const shuffleState = shufflePluginKey.getState(editorState);
+  const hoverPositions = useEditorStateSelector((state) => {
+    const shuffleState = shufflePluginKey.getState(state);
 
-  const hoverPositions = shuffleState?.hoverPositions ?? [];
+    return shuffleState?.hoverPositions ?? EMPTY;
+  });
+
+  const hoverStarts = useMemo(
+    () => hoverPositions.map(({ from }) => from).toSorted((a, b) => a - b),
+    [hoverPositions],
+  );
+
+  const [hoverOffsets, setHoverOffsets] = useState<Offsets[]>([]);
+
+  useEditorEffect(
+    (view) => {
+      const wrapperDOM = view.dom.closest("[data-shuffle-wrapper]");
+      const offsetRect = wrapperDOM?.getBoundingClientRect();
+
+      function computeOffsets(p: number) {
+        const nodeDOM = view.nodeDOM(p);
+        if (!(nodeDOM instanceof HTMLElement)) return null;
+        const nodeRect = nodeDOM.getBoundingClientRect();
+        const offsetLeft = offsetRect?.left ?? 0;
+        const offsetTop = offsetRect?.top ?? 0;
+        return { left: nodeRect.left - offsetLeft, top: nodeRect.top - offsetTop };
+      }
+
+      const offsets: Offsets[] = [];
+
+      for (const pos of hoverStarts) {
+        const o = computeOffsets(pos);
+        const lastO = offsets.at(-1);
+        offsets.push(o);
+        if (!lastO || !o) continue;
+
+        if (lastO.top > o.top + 8 || lastO.top < o.top - 8) continue;
+        if (lastO.left > o.left + 8 || lastO.left < o.left - 8) continue;
+
+        o.left += 32;
+      }
+
+      setHoverOffsets(offsets);
+    },
+    [hoverStarts],
+  );
 
   return (
     <>
-      {hoverPositions.map(({ from }) => (
-        <DragHandleRenderer key={from} pos={from} handleComponent={handleComponent} />
+      {hoverStarts.map((pos, index) => (
+        <DragHandleRenderer
+          key={pos}
+          pos={pos}
+          left={hoverOffsets[index]?.left ?? 0}
+          top={hoverOffsets[index]?.top ?? 0}
+          handleComponent={handleComponent}
+        />
       ))}
     </>
   );
@@ -59,32 +117,24 @@ export function DragHandles(props: { handleComponent?: ComponentType<DragHandleP
 
 interface DragHandleRendererProps {
   pos: number;
+  left: number;
+  top: number;
   handleComponent?: ComponentType<DragHandleProps> | undefined;
 }
 
-export function DragHandleRenderer({ pos, handleComponent: Handle }: DragHandleRendererProps) {
-  const [left, setLeft] = useState(0);
-  const [top, setTop] = useState(0);
+export function DragHandleRenderer({
+  pos,
+  left,
+  top,
+  handleComponent: Handle,
+}: DragHandleRendererProps) {
+  const node = useEditorStateSelector((state) => state.doc.nodeAt(pos));
 
-  const editorState = useEditorState();
+  const initialZIndex = useEditorStateSelector((state) => state.doc.resolve(pos).depth + 10_000);
 
-  const node = useMemo(() => editorState.doc.resolve(pos).nodeAfter, [editorState.doc, pos]);
+  const [hovered, setHovered] = useState(false);
 
-  useEditorEffect(
-    (view) => {
-      const nodeDOM = view.nodeDOM(pos);
-      if (!(nodeDOM instanceof HTMLElement)) return;
-      const nodeRect = nodeDOM.getBoundingClientRect();
-      const wrapperDOM = view.dom.closest("[data-shuffle-wrapper]");
-      const offsetRect = wrapperDOM?.getBoundingClientRect();
-      const offsetLeft = offsetRect?.left ?? 0;
-      const offsetTop = offsetRect?.top ?? 0;
-
-      setLeft(nodeRect.left - offsetLeft);
-      setTop(nodeRect.top - offsetTop);
-    },
-    [pos, node],
-  );
+  const zIndex = hovered ? 11_000 : initialZIndex;
 
   const handlePointerDown = useEditorEventCallback((view, event: SyntheticPointerEvent) => {
     const dom = view.nodeDOM(pos);
@@ -100,14 +150,38 @@ export function DragHandleRenderer({ pos, handleComponent: Handle }: DragHandleR
   if (!node) return;
 
   if (Handle) {
-    return <Handle style={{ top, left }} node={node} onPointerDown={handlePointerDown} />;
+    return (
+      <Handle
+        style={{ top, left, zIndex }}
+        node={node}
+        onPointerDown={handlePointerDown}
+        onMouseEnter={() => {
+          setHovered(true);
+        }}
+        onMouseLeave={() => {
+          setHovered(false);
+        }}
+      />
+    );
   }
 
-  return <DragHandle style={{ top, left }} onPointerDown={handlePointerDown} node={node} />;
+  return (
+    <DragHandle
+      style={{ top, left, zIndex }}
+      onPointerDown={handlePointerDown}
+      node={node}
+      onMouseEnter={() => {
+        setHovered(true);
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+      }}
+    />
+  );
 }
 
 export function DragHandle(props: DragHandleProps) {
-  const { style, node, onPointerDown } = props;
+  const { style, node, onPointerDown, onMouseEnter, onMouseLeave } = props;
   return (
     <button
       type="button"
@@ -115,8 +189,10 @@ export function DragHandle(props: DragHandleProps) {
       style={style}
       draggable="false"
       onPointerDown={onPointerDown}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
-      {node.type.name}
+      {sentenceCase(node.type.name)}
     </button>
   );
 }
