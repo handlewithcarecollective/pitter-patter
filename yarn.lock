@@ -2914,6 +2914,7 @@ __metadata:
     "@typescript/native-preview": "npm:7.0.0-dev.20260421.2"
     "@vitejs/plugin-react": "npm:^6.0.1"
     animejs: "npm:^4.3.6"
+    change-case: "npm:^5.4.4"
     classnames: "npm:^2.5.1"
     markdown-toc: "npm:^1.2.0"
     motion: "npm:^12.38.0"
@@ -6511,6 +6512,13 @@ __metadata:
   version: 5.6.2
   resolution: "chalk@npm:5.6.2"
   checksum: 10c0/99a4b0f0e7991796b1e7e3f52dceb9137cae2a9dfc8fc0784a550dc4c558e15ab32ed70b14b21b52beb2679b4892b41a0aa44249bcb996f01e125d58477c6976
+  languageName: node
+  linkType: hard
+
+"change-case@npm:^5.4.4":
+  version: 5.4.4
+  resolution: "change-case@npm:5.4.4"
+  checksum: 10c0/2a9c2b9c9ad6ab2491105aaf506db1a9acaf543a18967798dcce20926c6a173aa63266cb6189f3086e3c14bf7ae1f8ea4f96ecc466fcd582310efa00372f3734
   languageName: node
   linkType: hard
 

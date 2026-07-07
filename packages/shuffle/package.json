@@ -30,6 +30,7 @@
   "dependencies": {
     "@pitter-patter/refs": "workspace:*",
     "animejs": "^4.3.6",
+    "change-case": "^5.4.4",
     "classnames": "^2.5.1",
     "motion": "^12.38.0",
     "orderedmap": "^2.1.1",

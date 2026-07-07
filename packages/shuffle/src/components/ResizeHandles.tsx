@@ -48,9 +48,9 @@ export function ResizeHandles(props: {
 }) {
   const { handleComponent } = props;
 
-  const firstSelectedShuffleBlock = useEditorStateSelector(({ doc, selection }) => {
+  const firstSelectedShuffleBlockPos = useEditorStateSelector(({ selection }) => {
     if (selection instanceof NodeSelection) {
-      return { pos: selection.from, node: selection.node };
+      return selection.from;
     }
 
     const spansBlock = selection.$from.parent !== selection.$to.parent;
@@ -66,24 +66,35 @@ export function ResizeHandles(props: {
 
     if (supportsResize(node)) {
       const pos = blockRange.$from.before(depth);
-      return { pos, node: doc.resolve(pos).nodeAfter! };
+      return pos;
     }
 
     return null;
   });
 
-  if (firstSelectedShuffleBlock === null) return null;
+  const firstSelectedShuffleBlock = useEditorStateSelector(({ doc, selection }) => {
+    if (selection instanceof NodeSelection) {
+      return selection.node;
+    }
+    if (firstSelectedShuffleBlockPos === null) {
+      return null;
+    }
+
+    return doc.nodeAt(firstSelectedShuffleBlockPos);
+  });
+
+  if (firstSelectedShuffleBlockPos === null || firstSelectedShuffleBlock === null) return null;
 
   return (
     <>
       <LeftResizeHandle
-        pos={firstSelectedShuffleBlock.pos}
-        node={firstSelectedShuffleBlock.node}
+        pos={firstSelectedShuffleBlockPos}
+        node={firstSelectedShuffleBlock}
         handleComponent={handleComponent}
       />
       <RightResizeHandle
-        pos={firstSelectedShuffleBlock?.pos}
-        node={firstSelectedShuffleBlock.node}
+        pos={firstSelectedShuffleBlockPos}
+        node={firstSelectedShuffleBlock}
         handleComponent={handleComponent}
       />
     </>
