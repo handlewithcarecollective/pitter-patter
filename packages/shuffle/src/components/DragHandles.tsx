@@ -5,6 +5,7 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { sentenceCase } from "change-case";
 import { Node } from "prosemirror-model";
+import { NodeSelection } from "prosemirror-state";
 import {
   ComponentType,
   EventHandler,
@@ -137,7 +138,10 @@ export function DragHandleRenderer({
   const zIndex = hovered ? 11_000 : initialZIndex;
 
   const handlePointerDown = useEditorEventCallback((view, event: SyntheticPointerEvent) => {
+    view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos)));
+
     const dom = view.nodeDOM(pos);
+
     startDragOnPointerDown(
       view,
       pos,
