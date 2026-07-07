@@ -1,7 +1,7 @@
 import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
-import { NodeSelection, Plugin, PluginKey } from "prosemirror-state";
+import { NodeSelection, Plugin, PluginKey, Selection } from "prosemirror-state";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import throttle from "raf-throttle";
 
@@ -68,19 +68,39 @@ export interface ShufflePluginState {
   comp: string | undefined;
   activeNodePos: number | undefined;
   hoverPositions: { from: number; to: number }[];
+  startDragInContentDOM: boolean;
 }
 
 export const shufflePluginKey = new PluginKey<ShufflePluginState>("@pitter-patter/shuffle");
 
 export interface ShufflePluginOptions {
+  /**
+   * In schemas that can have deeply nested nodes, it can be helpful
+   * to use borders or highlights to indicate to the user which nodes
+   * are being hovered over.
+   *
+   * This function will be called on each hovered node to determine
+   * whether to render a node decoration. It should always return
+   * a node decoration (via Decoration.node()).
+   */
   hoverDecorations?: (from: number, to: number, node: Node) => Decoration | null;
+  /**
+   * If enabled, when the user starts a drag within a node's contentDOM,
+   * it will activate the plugin, rather than starting a selection.
+   *
+   * Defaults to false.
+   */
+  startDragInContentDOM?: boolean;
 }
 
 /**
  * A ProseMirror plugin factory. Manages decorations, state, and event listeners necessary for
  * autogroup, reorder, and reposition behaviors.
  */
-export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
+export function shuffle({
+  hoverDecorations,
+  startDragInContentDOM = false,
+}: ShufflePluginOptions = {}) {
   return new Plugin<ShufflePluginState>({
     key: shufflePluginKey,
     state: {
@@ -110,6 +130,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
           comp: undefined,
           activeNodePos: undefined,
           hoverPositions: [],
+          startDragInContentDOM,
         };
       },
       apply(tr, value, _oldState, newState) {
@@ -189,6 +210,7 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
           comp: nextComp,
           activeNodePos: nextActiveNodePos,
           hoverPositions: nextHoverPositions,
+          startDragInContentDOM,
         };
       },
     },
@@ -286,7 +308,20 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
           const viewDesc = dom.pmViewDesc;
 
           if (!viewDesc) return false;
-          if (viewDesc.contentDOM?.contains(event.target)) return false;
+          if (!startDragInContentDOM && viewDesc.contentDOM?.contains(event.target)) return false;
+
+          const { selection } = view.state;
+
+          const before = viewDesc.posBefore;
+          const after = before + viewDesc.node.nodeSize;
+          if (
+            before < selection.from &&
+            before < selection.to &&
+            after > selection.from &&
+            after > selection.to
+          ) {
+            return false;
+          }
 
           return startDragOnPointerDown(
             view,
@@ -350,6 +385,12 @@ export function startDragOnPointerDown(
   clientX: number,
   clientY: number,
 ) {
+  const startDragInContentDOM =
+    shufflePluginKey.getState(view.state)?.startDragInContentDOM ?? false;
+
+  const { selection } = view.state;
+  const preserveSelection = selection instanceof NodeSelection && selection.from === pos;
+
   const startTr = view.state.tr;
 
   startTr.setMeta(shufflePluginKey, {
@@ -464,7 +505,17 @@ export function startDragOnPointerDown(
   });
 
   function endDrag(domRect?: DOMRect) {
-    if (!clone || !initialStyles) return;
+    if (!clone || !initialStyles) {
+      if (startDragInContentDOM && !preserveSelection) {
+        const result = view.posAtCoords({ left: clientX, top: clientY });
+        if (result) {
+          view.dispatch(
+            view.state.tr.setSelection(Selection.near(view.state.doc.resolve(result.pos))),
+          );
+        }
+      }
+      return;
+    }
 
     clone.style.transition = "transform 0.2s ease";
     clone.style.boxShadow = initialStyles.boxShadow;
@@ -501,7 +552,7 @@ export function startDragOnPointerDown(
 
     animate(skeleton, { opacity: 0 }, { duration: 0.25 });
 
-    if (!clone || !initialStyles) return;
+    if (!clone || !initialStyles) return endDrag();
 
     if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
       currentAnimation.complete();
