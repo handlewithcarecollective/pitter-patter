@@ -39,7 +39,7 @@
   grid-column-start: 1;
 }
 
-.start-right {
+.end-right {
   grid-column-end: 15;
 }
 

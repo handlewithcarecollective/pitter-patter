@@ -9,13 +9,21 @@ export function resize(
   side: "start" | "end",
   clientX: number,
 ): Transaction | null {
-  const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-  if (!gridWrapper) return null;
+  const grid = view.dom.closest("[data-shuffle-wrapper]");
+  if (!grid) return null;
 
-  const bars = gridWrapper.querySelectorAll("[data-shuffle-skeleton-bar]");
+  const skeletonRect = grid.getBoundingClientRect();
+
+  const bars = grid.querySelectorAll("[data-shuffle-skeleton-bar]");
 
   let closestBar: null | number = null;
   let closestDistance: null | number = null;
+
+  if (side === "start") {
+    closestBar = -1;
+    closestDistance = Math.abs(clientX - skeletonRect.left);
+  }
+
   for (let i = 0; i < bars.length; i++) {
     const bar = bars.item(i);
     const barRect = bar.getBoundingClientRect();
@@ -23,7 +31,7 @@ export function resize(
     const distance = Math.abs(clientX - barSide);
     if (closestBar === null || closestDistance === null) {
       closestBar = i;
-      closestDistance = Math.abs(clientX - barSide);
+      closestDistance = distance;
       continue;
     }
     if (closestDistance > distance) {
@@ -31,6 +39,15 @@ export function resize(
       closestDistance = distance;
     }
   }
+
+  if (side === "end") {
+    const distance = Math.abs(clientX - skeletonRect.right);
+    if (closestDistance !== null && closestDistance > distance) {
+      closestBar = 12;
+      closestDistance = distance;
+    }
+  }
+
   if (closestBar === null) return null;
   const $before = view.state.doc.resolve(pos);
   const node = $before.nodeAfter;
