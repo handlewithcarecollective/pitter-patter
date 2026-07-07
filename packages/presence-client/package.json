@@ -30,7 +30,7 @@
     "classnames": "^2.5.1"
   },
   "devDependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.6",
+    "@handlewithcare/react-prosemirror": "^3.2.4",
     "@tsconfig/strictest": "^2.0.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

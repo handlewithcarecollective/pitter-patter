@@ -7,7 +7,8 @@
   "rules": {
     "import/consistent-type-specifier-style": ["error", "prefer-inline"],
     "no-console": ["error", { "allow": ["error"] }],
-    "extensions": ["error", "always", { "ignorePackages": true }]
+    "extensions": ["error", "always", { "ignorePackages": true }],
+    "exhaustive-deps": ["error", { "additionalHooks": "useEditorEffect" }]
   },
   "env": {
     "builtin": true

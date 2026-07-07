@@ -30,6 +30,7 @@
   "dependencies": {
     "@pitter-patter/refs": "workspace:*",
     "animejs": "^4.3.6",
+    "change-case": "^5.4.4",
     "classnames": "^2.5.1",
     "motion": "^12.38.0",
     "orderedmap": "^2.1.1",
@@ -40,7 +41,7 @@
     "tw-merge": "0.0.1-alpha.3"
   },
   "devDependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.6",
+    "@handlewithcare/react-prosemirror": "^3.2.4",
     "@tsconfig/strictest": "^2.0.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
@@ -63,7 +64,7 @@
     "vite": "^8.0.5"
   },
   "peerDependencies": {
-    "@handlewithcare/react-prosemirror": "^3.0.0",
+    "@handlewithcare/react-prosemirror": "^3.2.0",
     "prosemirror-model": "^1.0.0",
     "prosemirror-state": "^1.0.0",
     "prosemirror-transform": "^1.0.0",

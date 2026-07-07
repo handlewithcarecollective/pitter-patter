@@ -233,8 +233,6 @@ export function shuffle({ hoverDecorations }: ShufflePluginOptions = {}) {
         dragstart(_, event) {
           event.preventDefault();
         },
-        // TODO: Store the event coords so that we can recheck on scroll
-        // and view.update
         mousemove: throttle((view, event) => {
           if (!view.editable) return false;
 
