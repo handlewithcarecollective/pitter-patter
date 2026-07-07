@@ -4,7 +4,10 @@ description: Install and configure Collab
 ---
 
 This quick start provides a summary of a Pitter Patter Collab configuration. For a more in depth
-explanation, see the [Collab Guide](https://pitter-patter.dev/docs/guides/collab/).
+explanation, see the [Collab Guide](https://pitter-patter.dev/docs/guides/collab/). You can also see
+a
+[fully functional demo](https://github.com/handlewithcarecollective/pitter-patter/tree/main/packages/demo)
+in our Github repo.
 
 ## Configure your backend
 
