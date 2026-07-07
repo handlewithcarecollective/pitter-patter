@@ -1,13 +1,12 @@
 import {
   useEditorEffect,
   useEditorEventCallback,
-  useEditorState,
+  useEditorStateSelector,
 } from "@handlewithcare/react-prosemirror";
 import { Node } from "prosemirror-model";
 import {
   ComponentType,
   EventHandler,
-  useMemo,
   PointerEvent as SyntheticPointerEvent,
   useState,
 } from "react";
@@ -42,11 +41,12 @@ export interface DragHandleProps {
  */
 export function DragHandles(props: { handleComponent?: ComponentType<DragHandleProps> }) {
   const { handleComponent } = props;
-  const editorState = useEditorState();
 
-  const shuffleState = shufflePluginKey.getState(editorState);
+  const hoverPositions = useEditorStateSelector((state) => {
+    const shuffleState = shufflePluginKey.getState(state);
 
-  const hoverPositions = shuffleState?.hoverPositions ?? [];
+    return shuffleState?.hoverPositions ?? [];
+  });
 
   return (
     <>
@@ -66,9 +66,7 @@ export function DragHandleRenderer({ pos, handleComponent: Handle }: DragHandleR
   const [left, setLeft] = useState(0);
   const [top, setTop] = useState(0);
 
-  const editorState = useEditorState();
-
-  const node = useMemo(() => editorState.doc.resolve(pos).nodeAfter, [editorState.doc, pos]);
+  const node = useEditorStateSelector((state) => state.doc.resolve(pos).nodeAfter);
 
   useEditorEffect(
     (view) => {

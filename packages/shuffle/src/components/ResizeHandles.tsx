@@ -1,7 +1,7 @@
 import {
   useEditorEffect,
   useEditorEventCallback,
-  useEditorState,
+  useEditorStateSelector,
 } from "@handlewithcare/react-prosemirror";
 import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
@@ -12,7 +12,6 @@ import {
   ComponentType,
   EventHandler,
   PointerEvent as SyntheticPointerEvent,
-  useMemo,
   useState,
 } from "react";
 
@@ -48,9 +47,8 @@ export function ResizeHandles(props: {
   }>;
 }) {
   const { handleComponent } = props;
-  const { doc, selection } = useEditorState();
 
-  const firstSelectedShuffleBlock = useMemo(() => {
+  const firstSelectedShuffleBlock = useEditorStateSelector(({ doc, selection }) => {
     if (selection instanceof NodeSelection) {
       return { pos: selection.from, node: selection.node };
     }
@@ -72,7 +70,7 @@ export function ResizeHandles(props: {
     }
 
     return null;
-  }, [selection, doc]);
+  });
 
   if (firstSelectedShuffleBlock === null) return null;
 

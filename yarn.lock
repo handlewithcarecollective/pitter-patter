@@ -656,19 +656,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@handlewithcare/react-prosemirror@npm:^3.0.6":
-  version: 3.0.6
-  resolution: "@handlewithcare/react-prosemirror@npm:3.0.6"
+"@handlewithcare/react-prosemirror@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "@handlewithcare/react-prosemirror@npm:3.2.4"
   dependencies:
     classnames: "npm:^2.5.1"
   peerDependencies:
+    "@tiptap/core": ^3.0.0
+    "@tiptap/pm": ^3.0.0
+    "@tiptap/react": ^3.0.0
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
     prosemirror-view: 1.41.7
     react: ">=17 <20"
     react-dom: ">=17 <20"
     react-reconciler: ">=0.26.1 <=0.33.0"
-  checksum: 10c0/07abb80e1ec09778000a7bb51682c241efc37cb515fdc0bc5ce37c1568800a8560e17d1e7c16699e4753f5609e49401c724e02b2cd3f620a7eaccfd76c3c7567
+  peerDependenciesMeta:
+    "@tiptap/core":
+      optional: true
+    "@tiptap/pm":
+      optional: true
+    "@tiptap/react":
+      optional: true
+  checksum: 10c0/b519fde001ea6e3026cae0e7dab5544117c95a58b5b26ba9706afcbbb9f0c48391674c480ecc1ff4ace38cd90dcd13a37bad726a6c4d1839fd89362494b673a6
   languageName: node
   linkType: hard
 
@@ -2697,7 +2707,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/comments-client@workspace:packages/comments-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.6"
+    "@handlewithcare/react-prosemirror": "npm:^3.2.4"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
@@ -2740,7 +2750,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/demo@workspace:packages/demo"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.6"
+    "@handlewithcare/react-prosemirror": "npm:^3.2.4"
     "@parcel/rsc": "npm:^2.16.0"
     "@parcel/runtime-react-refresh": "npm:^2.13.3"
     "@parcel/runtime-rsc": "npm:^2.16.0"
@@ -2784,7 +2794,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/docs@workspace:packages/docs"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.6"
+    "@handlewithcare/react-prosemirror": "npm:^3.2.4"
     "@orama/orama": "npm:^3.1.18"
     "@pitter-patter/shuffle": "workspace:*"
     "@tailwindcss/vite": "npm:^4.2.4"
@@ -2827,7 +2837,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/presence-client@workspace:packages/presence-client"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.6"
+    "@handlewithcare/react-prosemirror": "npm:^3.2.4"
     "@pitter-patter/collab-client": "workspace:^"
     "@pitter-patter/refs": "workspace:^"
     "@tsconfig/strictest": "npm:^2.0.5"
@@ -2895,7 +2905,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pitter-patter/shuffle@workspace:packages/shuffle"
   dependencies:
-    "@handlewithcare/react-prosemirror": "npm:^3.0.6"
+    "@handlewithcare/react-prosemirror": "npm:^3.2.4"
     "@pitter-patter/refs": "workspace:*"
     "@tsconfig/strictest": "npm:^2.0.5"
     "@types/react": "npm:^19.2.2"
@@ -2927,7 +2937,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vite: "npm:^8.0.5"
   peerDependencies:
-    "@handlewithcare/react-prosemirror": ^3.0.0
+    "@handlewithcare/react-prosemirror": ^3.2.0
     prosemirror-model: ^1.0.0
     prosemirror-state: ^1.0.0
     prosemirror-transform: ^1.0.0
