@@ -62,11 +62,20 @@ export function findGap(doc: Node, pos: number, nodeType: NodeType) {
   const $pos = doc.resolve(pos);
 
   let d = $pos.depth;
-  while (!$pos.node(d).isTextblock && d > 0) {
+  while (!$pos.node(d).isBlock && d > 0) {
     d--;
   }
 
-  const start = d === 0 ? pos : $pos.before(d);
+  if (d === 0) {
+    return pos;
+  }
+
+  const textblock = $pos.node(d);
+  const textblockPos = $pos.before(d);
+
+  const isInFirstHalf = pos <= textblockPos + textblock.nodeSize / 2;
+
+  const start = isInFirstHalf ? textblockPos : $pos.after(d);
 
   const gap = start ? insertPoint(doc, start, nodeType) : start;
 
