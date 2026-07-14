@@ -15,7 +15,7 @@ export function autogroup(
   const rowType = getShuffleRowType(view.state.schema);
   if (!rowType) return null;
 
-  const node = view.state.doc.resolve(from).nodeAfter;
+  const node = view.state.doc.nodeAt(from);
   if (!node) return null;
 
   if (node.type.spec.pitterPatter?.shuffle?.containedBy) return null;

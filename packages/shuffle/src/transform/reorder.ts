@@ -1,5 +1,5 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
-import { Node, NodeType } from "prosemirror-model";
+import { NodeType } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
 import { insertPoint } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
@@ -33,18 +33,20 @@ export function reorder(
     return null;
   }
 
-  const gap = findGap(view.state.doc, pos, node.type);
+  if (pos <= from + node.nodeSize && pos >= from) return null;
+
+  const gap = findGap(view, pos, node.type, from, clientX, clientY);
 
   if (gap === null) return null;
 
-  if (gap === from + node.nodeSize || gap === from) return null;
+  if (gap <= from + node.nodeSize && gap >= from) return null;
 
   const tr = view.state.tr;
   tr.delete(from, from + node.nodeSize);
 
   const newPos = tr.mapping.map(gap);
 
-  tr.insert(tr.mapping.map(gap), node);
+  tr.insert(newPos, node);
 
   tr.setMeta(reactKeys().spec.key!, {
     overrides: { [from]: newPos },
@@ -58,26 +60,57 @@ export function reorder(
   return tr;
 }
 
-export function findGap(doc: Node, pos: number, nodeType: NodeType) {
+export function findGap(
+  view: EditorView,
+  pos: number,
+  nodeType: NodeType,
+  from: number | null,
+  clientX: number,
+  clientY: number,
+) {
+  const { doc } = view.state;
   const $pos = doc.resolve(pos);
+
+  if ($pos.nodeAfter && $pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)) {
+    return pos;
+  }
+
+  if (
+    $pos.parentOffset == $pos.parent.content.size &&
+    $pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)
+  ) {
+    return pos;
+  }
 
   let d = $pos.depth;
   while (!$pos.node(d).isBlock && d > 0) {
     d--;
   }
 
-  if (d === 0) {
-    return pos;
-  }
+  if (d === 0) return null;
 
-  const textblock = $pos.node(d);
-  const textblockPos = $pos.before(d);
+  const candidateStart = $pos.before(d);
 
-  const isInFirstHalf = pos <= textblockPos + textblock.nodeSize / 2;
+  const candidateDom = view.domAtPos(candidateStart, 1).node;
+  if (!(candidateDom instanceof Element)) return null;
 
-  const start = isInFirstHalf ? textblockPos : $pos.after(d);
+  const candidateRect = candidateDom.getBoundingClientRect();
 
-  const gap = start ? insertPoint(doc, start, nodeType) : start;
+  const fromDom = from === null ? from : view.domAtPos(from, 1).node;
+  if (fromDom !== null && !(fromDom instanceof Element)) return null;
 
-  return gap;
+  const fromRect = fromDom?.getBoundingClientRect();
+
+  const horizontal =
+    fromRect && candidateRect.top <= fromRect.bottom && candidateRect.bottom >= fromRect.top;
+
+  const isInFirstHalf = horizontal
+    ? clientX < (candidateRect.left + candidateRect.right) / 2
+    : clientY < (candidateRect.top + candidateRect.bottom) / 2;
+
+  const candidateGap = isInFirstHalf ? candidateStart : $pos.after(d);
+
+  if (candidateGap === 0) return 0;
+
+  return insertPoint(doc, candidateGap, nodeType);
 }

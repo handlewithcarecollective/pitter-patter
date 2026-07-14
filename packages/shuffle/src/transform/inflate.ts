@@ -28,7 +28,7 @@ export function inflate(view: EditorView, clone: HTMLElement, clientX: number, c
 
   const { pos } = posResult;
 
-  const gap = findGap(view.state.doc, pos, node.type);
+  const gap = findGap(view, pos, node.type, null, clientX, clientY);
   if (gap === null) return null;
 
   if (!node) return null;
