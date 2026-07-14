@@ -37,7 +37,7 @@ export function reorder(
 
   if (gap === null) return null;
 
-  if (gap === from + node.nodeSize || gap === from) return null;
+  if (gap <= from + node.nodeSize && gap >= from) return null;
 
   const tr = view.state.tr;
   tr.delete(from, from + node.nodeSize);
@@ -67,9 +67,9 @@ export function findGap(
   clientY: number,
 ) {
   const { doc } = view.state;
-  if (doc.nodeAt(pos)?.isBlock) return pos;
-
   const $pos = doc.resolve(pos);
+  if ($pos.nodeAfter?.isBlock) return pos;
+  if ($pos.parentOffset == $pos.parent.content.size && $pos.nodeBefore?.isBlock) return pos;
 
   let d = $pos.depth;
   while (!$pos.node(d).isBlock && d > 0) {
