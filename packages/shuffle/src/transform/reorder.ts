@@ -33,6 +33,8 @@ export function reorder(
     return null;
   }
 
+  if (pos <= from + node.nodeSize && pos >= from) return null;
+
   const gap = findGap(view, pos, node.type, from, clientX, clientY);
 
   if (gap === null) return null;
@@ -44,7 +46,7 @@ export function reorder(
 
   const newPos = tr.mapping.map(gap);
 
-  tr.insert(tr.mapping.map(gap), node);
+  tr.insert(newPos, node);
 
   tr.setMeta(reactKeys().spec.key!, {
     overrides: { [from]: newPos },
@@ -62,14 +64,23 @@ export function findGap(
   view: EditorView,
   pos: number,
   nodeType: NodeType,
-  from: number,
+  from: number | null,
   clientX: number,
   clientY: number,
 ) {
   const { doc } = view.state;
   const $pos = doc.resolve(pos);
-  if ($pos.nodeAfter?.isBlock) return pos;
-  if ($pos.parentOffset == $pos.parent.content.size && $pos.nodeBefore?.isBlock) return pos;
+
+  if ($pos.nodeAfter && $pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)) {
+    return pos;
+  }
+
+  if (
+    $pos.parentOffset == $pos.parent.content.size &&
+    $pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)
+  ) {
+    return pos;
+  }
 
   let d = $pos.depth;
   while (!$pos.node(d).isBlock && d > 0) {
@@ -85,14 +96,13 @@ export function findGap(
 
   const candidateRect = candidateDom.getBoundingClientRect();
 
-  const fromDom = view.domAtPos(from, 1).node;
-  if (!(fromDom instanceof Element)) return null;
+  const fromDom = from === null ? from : view.domAtPos(from, 1).node;
+  if (fromDom !== null && !(fromDom instanceof Element)) return null;
 
-  const fromRect = fromDom.getBoundingClientRect();
+  const fromRect = fromDom?.getBoundingClientRect();
 
   const horizontal =
-    (candidateRect.top >= fromRect.top && candidateRect.top <= fromRect.bottom) ||
-    (candidateRect.bottom >= fromRect.top && candidateRect.bottom <= fromRect.bottom);
+    fromRect && candidateRect.top <= fromRect.bottom && candidateRect.bottom >= fromRect.top;
 
   const isInFirstHalf = horizontal
     ? clientX < (candidateRect.left + candidateRect.right) / 2
