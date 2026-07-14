@@ -1,5 +1,5 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
-import { Node, NodeType } from "prosemirror-model";
+import { NodeType } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
 import { insertPoint } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
@@ -33,7 +33,7 @@ export function reorder(
     return null;
   }
 
-  const gap = findGap(view.state.doc, pos, node.type);
+  const gap = findGap(view, pos, node.type, from, clientX, clientY);
 
   if (gap === null) return null;
 
@@ -58,7 +58,17 @@ export function reorder(
   return tr;
 }
 
-export function findGap(doc: Node, pos: number, nodeType: NodeType) {
+export function findGap(
+  view: EditorView,
+  pos: number,
+  nodeType: NodeType,
+  from: number,
+  clientX: number,
+  clientY: number,
+) {
+  const { doc } = view.state;
+  if (doc.nodeAt(pos)?.isBlock) return pos;
+
   const $pos = doc.resolve(pos);
 
   let d = $pos.depth;
@@ -66,18 +76,31 @@ export function findGap(doc: Node, pos: number, nodeType: NodeType) {
     d--;
   }
 
-  if (d === 0) {
-    return pos;
-  }
+  if (d === 0) return null;
 
-  const textblock = $pos.node(d);
-  const textblockPos = $pos.before(d);
+  const candidateStart = $pos.before(d);
 
-  const isInFirstHalf = pos <= textblockPos + textblock.nodeSize / 2;
+  const candidateDom = view.domAtPos(candidateStart, 1).node;
+  if (!(candidateDom instanceof Element)) return null;
 
-  const start = isInFirstHalf ? textblockPos : $pos.after(d);
+  const candidateRect = candidateDom.getBoundingClientRect();
 
-  const gap = start ? insertPoint(doc, start, nodeType) : start;
+  const fromDom = view.domAtPos(from, 1).node;
+  if (!(fromDom instanceof Element)) return null;
 
-  return gap;
+  const fromRect = fromDom.getBoundingClientRect();
+
+  const horizontal =
+    (candidateRect.top >= fromRect.top && candidateRect.top <= fromRect.bottom) ||
+    (candidateRect.bottom >= fromRect.top && candidateRect.bottom <= fromRect.bottom);
+
+  const isInFirstHalf = horizontal
+    ? clientX < (candidateRect.left + candidateRect.right) / 2
+    : clientY < (candidateRect.top + candidateRect.bottom) / 2;
+
+  const candidateGap = isInFirstHalf ? candidateStart : $pos.after(d);
+
+  if (candidateGap === 0) return 0;
+
+  return insertPoint(doc, candidateGap, nodeType);
 }

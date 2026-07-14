@@ -451,9 +451,9 @@ export function startDragOnPointerDown(
 
     const tr =
       before != null
-        ? (autogroup(view, before, x, y) ??
-          reorder(view, before, x, y) ??
-          reposition(view, before, clone.getBoundingClientRect()))
+        ? (reposition(view, before, clone.getBoundingClientRect()) ??
+          autogroup(view, before, x, y) ??
+          reorder(view, before, x, y))
         : inflate(view, clone, x, y);
 
     if (!tr) return;
