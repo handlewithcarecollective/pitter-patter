@@ -1,7 +1,9 @@
-import { Transaction } from "prosemirror-state";
+import { reactKeys } from "@handlewithcare/react-prosemirror";
+import { EditorState, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 import { setShuffleColumns } from "../commands.ts";
+import { shufflePluginKey } from "../plugin.ts";
 
 export function reposition(view: EditorView, before: number, rect: DOMRect): Transaction | null {
   const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
@@ -25,6 +27,7 @@ export function reposition(view: EditorView, before: number, rect: DOMRect): Tra
       closestDistance = distance;
     }
   }
+
   if (closestBar === null) return null;
 
   const $before = view.state.doc.resolve(before);
@@ -52,5 +55,100 @@ export function reposition(view: EditorView, before: number, rect: DOMRect): Tra
     transaction = tr;
   });
 
+  const parentStart = $before.start();
+  const beforeParent = parentStart - 1;
+
+  const parent = $before.parent;
+
+  if (parent.type.spec.pitterPatter?.shuffle?.role !== "row") {
+    return transaction;
+  }
+
+  // setShuffleColumns doesn't change any positions in the doc
+  // so we can safely use a position from before the transaction
+  const starts = transaction.doc
+    .nodeAt(beforeParent)!
+    .children!.map((child) => child.attrs["shuffleStart"]);
+  const order = transaction.doc
+    .nodeAt(beforeParent)!
+    .children!.map((_, index) => index)
+    .toSorted((a, b) => starts[a]! - starts[b]!);
+
+  reorderSiblingsOnTransaction(
+    parentStart,
+    order,
+    transaction,
+    view.state.apply(transaction),
+    (tr) => {
+      transaction = tr;
+    },
+  );
+
+  const newPos = transaction.getMeta(reactKeys().spec.key!)!.overrides[before];
+
+  transaction.setMeta(shufflePluginKey, {
+    type: "map",
+    payload: { newPos },
+  });
+
   return transaction;
+}
+
+// This is copied from React ProseMirror. I don't
+// really feel like we should export this, as it's
+// not really a command, but in this case we do need
+// this version of it, not the command
+function reorderSiblingsOnTransaction(
+  pos: number,
+  order: number[],
+  tr: Transaction,
+  state: EditorState,
+  dispatch: (tr: Transaction) => void,
+) {
+  const orderLookup = order.reduce<number[]>((acc, oldIndex, newIndex) => {
+    acc[oldIndex] = newIndex;
+    return acc;
+  }, []);
+  const $pos = state.doc.resolve(pos);
+  if ($pos.start() !== pos) {
+    return false;
+  }
+  if (!dispatch) return true;
+  const nodes = $pos.parent.children;
+  const reordered = nodes
+    .map((node, i) => [node, i] as const)
+    .sort((param, param1) => {
+      let [, a] = param,
+        [, b] = param1;
+      return orderLookup[a]! - orderLookup[b]!;
+    })
+    .map((param) => {
+      let [node] = param;
+      return node;
+    });
+  tr.replaceWith(pos, $pos.parent.content.size + pos, reordered);
+  const meta: { overrides: Record<number, number> } = {
+    overrides: {},
+  };
+  const oldPositions = [];
+  let start = pos;
+  for (const node of nodes) {
+    oldPositions.push(start);
+    start += node.nodeSize;
+  }
+  start = pos;
+  const newPositions: number[] = [];
+  for (let i = 0; i < reordered.length; i++) {
+    const node = reordered[i];
+    newPositions[order[i]!] = start;
+    start += node!.nodeSize;
+  }
+  for (let i = 0; i < oldPositions.length; i++) {
+    const oldPosition = oldPositions[i]!;
+    const newPosition = newPositions[i]!;
+    meta.overrides[oldPosition] = newPosition;
+  }
+  tr.setMeta(reactKeys().spec.key!, meta);
+  dispatch(tr);
+  return true;
 }
