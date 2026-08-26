@@ -3,6 +3,8 @@ import { CommitJSON, NodeJSON } from "@stepwisehq/prosemirror-collab-commit/coll
 import { Schema } from "prosemirror-model";
 import { createClient, RedisClientType } from "redis";
 
+export { type CommitJSON };
+
 function PromiseWithResolvers<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;
   let reject!: (reason?: any) => void;
