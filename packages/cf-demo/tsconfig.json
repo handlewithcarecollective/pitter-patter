@@ -1,0 +1,24 @@
+{
+  "extends": "@tsconfig/strictest",
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "noUncheckedSideEffectImports": false,
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "target": "ESNext",
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src", "worker-configuration.d.ts"],
+  "references": [
+    {
+      "path": "../collab-server"
+    },
+    {
+      "path": "../presence-server"
+    }
+  ]
+}

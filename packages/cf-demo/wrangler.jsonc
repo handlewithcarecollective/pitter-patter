@@ -1,0 +1,22 @@
+{
+  "name": "pitter-patter-authority",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-24",
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["PitterPatterAuthority"],
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "PitterPatterAuthority",
+        "name": "PITTER_PATTER_AUTHORITY",
+      },
+    ],
+  },
+  "observability": {
+    "enabled": true,
+  },
+}

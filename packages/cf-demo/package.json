@@ -1,0 +1,22 @@
+{
+  "name": "@pitter-patter/cf-demo",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@pitter-patter/collab-server": "workspace:*",
+    "@pitter-patter/presence-server": "workspace:*",
+    "prosemirror-model": "^1.25.11",
+    "prosemirror-schema-basic": "^1.2.4"
+  },
+  "devDependencies": {
+    "@handlewithcare/prosemirror-json": "^0.1.0",
+    "@tsconfig/strictest": "^2.0.8",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.125.0"
+  }
+}
