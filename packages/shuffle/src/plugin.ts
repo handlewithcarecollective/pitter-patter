@@ -623,6 +623,7 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
       const property = domStyles.item(i);
       cloneElement.style.setProperty(property, domStyles.getPropertyValue(property));
     }
+    cloneElement.style.pointerEvents = "none";
 
     cloneQueue.push(...cloneElement.children);
     domQueue.push(...domElement.children);
