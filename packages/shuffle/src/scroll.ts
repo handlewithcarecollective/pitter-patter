@@ -59,6 +59,9 @@ export class AutoScroller {
       autoScroll(element, x, y);
     };
 
+    // Recursively call autoScroll, triggered by its own scroll
+    // events, so that just holding the element near the edge
+    // of the scroll parent continuously scrolls the parent.
     this.scrollParent.addEventListener("scroll", this.handler);
   }
 
