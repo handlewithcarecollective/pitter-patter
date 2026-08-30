@@ -93,6 +93,14 @@ export class PresenceClient {
       this.receiveIndicators(indicators);
     }
   }
+
+  getUserId(): string {
+    return this.userId;
+  }
+
+  getClientId(): string {
+    return this.clientId;
+  }
 }
 
 export interface LongPollListenerOptions {
