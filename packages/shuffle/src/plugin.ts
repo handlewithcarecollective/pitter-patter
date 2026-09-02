@@ -118,7 +118,7 @@ export function shuffle({
               ...(!isShuffleRow(node) && {
                 class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
               }),
-              style: `grid-row: ${index + 1}; z-index: ${zIndex ?? 0};${alignment ? ` align-items: ${alignment};` : "center"}`,
+              style: `grid-row: ${index + 1}; z-index: ${zIndex ?? 0};${alignment ? ` align-items: ${alignment};` : ""}`,
             }),
           );
 
@@ -438,8 +438,6 @@ export function startDragOnPointerDown(
     if (!clone || !layout) return;
     if (!(dom instanceof HTMLElement)) return;
 
-    autoScroller.start(dom, x, y);
-
     const { transform, transformOrigin } = translateCalc.slide(x, y);
 
     clone.style.transform = transform;
@@ -500,6 +498,8 @@ export function startDragOnPointerDown(
       animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
       layout = createLayout(view.dom, { duration: 150 });
     }
+
+    autoScroller.start(dom, e.clientX, e.clientY);
 
     move(e.clientX, e.clientY);
   });
@@ -586,8 +586,8 @@ export function startDragOnPointerDown(
     move(translateCalc.lastSlideX, translateCalc.lastSlideY);
   }
 
-  (view.root as Document).addEventListener("pointermove", onMove);
   view.root.addEventListener("pointerup", onUp);
+  (view.root as Document).addEventListener("pointermove", onMove);
   view.root.addEventListener("mousedown", preventSelection);
   view.root.addEventListener("mousemove", preventSelection);
   view.root.addEventListener("scroll", onScroll);
