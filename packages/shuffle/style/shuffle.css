@@ -36,6 +36,14 @@
   grid-row-start: 1 !important;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: var(--shuffle-container-gap, 1rem);
+}
+
 .shuffle-block {
   width: 100%;
 }
