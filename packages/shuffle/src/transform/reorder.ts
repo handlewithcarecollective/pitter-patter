@@ -91,15 +91,21 @@ export function findGap(
 
   const candidateStart = $pos.before(d);
 
-  const candidateDom = view.domAtPos(candidateStart, 1).node;
-  if (!(candidateDom instanceof Element)) return null;
+  const candidateDom = view.domAtPos(candidateStart, 1);
+  if (!(candidateDom.node instanceof Element)) return null;
+  const candidateNode = candidateDom.offset
+    ? candidateDom.node.childNodes.item(candidateDom.offset)
+    : candidateDom.node;
+  if (!(candidateNode instanceof Element)) return null;
 
-  const candidateRect = candidateDom.getBoundingClientRect();
+  const candidateRect = candidateNode.getBoundingClientRect();
 
-  const fromDom = from === null ? from : view.domAtPos(from, 1).node;
-  if (fromDom !== null && !(fromDom instanceof Element)) return null;
+  const fromDom = from === null ? from : view.domAtPos(from, 1);
+  const fromNode =
+    fromDom && (fromDom.offset ? fromDom.node.childNodes.item(fromDom.offset) : fromDom.node);
+  if (fromNode !== null && !(fromNode instanceof HTMLElement)) return null;
 
-  const fromRect = fromDom?.getBoundingClientRect();
+  const fromRect = fromNode?.getBoundingClientRect();
 
   const horizontal =
     fromRect && candidateRect.top <= fromRect.bottom && candidateRect.bottom >= fromRect.top;

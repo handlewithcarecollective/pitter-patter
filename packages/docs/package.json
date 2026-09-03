@@ -12,7 +12,7 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.2.4",
+    "@handlewithcare/react-prosemirror": "^3.2.8",
     "@orama/orama": "^3.1.18",
     "@pitter-patter/shuffle": "workspace:*",
     "@tanstack/react-router": "1.169.1",
@@ -30,7 +30,7 @@
     "prosemirror-model": "^1.25.4",
     "prosemirror-schema-basic": "^1.2.4",
     "prosemirror-state": "^1.4.4",
-    "prosemirror-view": "1.41.7",
+    "prosemirror-view": "1.42.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-reconciler": "0.32.0",

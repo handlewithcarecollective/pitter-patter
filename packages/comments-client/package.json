@@ -18,7 +18,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@handlewithcare/react-prosemirror": "^3.2.4",
+    "@handlewithcare/react-prosemirror": "^3.2.8",
     "@pitter-patter/collab-client": "workspace:^",
     "@pitter-patter/refs": "workspace:^",
     "classnames": "^2.5.1",
@@ -34,9 +34,9 @@
     "@types/react-reconciler": "^0.32.2",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
     "prosemirror-model": "^1.25.3",
-    "prosemirror-state": "^1.4.3",
+    "prosemirror-state": "^1.4.4",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.41.7"
+    "prosemirror-view": "1.42.0"
   },
   "peerDependencies": {
     "prosemirror-model": "^1.0.0",

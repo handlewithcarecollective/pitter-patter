@@ -41,7 +41,7 @@
     "tw-merge": "0.0.1-alpha.3"
   },
   "devDependencies": {
-    "@handlewithcare/react-prosemirror": "^3.2.4",
+    "@handlewithcare/react-prosemirror": "^3.2.8",
     "@tsconfig/strictest": "^2.0.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
@@ -54,9 +54,9 @@
     "prosemirror-keymap": "^1.2.3",
     "prosemirror-model": "^1.25.3",
     "prosemirror-schema-basic": "^1.2.4",
-    "prosemirror-state": "^1.4.3",
+    "prosemirror-state": "^1.4.4",
     "prosemirror-transform": "^1.10.4",
-    "prosemirror-view": "1.41.7",
+    "prosemirror-view": "1.42.0",
     "typedoc": "^0.28.19",
     "typedoc-plugin-frontmatter": "^1.3.1",
     "typedoc-plugin-markdown": "^4.11.0",
