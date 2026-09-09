@@ -37,7 +37,7 @@ export function autoScroll(element: Element, x: number, y: number) {
   const scrollY =
     -Math.max(75 - (y - scrollRect.top), 0) || Math.max(75 - (scrollRect.bottom - y), 0);
 
-  (scrollParent ?? window).scrollBy({ top: scrollY * 2, left: scrollX * 2, behavior: "smooth" });
+  (scrollParent ?? window).scrollBy({ top: scrollY / 3, left: scrollX / 3 });
 }
 
 export class AutoScroller {
