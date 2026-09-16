@@ -3328,6 +3328,8 @@ __metadata:
   dependencies:
     "@handlewithcare/react-prosemirror": "npm:^3.2.8"
     "@orama/orama": "npm:^3.1.18"
+    "@pitter-patter/collab-client": "workspace:*"
+    "@pitter-patter/presence-client": "workspace:*"
     "@pitter-patter/shuffle": "workspace:*"
     "@tailwindcss/vite": "npm:^4.2.4"
     "@tanstack/react-router": "npm:1.169.1"
@@ -3352,6 +3354,7 @@ __metadata:
     prosemirror-model: "npm:^1.25.4"
     prosemirror-schema-basic: "npm:^1.2.4"
     prosemirror-state: "npm:^1.4.4"
+    prosemirror-transform: "npm:^1.12.1"
     prosemirror-view: "npm:1.42.0"
     react: "npm:^19.2.5"
     react-dom: "npm:^19.2.5"
@@ -12499,6 +12502,15 @@ __metadata:
   dependencies:
     prosemirror-model: "npm:^1.21.0"
   checksum: 10c0/e9e94fbb36fa53badc73d27833bac834835246f28a6176fb33c65a85c9025da0c08ac503f860898591a14fcacef58ba18a29e8df5a916cf376084bc17f324753
+  languageName: node
+  linkType: hard
+
+"prosemirror-transform@npm:^1.12.1":
+  version: 1.12.1
+  resolution: "prosemirror-transform@npm:1.12.1"
+  dependencies:
+    prosemirror-model: "npm:^1.21.0"
+  checksum: 10c0/054373306017df90325c90c7edd86c312a4c5d436d05f330e5a2fb4d4a227929693c4464762cd238dc6615e5e6037253bdae0673f3292e2e4fd83dc112c138c7
   languageName: node
   linkType: hard
 

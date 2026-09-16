@@ -45,7 +45,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
         return commits.filter((c) => c.version > version);
       },
       saveDoc: async (_tr, _docId, docJSON, version) => {
-        await this.ctx.storage.put({ docJSON, version, lastUpdatedTimestamp: Date.now() });
+        await this.ctx.storage.put("doc", { docJSON, version, lastUpdatedTimestamp: Date.now() });
       },
       saveCommit: async (_tr, _docId, commitRef, commitVersion, commitSteps) => {
         const commits = (await this.ctx.storage.get<CommitJSON[]>("commits")) ?? [];
@@ -88,41 +88,18 @@ export class PitterPatterAuthority extends DurableObject<Env> {
   }
 }
 
-type GetDoc = {
-  method: "getDoc";
-  payload: {};
-};
-
-type GetCommits = {
-  method: "getCommits";
-  payload: {
-    version: number;
-  };
-};
-
 type CreateCommit = {
-  method: "createCommit";
-  payload: {
-    commitJSON: CommitJSON;
-  };
+  commitJSON: CommitJSON;
 };
 
 type GetPresence = {
-  method: "getPresence";
-  payload: {
-    clientId: string;
-    refs: Record<string, string>;
-  };
+  clientId: string;
+  refs: Record<string, string>;
 };
 
 type UpdatePresence = {
-  method: "updatePresence";
-  payload: {
-    indicator: PresenceIndicator;
-  };
+  indicator: PresenceIndicator;
 };
-
-type Body = { docId: string } & (GetDoc | GetCommits | CreateCommit | GetPresence | UpdatePresence);
 
 export interface Env {
   PITTER_PATTER_AUTHORITY: DurableObjectNamespace<PitterPatterAuthority>;
@@ -138,31 +115,66 @@ export default {
    * @returns The response to be sent back to the client
    */
   async fetch(request, env): Promise<Response> {
-    const body: Body = await request.json();
-    const stub = env.PITTER_PATTER_AUTHORITY.getByName(body.docId);
+    const url = new URL(request.url);
+    const path = url.pathname;
 
-    switch (body.method) {
-      case "getDoc": {
-        // oxlint-disable-next-line typescript/await-thenable
-        return new Response(JSON.stringify(await stub.getDoc()));
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*",
+      "Access-Control-Allow-Headers": "*",
+    };
+    const [, docId, endpoint, clientId] = path.split("/");
+    if (!docId) return new Response(null, { status: 404, headers });
+    const stub = env.PITTER_PATTER_AUTHORITY.getByName(docId);
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers });
+    }
+    if (request.method === "GET") {
+      switch (endpoint) {
+        case "doc": {
+          // oxlint-disable-next-line typescript/await-thenable
+          return new Response(JSON.stringify(await stub.getDoc()), { headers });
+        }
+        case "commits": {
+          const version = url.searchParams.get("version") ?? "0";
+          // oxlint-disable-next-line typescript/await-thenable
+          return new Response(JSON.stringify(await stub.getCommits(parseInt(version, 10))), {
+            headers,
+          });
+        }
+        default: {
+          return new Response(null, { status: 404, headers });
+        }
       }
-      case "getCommits": {
-        // oxlint-disable-next-line typescript/await-thenable
-        return new Response(JSON.stringify(await stub.getCommits(body.payload.version)));
-      }
-      case "createCommit": {
-        await stub.createCommit(body.payload.commitJSON);
-        return new Response(null, { status: 204 });
-      }
-      case "getPresence": {
-        return new Response(
-          JSON.stringify(await stub.getPresence(body.payload.clientId, body.payload.refs)),
-        );
-      }
-      case "updatePresence": {
-        await stub.updatePresence(body.payload.indicator);
-        return new Response(null, { status: 204 });
+    } else if (request.method === "POST") {
+      const body = await request.json();
+      switch (endpoint) {
+        case "commits": {
+          await stub.createCommit((body as CreateCommit).commitJSON);
+          return new Response(null, { status: 204, headers });
+        }
+        case "presence": {
+          if (clientId) {
+            const [, clientId] = path.split("/");
+            if (!clientId) throw new Error("Missing clientId");
+
+            await stub.updatePresence((body as UpdatePresence).indicator);
+            return new Response(null, { status: 204, headers });
+          }
+          return new Response(
+            JSON.stringify(
+              await stub.getPresence((body as GetPresence).clientId, (body as GetPresence).refs),
+            ),
+            { headers },
+          );
+        }
+        default: {
+          return new Response(null, { status: 404, headers });
+        }
       }
     }
+
+    return new Response(null, { status: 405, headers });
   },
 } satisfies ExportedHandler<Env>;
