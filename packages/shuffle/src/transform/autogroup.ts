@@ -6,11 +6,14 @@ import { EditorView } from "prosemirror-view";
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
 import { getShuffleRowType, isShuffleRow } from "../schema.ts";
 
+import { Forward } from "./forward.ts";
+
 export function autogroup(
   view: EditorView,
   from: number,
   clientX: number,
   clientY: number,
+  forward?: Forward,
 ): Transaction | null {
   const rowType = getShuffleRowType(view.state.schema);
   if (!rowType) return null;
