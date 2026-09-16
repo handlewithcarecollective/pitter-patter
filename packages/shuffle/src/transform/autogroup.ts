@@ -6,14 +6,11 @@ import { EditorView } from "prosemirror-view";
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
 import { getShuffleRowType, isShuffleRow } from "../schema.ts";
 
-import { Forward } from "./forward.ts";
-
 export function autogroup(
   view: EditorView,
   from: number,
   clientX: number,
   clientY: number,
-  forward?: Forward,
 ): Transaction | null {
   const rowType = getShuffleRowType(view.state.schema);
   if (!rowType) return null;
@@ -91,7 +88,11 @@ export function autogroup(
     });
     tr.setMeta(shufflePluginKey, {
       type: "map",
-      payload: { newPos },
+      payload: {
+        newPos,
+        // See reorder.ts: keep the adjacent node where it was on screen.
+        scrollAnchor: { before: $pos.pos, after: newPos + node.nodeSize },
+      },
     } satisfies ShufflePluginMeta);
     tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 

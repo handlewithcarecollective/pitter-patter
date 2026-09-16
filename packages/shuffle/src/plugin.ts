@@ -1,4 +1,4 @@
-import { AutoLayout, createLayout, Timeline } from "animejs";
+import { animate as tween, AutoLayout, createLayout, JSAnimation, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { NodeSelection, Plugin, PluginKey, Selection } from "prosemirror-state";
@@ -8,7 +8,7 @@ import throttle from "raf-throttle";
 import { randomRef } from "@pitter-patter/refs";
 
 import { isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
-import { AutoScroller, ScrollCalculator } from "./scroll.ts";
+import { AutoScroller, findScrollParent, getScrollingElement, ScrollCalculator } from "./scroll.ts";
 import { autogroup } from "./transform/autogroup.ts";
 import { inflate } from "./transform/inflate.ts";
 import { reorder } from "./transform/reorder.ts";
@@ -46,6 +46,18 @@ interface ShufflePluginMapMeta {
   type: "map";
   payload: {
     newPos: number;
+    /**
+     * A node whose on-screen position should be preserved across this
+     * transaction, given as its position before and after the transaction
+     * is applied. When a transform reflows content above the pointer (e.g.
+     * autogrouping pulls the dragged node out from above the hovered node),
+     * the drag handler animates the scroll offset alongside the layout so
+     * that this node stays put under the pointer.
+     */
+    scrollAnchor?: {
+      before: number;
+      after: number;
+    };
   };
 }
 
@@ -378,6 +390,9 @@ interface NodeViewDesc {
   posBefore: number;
 }
 
+const LAYOUT_DURATION = 150;
+const LAYOUT_EASE = "inOut(3.5)";
+
 export function startDragOnPointerDown(
   view: EditorView,
   pos: number | null,
@@ -432,7 +447,27 @@ export function startDragOnPointerDown(
 
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
+  let currentScrollAnimation: JSAnimation | null = null;
   let skeletonOn = false;
+
+  /**
+   * Re-derive the clone's transform from the current scroll offset, so that
+   * it stays under the pointer while the document scrolls beneath it.
+   */
+  function syncCloneWithScroll() {
+    const { x, y } = scrollCalc.diff();
+    translateCalc.scroll(x, y);
+
+    if (!clone) return;
+
+    const { transform, transformOrigin } = translateCalc.slide(
+      translateCalc.lastSlideX,
+      translateCalc.lastSlideY,
+    );
+
+    clone.style.transform = transform;
+    clone.style.transformOrigin = transformOrigin;
+  }
 
   function move(x: number, y: number) {
     if (!clone || !layout) return;
@@ -456,9 +491,45 @@ export function startDragOnPointerDown(
 
     if (!tr) return;
 
+    const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined;
+    const scrollAnchor = meta?.type === "map" ? meta.payload.scrollAnchor : undefined;
+
+    currentScrollAnimation?.cancel();
+    currentScrollAnimation = null;
+
+    const scrollParent = getScrollingElement(findScrollParent(view.dom));
+    const scrollTopBefore = scrollParent.scrollTop;
+
+    const anchorDomBefore = scrollAnchor ? view.nodeDOM(scrollAnchor.before) : null;
+    const anchorTopBefore =
+      anchorDomBefore instanceof HTMLElement ? anchorDomBefore.getBoundingClientRect().top : null;
+
+    let scrollTopAfter: number | null = null;
+
     currentAnimation = layout.update(() => {
       view.dispatch(tr);
+
+      if (!scrollAnchor || anchorTopBefore === null) return;
+
+      const anchorDomAfter = view.nodeDOM(scrollAnchor.after);
+      if (!(anchorDomAfter instanceof HTMLElement)) return;
+
+      const anchorDocTopAfter = anchorDomAfter.getBoundingClientRect().top + scrollParent.scrollTop;
+      scrollTopAfter = anchorDocTopAfter - anchorTopBefore;
     });
+
+    if (scrollTopAfter !== null && Math.abs(scrollTopAfter - scrollTopBefore) >= 1) {
+      const scrollState = { top: scrollTopBefore };
+      currentScrollAnimation = tween(scrollState, {
+        top: scrollTopAfter,
+        duration: LAYOUT_DURATION,
+        ease: LAYOUT_EASE,
+        onUpdate() {
+          scrollParent.scrollTop = scrollState.top;
+          syncCloneWithScroll();
+        },
+      });
+    }
 
     const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
 
@@ -496,7 +567,7 @@ export function startDragOnPointerDown(
 
       skeletonOn = true;
       animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
-      layout = createLayout(view.dom, { duration: 150 });
+      layout = createLayout(view.dom, { duration: LAYOUT_DURATION, ease: LAYOUT_EASE });
     }
 
     autoScroller.start(dom, e.clientX, e.clientY);
@@ -539,7 +610,7 @@ export function startDragOnPointerDown(
     view.root.removeEventListener("mousemove", preventSelection);
     (view.root as Document).removeEventListener("pointermove", onMove);
     view.root.removeEventListener("pointerup", onUp);
-    view.root.removeEventListener("scroll", onScroll);
+    view.root.removeEventListener("scroll", onScroll, { capture: true });
 
     autoScroller.stop();
 
@@ -556,6 +627,12 @@ export function startDragOnPointerDown(
 
     if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
       currentAnimation.complete();
+    }
+
+    if (currentScrollAnimation && !currentScrollAnimation.completed) {
+      currentScrollAnimation.complete();
+      currentScrollAnimation = null;
+      syncCloneWithScroll();
     }
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
@@ -590,7 +667,9 @@ export function startDragOnPointerDown(
   (view.root as Document).addEventListener("pointermove", onMove);
   view.root.addEventListener("mousedown", preventSelection);
   view.root.addEventListener("mousemove", preventSelection);
-  view.root.addEventListener("scroll", onScroll);
+  // Scroll events don't bubble, so listen in the capture phase to also see
+  // scrolling of nested scroll containers, not just the window.
+  view.root.addEventListener("scroll", onScroll, { capture: true });
 
   return true;
 }

@@ -25,6 +25,13 @@ export function reorder(
 
   let { pos } = posResult;
 
+  // The pointer is directly over the node being dragged, so there is nothing
+  // to do. This has to be checked via `inside` rather than `pos`: for leaf
+  // nodes like images, posAtCoords resolves to a position *adjacent* to the
+  // node, which the boundary adjustment below would otherwise mistake for
+  // hovering the surrounding row.
+  if (posResult.inside === from) return null;
+
   if ((pos === from || pos === from + node.nodeSize) && $from.depth > 0) {
     pos = $from.before();
   }
@@ -73,10 +80,10 @@ export function findGap(
   view: EditorView,
   pos: number,
   nodeType: NodeType,
-  from: number,
+  from: number | null,
   clientX: number,
   clientY: number,
-) {
+): number | Transaction | null {
   const { doc } = view.state;
   const $pos = doc.resolve(pos);
 
@@ -122,9 +129,8 @@ export function findGap(
     candidateRect.top <= fromRect.bottom &&
     candidateRect.bottom >= fromRect.top;
 
-  if (isInCenter(candidateRect, clientX, clientY, horizontal ?? false)) {
-    const tr = autogroup(view, $pos.doc.resolve(candidateStart), from);
-    return tr;
+  if (from !== null && isInCenter(candidateRect, clientX, clientY, horizontal ?? false)) {
+    return autogroup(view, $pos.doc.resolve(candidateStart), from);
   }
 
   const isInFirstHalf = horizontal
@@ -200,7 +206,13 @@ function autogroup(view: EditorView, $pos: ResolvedPos, from: number) {
   });
   tr.setMeta(shufflePluginKey, {
     type: "map",
-    payload: { newPos },
+    payload: {
+      newPos,
+      // The dragged node is inserted immediately before the candidate, so the
+      // candidate now sits right after it. Keep the candidate where it was on
+      // screen
+      scrollAnchor: { before: $pos.pos, after: newPos + node.nodeSize },
+    },
   } satisfies ShufflePluginMeta);
   tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 
