@@ -3184,6 +3184,7 @@ __metadata:
     "@handlewithcare/prosemirror-json": "npm:^0.1.0"
     "@pitter-patter/collab-server": "workspace:*"
     "@pitter-patter/presence-server": "workspace:*"
+    "@pitter-patter/shuffle": "workspace:*"
     "@tsconfig/strictest": "npm:^2.0.8"
     prosemirror-model: "npm:^1.25.11"
     prosemirror-schema-basic: "npm:^1.2.4"

@@ -10,6 +10,7 @@
   "dependencies": {
     "@pitter-patter/collab-server": "workspace:*",
     "@pitter-patter/presence-server": "workspace:*",
+    "@pitter-patter/shuffle": "workspace:*",
     "prosemirror-model": "^1.25.11",
     "prosemirror-schema-basic": "^1.2.4"
   },
