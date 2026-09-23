@@ -38,8 +38,8 @@ export function autogroup(
 
   if (!adjacentPmDoms.length) return null;
 
-  // Nodes that the pointer is outside of. Check these first, and only
-  // fall back to nodes that the pointer is inside if we can't use
+  // Nodes that the drag clone's center is outside of. Check these first,
+  // and only fall back to nodes that the center is inside if we can't use
   // any of these
   const outsidePmDoms = adjacentPmDoms.filter((el) => {
     const rect = el.getBoundingClientRect();
@@ -88,18 +88,13 @@ export function autogroup(
     });
     tr.setMeta(shufflePluginKey, {
       type: "map",
-      payload: {
-        newPos,
-        // See reorder.ts: keep the adjacent node where it was on screen.
-        scrollAnchor: { before: $pos.pos, after: newPos + node.nodeSize },
-      },
+      payload: { newPos },
     } satisfies ShufflePluginMeta);
     tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 
     return tr;
   }
 
-  // TODO: Check insidePmDoms
   return null;
 }
 

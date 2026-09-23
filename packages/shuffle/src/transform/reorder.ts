@@ -23,18 +23,13 @@ export function reorder(
   const posResult = view.posAtCoords({ left: clientX, top: clientY });
   if (!posResult) return null;
 
-  let { pos } = posResult;
+  const { pos } = posResult;
 
   // The pointer is directly over the node being dragged, so there is nothing
-  // to do. This has to be checked via `inside` rather than `pos`: for leaf
-  // nodes like images, posAtCoords resolves to a position *adjacent* to the
-  // node, which the boundary adjustment below would otherwise mistake for
-  // hovering the surrounding row.
+  // to do. Checked via `inside` as well as the `pos` range below because for
+  // leaf nodes like images, posAtCoords resolves to a position *adjacent* to
+  // the node rather than within it.
   if (posResult.inside === from) return null;
-
-  if ((pos === from || pos === from + node.nodeSize) && $from.depth > 0) {
-    pos = $from.before();
-  }
 
   if (
     $containedBy &&
@@ -47,7 +42,7 @@ export function reorder(
 
   if (pos <= from + node.nodeSize && pos >= from) return null;
 
-  const gap = findGap(view, pos, node.type, from, clientX, clientY);
+  const gap = findGap(view, pos, node.type, from, clientX, clientY, posResult.inside);
 
   if (gap instanceof Transaction) {
     return gap;
@@ -83,6 +78,7 @@ export function findGap(
   from: number | null,
   clientX: number,
   clientY: number,
+  inside = -1,
 ): number | Transaction | null {
   const { doc } = view.state;
   const $pos = doc.resolve(pos);
@@ -105,7 +101,18 @@ export function findGap(
     d--;
   }
 
-  const candidateStart = d === 0 ? $pos.pos : $pos.before(d);
+  // For leaf block nodes like images, posAtCoords resolves to a position
+  // *beside* the node rather than within it, so walking up from $pos would
+  // land on the parent (e.g. the row) instead of the node the pointer is
+  // actually over. Use the node from `inside` as the candidate in that case.
+  const insideNode = inside >= 0 ? doc.nodeAt(inside) : null;
+  const overLeaf =
+    !!insideNode &&
+    insideNode.isBlock &&
+    insideNode.isLeaf &&
+    (pos === inside || pos === inside + insideNode.nodeSize);
+
+  const candidateStart = overLeaf ? inside : d === 0 ? $pos.pos : $pos.before(d);
 
   const candidateDom = view.domAtPos(candidateStart, 1);
   if (!(candidateDom.node instanceof Element)) return null;
@@ -139,9 +146,11 @@ export function findGap(
 
   const candidateGap = isInFirstHalf
     ? candidateStart
-    : d === 0
-      ? $pos.pos + $pos.doc.nodeAt($pos.pos)!.nodeSize
-      : $pos.after(d);
+    : overLeaf
+      ? candidateStart + insideNode.nodeSize
+      : d === 0
+        ? $pos.pos + $pos.doc.nodeAt($pos.pos)!.nodeSize
+        : $pos.after(d);
 
   if (candidateGap === 0) return 0;
 
@@ -206,13 +215,7 @@ function autogroup(view: EditorView, $pos: ResolvedPos, from: number) {
   });
   tr.setMeta(shufflePluginKey, {
     type: "map",
-    payload: {
-      newPos,
-      // The dragged node is inserted immediately before the candidate, so the
-      // candidate now sits right after it. Keep the candidate where it was on
-      // screen
-      scrollAnchor: { before: $pos.pos, after: newPos + node.nodeSize },
-    },
+    payload: { newPos },
   } satisfies ShufflePluginMeta);
   tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 

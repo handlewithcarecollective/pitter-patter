@@ -46,18 +46,6 @@ interface ShufflePluginMapMeta {
   type: "map";
   payload: {
     newPos: number;
-    /**
-     * A node whose on-screen position should be preserved across this
-     * transaction, given as its position before and after the transaction
-     * is applied. When a transform reflows content above the pointer (e.g.
-     * autogrouping pulls the dragged node out from above the hovered node),
-     * the drag handler animates the scroll offset alongside the layout so
-     * that this node stays put under the pointer.
-     */
-    scrollAnchor?: {
-      before: number;
-      after: number;
-    };
   };
 }
 
@@ -393,6 +381,14 @@ interface NodeViewDesc {
 const LAYOUT_DURATION = 150;
 const LAYOUT_EASE = "inOut(3.5)";
 
+/**
+ * How far (px) the clone's center may sit outside the dragged node's box
+ * before we treat it as having lost the node. Covers the gap between rows plus
+ * a little leeway, so that a node landing flush against the clone doesn't
+ * trigger a correction.
+ */
+const POINTER_SLACK = 24;
+
 export function startDragOnPointerDown(
   view: EditorView,
   pos: number | null,
@@ -480,19 +476,22 @@ export function startDragOnPointerDown(
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
 
-    if (currentAnimation?.began && !currentAnimation.completed) return;
+    if (currentAnimation && !currentAnimation.completed) return;
+
+    // Drive the transforms from where the clone visually is rather than from
+    // the pointer.
+    const cloneRect = clone.getBoundingClientRect();
+    const centerX = cloneRect.left + cloneRect.width / 2;
+    const centerY = cloneRect.top + cloneRect.height / 2;
 
     const tr =
       before != null
-        ? (reposition(view, before, clone.getBoundingClientRect()) ??
-          autogroup(view, before, x, y) ??
-          reorder(view, before, x, y))
-        : inflate(view, clone, x, y);
+        ? (reposition(view, before, cloneRect) ??
+          autogroup(view, before, centerX, centerY) ??
+          reorder(view, before, centerX, centerY))
+        : inflate(view, clone, centerX, centerY);
 
     if (!tr) return;
-
-    const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined;
-    const scrollAnchor = meta?.type === "map" ? meta.payload.scrollAnchor : undefined;
 
     currentScrollAnimation?.cancel();
     currentScrollAnimation = null;
@@ -500,25 +499,50 @@ export function startDragOnPointerDown(
     const scrollParent = getScrollingElement(findScrollParent(view.dom));
     const scrollTopBefore = scrollParent.scrollTop;
 
-    const anchorDomBefore = scrollAnchor ? view.nodeDOM(scrollAnchor.before) : null;
-    const anchorTopBefore =
-      anchorDomBefore instanceof HTMLElement ? anchorDomBefore.getBoundingClientRect().top : null;
+    // The dragged node's position in document coordinates before the
+    // transaction, so we can tell whether the transaction actually moved it.
+    const activeDomBefore = before != null ? view.nodeDOM(before) : null;
+    const docTopBefore =
+      activeDomBefore instanceof HTMLElement
+        ? activeDomBefore.getBoundingClientRect().top + scrollTopBefore
+        : null;
 
     let scrollTopAfter: number | null = null;
 
     currentAnimation = layout.update(() => {
       view.dispatch(tr);
 
-      if (!scrollAnchor || anchorTopBefore === null) return;
+      // Autoscroll is already moving the page; a competing tween just fights it.
+      if (autoScroller.active) return;
 
-      const anchorDomAfter = view.nodeDOM(scrollAnchor.after);
-      if (!(anchorDomAfter instanceof HTMLElement)) return;
+      // Inside this callback the DOM is already in its final layout. If the
+      // transaction reflowed content such that the drag clone is no longer over
+      // the dragged node, find the scroll offset that puts the node's center back
+      // under the clone's center.
+      const activePos = shufflePluginKey.getState(view.state)?.activeNodePos;
+      if (activePos === undefined) return;
 
-      const anchorDocTopAfter = anchorDomAfter.getBoundingClientRect().top + scrollParent.scrollTop;
-      scrollTopAfter = anchorDocTopAfter - anchorTopBefore;
+      const activeDom = view.nodeDOM(activePos);
+      if (!(activeDom instanceof HTMLElement)) return;
+
+      const rect = activeDom.getBoundingClientRect();
+      const docTop = rect.top + scrollParent.scrollTop;
+
+      // Only react to transactions that moved the node itself. The clone
+      // routinely drifts away from a stationary node mid-drag (e.g. while a
+      // reposition adjusts its columns), and that must not scroll the page.
+      if (docTopBefore !== null && Math.abs(docTop - docTopBefore) < 1) return;
+
+      if (centerY >= rect.top - POINTER_SLACK && centerY <= rect.bottom + POINTER_SLACK) return;
+
+      scrollTopAfter = docTop + rect.height / 2 - centerY;
     });
 
     if (scrollTopAfter !== null && Math.abs(scrollTopAfter - scrollTopBefore) >= 1) {
+      // Drive the scroll offset with the same timing as the layout animation
+      // so the two read as a single motion. Anime ticks both on the same
+      // frame, and updating the clone here (rather than waiting for the
+      // asynchronous scroll event) keeps it from lagging a frame behind.
       const scrollState = { top: scrollTopBefore };
       currentScrollAnimation = tween(scrollState, {
         top: scrollTopAfter,
@@ -625,7 +649,7 @@ export function startDragOnPointerDown(
 
     if (!clone || !initialStyles) return endDrag();
 
-    if (currentAnimation && currentAnimation.began && !currentAnimation.completed) {
+    if (currentAnimation && !currentAnimation.completed) {
       currentAnimation.complete();
     }
 

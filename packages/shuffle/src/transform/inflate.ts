@@ -29,7 +29,7 @@ export function inflate(view: EditorView, clone: HTMLElement, clientX: number, c
 
   const { pos } = posResult;
 
-  const gap = findGap(view, pos, node.type, null, clientX, clientY);
+  const gap = findGap(view, pos, node.type, null, clientX, clientY, posResult.inside);
   // findGap only autogroups when dragging an existing node (from !== null)
   if (gap === null || gap instanceof Transaction) return null;
 
