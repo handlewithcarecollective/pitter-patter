@@ -1,4 +1,5 @@
 import { Node } from "prosemirror-model";
+import { Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 import { shufflePluginKey } from "../plugin.ts";
@@ -28,8 +29,9 @@ export function inflate(view: EditorView, clone: HTMLElement, clientX: number, c
 
   const { pos } = posResult;
 
-  const gap = findGap(view, pos, node.type, null, clientX, clientY);
-  if (gap === null) return null;
+  const gap = findGap(view, pos, node.type, null, clientX, clientY, posResult.inside);
+  // findGap only autogroups when dragging an existing node (from !== null)
+  if (gap === null || gap instanceof Transaction) return null;
 
   if (!node) return null;
 

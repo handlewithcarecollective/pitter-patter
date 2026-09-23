@@ -183,8 +183,8 @@ export function supportsDrag(node: Node | undefined) {
   return !!node.type.spec.pitterPatter?.shuffle?.draggable;
 }
 
-export function isShuffleRow(node: Node) {
-  return node.type.spec.pitterPatter?.shuffle?.role === "row";
+export function isShuffleRow(node: Node | null) {
+  return node?.type.spec.pitterPatter?.shuffle?.role === "row";
 }
 
 export function isShuffleContainer(node: Node) {
