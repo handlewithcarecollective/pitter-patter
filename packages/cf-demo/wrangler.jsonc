@@ -1,5 +1,5 @@
 {
-  "name": "pitter-patter-authority",
+  "name": "pitter-patter-demo",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-24",
   "migrations": [
