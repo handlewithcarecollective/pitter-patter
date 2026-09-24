@@ -1,11 +1,11 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
-import { NodeType, ResolvedPos } from "prosemirror-model";
+import { Fragment, NodeType, ResolvedPos } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
 import { findWrapping, insertPoint } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
-import { getBeforeContainedBy, getShuffleRowType, isShuffleRow } from "../schema.ts";
+import { getBeforeContainedBy, getShuffleRowType, isShuffleRow, supportsDrag } from "../schema.ts";
 
 export function reorder(
   view: EditorView,
@@ -20,15 +20,22 @@ export function reorder(
 
   const $containedBy = getBeforeContainedBy($from);
 
+  // `posAtCoords` is unreliable over a non-editable atom.
+  // the browser reports the nearest *editable* position,
+  // which may be in an unrelated block.
+  const fromDom = view.nodeDOM(from);
+  if (
+    fromDom instanceof HTMLElement &&
+    contains(fromDom.getBoundingClientRect(), clientX, clientY)
+  ) {
+    return null;
+  }
+
   const posResult = view.posAtCoords({ left: clientX, top: clientY });
   if (!posResult) return null;
 
   const { pos } = posResult;
 
-  // The pointer is directly over the node being dragged, so there is nothing
-  // to do. Checked via `inside` as well as the `pos` range below because for
-  // leaf nodes like images, posAtCoords resolves to a position *adjacent* to
-  // the node rather than within it.
   if (posResult.inside === from) return null;
 
   if (
@@ -40,7 +47,7 @@ export function reorder(
     return null;
   }
 
-  if (pos <= from + node.nodeSize && pos >= from) return null;
+  if (pos < from + node.nodeSize && pos > from) return null;
 
   const gap = findGap(view, pos, node.type, from, clientX, clientY, posResult.inside);
 
@@ -83,36 +90,19 @@ export function findGap(
   const { doc } = view.state;
   const $pos = doc.resolve(pos);
 
-  // if ($pos.nodeAfter && $pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)) {
-  //   console.log(1);
-  //   return pos;
-  // }
-
   if (
     $pos.parentOffset == $pos.parent.content.size &&
     $pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)
   ) {
-    // console.log(2);
     return pos;
   }
 
-  let d = $pos.depth;
-  while (!$pos.node(d).isBlock && d > 0) {
-    d--;
-  }
+  const candidateStart = findCandidate($pos, inside);
+  if (candidateStart === null) return null;
+  if (candidateStart === from) return null;
 
-  // For leaf block nodes like images, posAtCoords resolves to a position
-  // *beside* the node rather than within it, so walking up from $pos would
-  // land on the parent (e.g. the row) instead of the node the pointer is
-  // actually over. Use the node from `inside` as the candidate in that case.
-  const insideNode = inside >= 0 ? doc.nodeAt(inside) : null;
-  const overLeaf =
-    !!insideNode &&
-    insideNode.isBlock &&
-    insideNode.isLeaf &&
-    (pos === inside || pos === inside + insideNode.nodeSize);
-
-  const candidateStart = overLeaf ? inside : d === 0 ? $pos.pos : $pos.before(d);
+  const candidate = doc.nodeAt(candidateStart);
+  if (!candidate) return null;
 
   const candidateDom = view.domAtPos(candidateStart, 1);
   if (!(candidateDom.node instanceof Element)) return null;
@@ -131,55 +121,131 @@ export function findGap(
   const fromRect = fromNode?.getBoundingClientRect();
 
   const horizontal =
-    !isShuffleRow($pos.doc.nodeAt(candidateStart)) &&
+    !isShuffleRow(candidate) &&
     fromRect &&
     candidateRect.top <= fromRect.bottom &&
     candidateRect.bottom >= fromRect.top;
 
+  // `posAtCoords` can resolve to content nowhere near the pointer (e.g. the
+  // nearest editable text when the pointer is over a non-editable atom). Only
+  // act on a candidate the pointer is actually over or in the spacing beside,
+  // measured along the axis the candidate's siblings are laid out on.
+  const nearby = horizontal
+    ? clientX >= candidateRect.left - CANDIDATE_SLACK &&
+      clientX <= candidateRect.right + CANDIDATE_SLACK
+    : clientY >= candidateRect.top - CANDIDATE_SLACK &&
+      clientY <= candidateRect.bottom + CANDIDATE_SLACK;
+  if (!nearby) return null;
+
   if (from !== null && isInCenter(candidateRect, clientX, clientY, horizontal ?? false)) {
-    return autogroup(view, $pos.doc.resolve(candidateStart), from);
+    const grouped = autogroup(view, doc.resolve(candidateStart), from);
+    if (grouped) return grouped;
   }
 
   const isInFirstHalf = horizontal
     ? clientX < (candidateRect.left + candidateRect.right) / 2
     : clientY < (candidateRect.top + candidateRect.bottom) / 2;
 
-  const candidateGap = isInFirstHalf
-    ? candidateStart
-    : overLeaf
-      ? candidateStart + insideNode.nodeSize
-      : d === 0
-        ? $pos.pos + $pos.doc.nodeAt($pos.pos)!.nodeSize
-        : $pos.after(d);
+  const candidateGap = isInFirstHalf ? candidateStart : candidateStart + candidate.nodeSize;
 
   if (candidateGap === 0) return 0;
 
   return insertPoint(doc, candidateGap, nodeType);
 }
 
-function isInCenter(rect: DOMRect, clientX: number, clientY: number, horizontal: boolean) {
-  if (horizontal) {
-    return (
-      clientX > Math.max((rect.left + rect.right) / 2 - 30, rect.left) &&
-      clientX < Math.min((rect.left + rect.right) / 2 + 30, rect.right)
-    );
+/**
+ * Picks the block the pointer should be considered "over", given the position
+ * `posAtCoords` resolved to, and returns the position directly before it.
+ *
+ * Inside a textblock, that's the textblock itself (or its nearest block
+ * ancestor when the position sits inside an inline node with content).
+ *
+ * Otherwise the position is a gap between block children. When the pointer is
+ * over a draggable parent's own chrome, that parent is the candidate; otherwise
+ * it is one of the two blocks adjacent to the gap, never the parent: prefer
+ * whichever one the pointer is actually inside (per `inside`), then the block
+ * after the gap, then the block before it.
+ */
+function findCandidate($pos: ResolvedPos, inside: number): number | null {
+  if ($pos.parent.inlineContent) {
+    let d = $pos.depth;
+    while (d > 0 && !$pos.node(d).isBlock) {
+      d--;
+    }
+    return d === 0 ? null : $pos.before(d);
   }
 
+  // The pointer is over the parent block's own chrome rather than any child
+  // (e.g. the picture of an image block whose content is its caption), so
+  // `posAtCoords` landed at an edge of the parent's content. The parent is the
+  // block being hovered. Rows are the exception: the pointer between a row's
+  // children is targeting those children.
+  if (
+    $pos.depth > 0 &&
+    inside === $pos.before() &&
+    supportsDrag($pos.parent) &&
+    !isShuffleRow($pos.parent)
+  ) {
+    return $pos.before();
+  }
+
+  const { nodeBefore, nodeAfter } = $pos;
+  const beforeStart = nodeBefore ? $pos.pos - nodeBefore.nodeSize : null;
+
+  if (beforeStart !== null && inside === beforeStart) return beforeStart;
+  if (nodeAfter && inside === $pos.pos) return $pos.pos;
+  if (nodeAfter) return $pos.pos;
+  return beforeStart;
+}
+
+/**
+ * How far (px) past a candidate block's edge, along its layout axis, the
+ * pointer may be and still count as hovering it (covers the spacing between
+ * blocks).
+ */
+const CANDIDATE_SLACK = 60;
+
+function contains(rect: DOMRect, clientX: number, clientY: number) {
   return (
-    clientY > Math.max((rect.top + rect.bottom) / 2 - 30, rect.top) &&
-    clientY < Math.min((rect.top + rect.bottom) / 2 + 30, rect.bottom)
+    clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom
   );
 }
 
-function autogroup(view: EditorView, $pos: ResolvedPos, from: number) {
+/**
+ * The widest the center band (the zone that triggers an autogroup rather than
+ * a reorder) may extend to either side of a block's midpoint, in pixels.
+ */
+const CENTER_BAND = 30;
+
+/**
+ * Whether the pointer is in the block's center band. The band is capped at
+ * the middle third of the block so short blocks (headings, buttons, list
+ * items) always keep a reorder zone at their leading and trailing edges.
+ */
+function isInCenter(rect: DOMRect, clientX: number, clientY: number, horizontal: boolean) {
+  if (horizontal) {
+    const mid = (rect.left + rect.right) / 2;
+    const half = Math.min(CENTER_BAND, rect.width / 6);
+    return clientX > mid - half && clientX < mid + half;
+  }
+
+  const mid = (rect.top + rect.bottom) / 2;
+  const half = Math.min(CENTER_BAND, rect.height / 6);
+  return clientY > mid - half && clientY < mid + half;
+}
+
+function autogroup(view: EditorView, $pos: ResolvedPos, from: number): Transaction | null {
   const rowType = getShuffleRowType(view.state.schema);
   if (!rowType) return null;
 
   const node = $pos.doc.nodeAt(from);
-  if (!node) return null;
+  // Rows don't nest: dragging a row over another block's center reorders it.
+  if (!node || isShuffleRow(node)) return null;
 
   const candidate = $pos.doc.nodeAt($pos.pos);
   if (!candidate || isShuffleRow(candidate)) return null;
+
+  if (!rowType.validContent(Fragment.from([node, candidate]))) return null;
 
   let d = $pos.depth;
   while (d >= 0) {

@@ -1,4 +1,5 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
+import { Fragment } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
 import { findWrapping } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
@@ -60,6 +61,7 @@ export function autogroup(
     if (isShuffleRow($pos.parent)) return null;
     const adjacentNode = $pos.nodeAfter;
     if (!adjacentNode || isShuffleRow(adjacentNode)) return null;
+    if (!rowType.validContent(Fragment.from([node, adjacentNode]))) continue;
 
     const blockRange = $pos.blockRange(view.state.doc.resolve($pos.pos + adjacentNode.nodeSize));
 

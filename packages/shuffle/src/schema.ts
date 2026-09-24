@@ -191,7 +191,7 @@ export function isShuffleContainer(node: Node) {
   return !!node.type.spec.pitterPatter?.shuffle?.role;
 }
 
-export function getShuffleRowType(schema: Schema) {
+export function getShuffleRowType(schema: Schema): NodeType | null {
   let rowType: NodeType | undefined = undefined;
   schema.spec.nodes.forEach((nodeName, nodeSpec) => {
     if (nodeSpec.pitterPatter?.shuffle?.role !== "row") return;
