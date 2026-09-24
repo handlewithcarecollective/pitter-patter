@@ -382,12 +382,38 @@ const LAYOUT_DURATION = 150;
 const LAYOUT_EASE = "inOut(3.5)";
 
 /**
- * How far (px) the clone's center may sit outside the dragged node's box
- * before we treat it as having lost the node. Covers the gap between rows plus
- * a little leeway, so that a node landing flush against the clone doesn't
- * trigger a correction.
+ * Picks the block to hold visually still on screen while a transform reflows the
+ * document, given the dragged node's position in `doc`.
  */
-const POINTER_SLACK = 24;
+function findScrollReference(doc: PmNode, pos: number, fromAbove: boolean): number | null {
+  const $pos = doc.resolve(pos);
+  for (let d = $pos.depth; d >= 0; d--) {
+    const index = $pos.index(d) + (fromAbove ? 1 : -1);
+    if (index < 0 || index >= $pos.node(d).childCount) continue;
+    return $pos.posAtIndex(index, d);
+  }
+
+  return null;
+}
+
+/** The document-space top of the DOM of the node at `pos`, or null. */
+function docTopOf(view: EditorView, pos: number, scrollTop: number): number | null {
+  const dom = view.nodeDOM(pos);
+  if (!(dom instanceof HTMLElement)) return null;
+
+  return dom.getBoundingClientRect().top + scrollTop;
+}
+
+/**
+ * Whether a layout timeline is still tweening the DOM (so it can't be
+ * measured). A timeline that hasn't completed but is paused is finished from
+ * our point of view; anime never marks an empty one (a transform that moved
+ * nothing visually, e.g. reordering within a row whose grid columns fix the
+ * layout) as `completed` (??).
+ */
+function isAnimating(timeline: Timeline | null): timeline is Timeline {
+  return timeline !== null && !timeline.completed && !timeline.paused;
+}
 
 export function startDragOnPointerDown(
   view: EditorView,
@@ -446,6 +472,13 @@ export function startDragOnPointerDown(
   let currentScrollAnimation: JSAnimation | null = null;
   let skeletonOn = false;
 
+  let pendingMoveTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function rerunMove() {
+    pendingMoveTimer = null;
+    move(translateCalc.lastSlideX, translateCalc.lastSlideY);
+  }
+
   /**
    * Re-derive the clone's transform from the current scroll offset, so that
    * it stays under the pointer while the document scrolls beneath it.
@@ -476,7 +509,15 @@ export function startDragOnPointerDown(
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
 
-    if (currentAnimation && !currentAnimation.completed) return;
+    if (isAnimating(currentAnimation)) {
+      // Mid-animation the DOM is in FLIP positions and can't be measured. If
+      // the pointer then comes to rest, no further event would re-evaluate
+      // this position, so schedule a re-run for when the animation is done.
+      if (pendingMoveTimer === null) {
+        pendingMoveTimer = setTimeout(rerunMove, 40);
+      }
+      return;
+    }
 
     // Drive the transforms from where the clone visually is rather than from
     // the pointer.
@@ -499,12 +540,26 @@ export function startDragOnPointerDown(
     const scrollParent = getScrollingElement(findScrollParent(view.dom));
     const scrollTopBefore = scrollParent.scrollTop;
 
-    // The dragged node's position in document coordinates before the
-    // transaction, so we can tell whether the transaction actually moved it.
+    // Hold the content ahead of the pointer still. Note where the reference
+    // block sits in document coordinates before the transaction, then scroll
+    // by however much it moved.
     const activeDomBefore = before != null ? view.nodeDOM(before) : null;
-    const docTopBefore =
-      activeDomBefore instanceof HTMLElement
-        ? activeDomBefore.getBoundingClientRect().top + scrollTopBefore
+    const activeRectBefore =
+      activeDomBefore instanceof HTMLElement ? activeDomBefore.getBoundingClientRect() : null;
+    const fromAbove =
+      activeRectBefore !== null && activeRectBefore.top + activeRectBefore.height / 2 < centerY;
+    const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined;
+    const refPosNew =
+      activeRectBefore !== null && meta?.type === "map"
+        ? findScrollReference(tr.doc, meta.payload.newPos, fromAbove)
+        : null;
+    const refNode = refPosNew !== null ? tr.doc.nodeAt(refPosNew) : null;
+    const refPosOld = refPosNew !== null ? tr.mapping.invert().map(refPosNew, 1) : null;
+    // The transform doesn't touch the reference block itself, so mapping its
+    // position back must land on an equal node in the old document.
+    const refTopBefore =
+      refNode !== null && refPosOld !== null && tr.before.nodeAt(refPosOld)?.eq(refNode)
+        ? docTopOf(view, refPosOld, scrollTopBefore)
         : null;
 
     let scrollTopAfter: number | null = null;
@@ -514,35 +569,31 @@ export function startDragOnPointerDown(
 
       // Autoscroll is already moving the page; a competing tween just fights it.
       if (autoScroller.active) return;
+      if (refTopBefore === null) return;
 
-      // Inside this callback the DOM is already in its final layout. If the
-      // transaction reflowed content such that the drag clone is no longer over
-      // the dragged node, find the scroll offset that puts the node's center back
-      // under the clone's center.
       const activePos = shufflePluginKey.getState(view.state)?.activeNodePos;
       if (activePos === undefined) return;
+      const refPosAfter = findScrollReference(view.state.doc, activePos, fromAbove);
+      if (refPosAfter === null) return;
 
-      const activeDom = view.nodeDOM(activePos);
-      if (!(activeDom instanceof HTMLElement)) return;
+      // Inside this callback the DOM is already in its final layout.
+      const refTopAfter = docTopOf(view, refPosAfter, scrollParent.scrollTop);
+      if (refTopAfter === null) return;
 
-      const rect = activeDom.getBoundingClientRect();
-      const docTop = rect.top + scrollParent.scrollTop;
+      const delta = refTopAfter - refTopBefore;
+      if (Math.abs(delta) < 1) return;
 
-      // Only react to transactions that moved the node itself. The clone
-      // routinely drifts away from a stationary node mid-drag (e.g. while a
-      // reposition adjusts its columns), and that must not scroll the page.
-      if (docTopBefore !== null && Math.abs(docTop - docTopBefore) < 1) return;
-
-      if (centerY >= rect.top - POINTER_SLACK && centerY <= rect.bottom + POINTER_SLACK) return;
-
-      scrollTopAfter = docTop + rect.height / 2 - centerY;
+      scrollTopAfter = scrollTopBefore + delta;
     });
+
+    if (pendingMoveTimer === null) {
+      pendingMoveTimer = setTimeout(rerunMove, 40);
+    }
 
     if (scrollTopAfter !== null && Math.abs(scrollTopAfter - scrollTopBefore) >= 1) {
       // Drive the scroll offset with the same timing as the layout animation
       // so the two read as a single motion. Anime ticks both on the same
-      // frame, and updating the clone here (rather than waiting for the
-      // asynchronous scroll event) keeps it from lagging a frame behind.
+      // frame.
       const scrollState = { top: scrollTopBefore };
       currentScrollAnimation = tween(scrollState, {
         top: scrollTopAfter,
@@ -637,6 +688,10 @@ export function startDragOnPointerDown(
     view.root.removeEventListener("scroll", onScroll, { capture: true });
 
     autoScroller.stop();
+    if (pendingMoveTimer !== null) {
+      clearTimeout(pendingMoveTimer);
+      pendingMoveTimer = null;
+    }
 
     view.root.shuffleDragging = false;
 
@@ -649,7 +704,7 @@ export function startDragOnPointerDown(
 
     if (!clone || !initialStyles) return endDrag();
 
-    if (currentAnimation && !currentAnimation.completed) {
+    if (isAnimating(currentAnimation)) {
       currentAnimation.complete();
     }
 
@@ -732,6 +787,7 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
     domQueue.push(...domElement.children);
   }
 
+  clone.dataset["shuffleClone"] = "true";
   clone.style.position = "absolute";
   clone.style.top = `${domRect.top - bodyRect.top}px`;
   clone.style.left = `${domRect.left - bodyRect.left}px`;
