@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
+    "versions": "wrangler versions upload",
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "cf-typegen": "wrangler types"
