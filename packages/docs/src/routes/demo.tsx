@@ -5,7 +5,7 @@ import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
 import { Node } from "prosemirror-model";
 import { EditorState, Transaction } from "prosemirror-state";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
   collab,
@@ -30,7 +30,9 @@ import {
   ShuffleSkeleton,
 } from "@pitter-patter/shuffle";
 
+import { COLLAB_SERVER_URL } from "@/demo/config.js";
 import { schema } from "@/demo/schema.js";
+import { useTypingBuddy } from "@/demo/useTypingBuddy.js";
 import { baseOptions } from "@/lib/layout.shared";
 
 import "@pitter-patter/presence-client/styles.css";
@@ -54,10 +56,12 @@ function randomRef() {
 function Demo() {
   const docId = useId();
   const [initialState, setInitialState] = useState<null | EditorState>(null);
+  const typingBuddy = useTypingBuddy(docId);
+  const [rightOffline, setRightOffline] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     async function run() {
-      const response = await fetch(`http://localhost:8787/${docId}/doc`, {
+      const response = await fetch(`${COLLAB_SERVER_URL}/${docId}/doc`, {
         signal: controller.signal,
       });
       const json = await response.json();
@@ -81,16 +85,35 @@ function Demo() {
     <HomeLayout {...baseOptions()}>
       {initialState && (
         <div className="flex flex-col gap-4 p-10">
-          <h1 className="text-3xl font-semibold">Pitter Patter Demo!</h1>
+          <h1 className="text-3xl font-semibold">Pitter Patter Demo</h1>
           <p>
             Try typing in the editors below, and see the edits and presence indicators update in the
-            other editor! You can also drag one of the menu items below to insert a node of that
-            type into either editor.
+            other editor! You can also...
           </p>
           <InflatableMenu />
+          <div className="flex flex-col gap-2">
+            <div>
+              Use Typing Buddy to simulate a remote collaborator typing Moby Dick into the end of
+              your doc, or take the right editor offline to simulate network problems!
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={typingBuddy.isTyping ? typingBuddy.stop : typingBuddy.start}
+                className="cursor-pointer border-gray border rounded-md p-2 text-sm"
+              >
+                {typingBuddy.isTyping ? "Stop Typing Buddy" : "Start Typing Buddy"}
+              </button>
+              <button
+                onClick={() => setRightOffline((offline) => !offline)}
+                className="cursor-pointer border-gray border rounded-md p-2 text-sm"
+              >
+                {rightOffline ? "Bring Right Editor Online" : "Take Right Editor Offline"}
+              </button>
+            </div>
+          </div>
           <div className="flex gap-6 flex-col md:flex-row py-6">
             <DemoEditor docId={docId} initialState={initialState} />
-            <DemoEditor docId={docId} initialState={initialState} />
+            <DemoEditor docId={docId} initialState={initialState} isOffline={rightOffline} />
           </div>
         </div>
       )}
@@ -100,38 +123,51 @@ function Demo() {
 
 function InflatableMenu() {
   return (
-    <div className="flex gap-2 sticky top-0 z-10">
-      <div
-        data-shuffle-inflatable={JSON.stringify(
-          schema.nodes.paragraph.create(null, schema.text("A brand new paragraph!")).toJSON(),
-        )}
-        className="border-gray border rounded-md px-3 py-2 cursor-grab touch-none select-none"
-      >
-        Paragraph
-      </div>
-      <div
-        data-shuffle-inflatable={JSON.stringify(
-          schema.nodes.image.create({ src: "/images/shuffle-dance.jpg" }).toJSON(),
-        )}
-        className="border-gray border rounded-md px-3 py-2 cursor-grab touch-none select-none"
-      >
-        Image
+    <div className="flex flex-col gap-2">
+      <div>Drag one of the items below to insert a node of that type into either editor:</div>
+      <div className="flex gap-2 sticky top-0 z-10">
+        <div
+          data-shuffle-inflatable={JSON.stringify(
+            schema.nodes.paragraph.create(null, schema.text("A brand new paragraph!")).toJSON(),
+          )}
+          className="border-gray border rounded-md p-2 cursor-grab touch-none select-none text-sm"
+        >
+          Paragraph
+        </div>
+        <div
+          data-shuffle-inflatable={JSON.stringify(
+            schema.nodes.image.create({ src: "/images/shuffle-dance.jpg" }).toJSON(),
+          )}
+          className="border-gray border rounded-md p-2 cursor-grab touch-none select-none text-sm"
+        >
+          Image
+        </div>
       </div>
     </div>
   );
 }
 
-function DemoEditor({ docId, initialState }: { docId: string; initialState: EditorState }) {
+function DemoEditor({
+  docId,
+  initialState,
+  isOffline = false,
+}: {
+  docId: string;
+  initialState: EditorState;
+  isOffline?: boolean;
+}) {
   const [state, setState] = useState<EditorState>(initialState);
+  const stateRef = useRef(state);
+  stateRef.current = state;
   const [listener] = useState(
-    () => new CollabLongPollListener(new URL(`http://localhost:8787/${docId}/commits`)),
+    () => new CollabLongPollListener(new URL(`${COLLAB_SERVER_URL}/${docId}/commits`)),
   );
   const userId = randomRef();
 
   const collabConfig = useMemo<CollabClientConfig>(
     () => ({
       sendCommit: async (commit) => {
-        await fetch(`http://localhost:8787/${docId}/commits`, {
+        await fetch(`${COLLAB_SERVER_URL}/${docId}/commits`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ commitJSON: commit.toJSON() }),
@@ -151,14 +187,14 @@ function DemoEditor({ docId, initialState }: { docId: string; initialState: Edit
   );
 
   const [presenceListener] = useState(
-    () => new PresenceLongPollListener(new URL(`http://localhost:8787/${docId}/presence`)),
+    () => new PresenceLongPollListener(new URL(`${COLLAB_SERVER_URL}/${docId}/presence`)),
   );
 
   const presenceConfig = useMemo<PresenceClientConfig>(
     () => ({
       userId,
       sendIndicator: async (clientId, indicator) => {
-        await fetch(`http://localhost:8787/${docId}/presence/${clientId}`, {
+        await fetch(`${COLLAB_SERVER_URL}/${docId}/presence/${clientId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ indicator }),
@@ -181,41 +217,51 @@ function DemoEditor({ docId, initialState }: { docId: string; initialState: Edit
   }, []);
 
   useEffect(() => {
-    if (!state) return;
+    if (!state || isOffline) return;
     collabClient.send(state).catch(console.error);
-  }, [collabClient, state]);
+  }, [collabClient, state, isOffline]);
 
   useEffect(() => {
+    if (isOffline) return;
     presenceClient.send(state).catch((e) => console.error(e));
-  }, [presenceClient, state]);
+  }, [presenceClient, state, isOffline]);
 
   useEffect(() => {
+    if (isOffline) return;
     const abortController = new AbortController();
-    collabClient?.listen(initialState, abortController.signal).catch((e) => console.error(e));
+    collabClient?.listen(stateRef.current, abortController.signal).catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
     };
-  }, [collabClient, initialState]);
+  }, [collabClient, isOffline]);
 
   useEffect(() => {
+    if (isOffline) return;
     const abortController = new AbortController();
     presenceClient.listen(abortController.signal).catch((e) => console.error(e));
 
     return () => {
       abortController.abort();
     };
-  }, [presenceClient, initialState]);
+  }, [presenceClient, isOffline]);
 
   return (
     <div className="flex-1 min-w-0">
       <ProseMirror state={state} dispatchTransaction={dispatchTransaction}>
         <ShuffleSkeleton>
-          <ProseMirrorDoc className="border-gray border rounded-md min-h-[350px] p-2" />
+          <ProseMirrorDoc
+            className={`border rounded-md min-h-[350px] p-2 ${isOffline ? "border-red-500" : "border-gray"}`}
+          />
           <ResizeHandles />
           <DragHandles handleComponent={CustomHandle} />
         </ShuffleSkeleton>
       </ProseMirror>
+      {isOffline && (
+        <p className="text-red-500 mb-2">
+          Editor is offline. Edits are local-only and will sync when back online.
+        </p>
+      )}
     </div>
   );
 }

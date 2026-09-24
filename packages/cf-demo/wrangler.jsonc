@@ -5,7 +5,7 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["PitterPatterAuthority"],
+      "new_sqlite_classes": ["PitterPatterAuthority"],
     },
   ],
   "durable_objects": {
