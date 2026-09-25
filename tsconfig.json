@@ -32,6 +32,9 @@
       "path": "packages/demo"
     },
     {
+      "path": "packages/cf-demo"
+    },
+    {
       "path": "packages/shuffle"
     }
   ]
