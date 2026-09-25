@@ -3,7 +3,6 @@ import { schema as basic } from "prosemirror-schema-basic";
 
 import { addShuffleNodes } from "@pitter-patter/shuffle";
 
-
 const imageSpec = basic.spec.nodes.get("image");
 
 basic.spec.nodes = basic.spec.nodes.update("image", {
