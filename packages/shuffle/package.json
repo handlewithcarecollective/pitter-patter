@@ -25,7 +25,9 @@
     "gen:ref": "typedoc",
     "fix:toc": "markdown-toc --bullets='-' -i README.md",
     "prepack": "yarn check:types",
-    "prepublish": "yarn check:format && yarn check:lint"
+    "prepublish": "yarn check:format && yarn check:lint",
+    "test": "playwright test",
+    "test:harness": "vite --config tests/harness/vite.config.ts"
   },
   "dependencies": {
     "@pitter-patter/refs": "workspace:*",
@@ -42,6 +44,7 @@
   },
   "devDependencies": {
     "@handlewithcare/react-prosemirror": "^3.2.8",
+    "@playwright/test": "1.63.0",
     "@tsconfig/strictest": "^2.0.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

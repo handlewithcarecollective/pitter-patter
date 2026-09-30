@@ -1,0 +1,117 @@
+/*
+ * Presentation only. The functional grid lives in
+ * `@pitter-patter/shuffle/style/shuffle.css`; this file keeps the harness
+ * geometry fixed so rectangles are predictable.
+ */
+
+/* Shuffle toggles `box-sizing: border-box` on animated elements; making it
+ * global means blocks never change size mid-animation. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  /* The drag clone is positioned relative to the document origin, so the body
+   * must not add an offset of its own. */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background-color: #ffffff;
+}
+
+.page {
+  padding: 2rem 2rem 6rem;
+}
+
+.shuffle-wrapper {
+  width: 960px;
+}
+
+.ProseMirror {
+  position: relative;
+  min-height: 40rem;
+  padding-top: 1rem;
+  outline: none;
+}
+
+/* Node chrome is drawn with outlines, which never affect layout. */
+[data-node-type] {
+  background-color: #f6f1f0;
+  outline: 1px solid #e0d8d5;
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: 5rem;
+  object-fit: cover;
+}
+
+.card-deck {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #d8e3e0;
+  outline: 1px solid #b9cbc6;
+}
+
+.card {
+  flex: 1 1 0;
+  padding: 0.5rem;
+  background-color: #ffffff;
+  outline: 1px solid #b9cbc6;
+}
+
+.card p {
+  background-color: transparent;
+  outline: none;
+}
+
+.shuffle-hover-block {
+  outline: 2px dashed #6ba3d6;
+}
+
+/* Scrollable overflow, so the window scrolls and the library's scroll adjustment has something to
+ * adjust. See `Harness`. */
+.scroll-runway {
+  height: 200vh;
+}
+
+.inflatable-menu {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.inflatable {
+  padding: 0.5rem 1rem;
+  color: #1a1a1a;
+  background-color: #fff0d8;
+  outline: 1px solid #d9a441;
+  cursor: grab;
+}

@@ -28,7 +28,7 @@ basic.spec.nodes = basic.spec.nodes.update("card", {
 
 export const schema = addShuffleNodes(
   new Schema({ nodes: basic.spec.nodes, marks: basic.spec.marks }) as unknown as typeof basic,
-  "block+",
+  "block*",
   "block",
   { defaultStart: 0, defaultEnd: 13 },
 );

@@ -51,7 +51,7 @@ let nodes = basic.spec.nodes.update("paragraph", {
 
 export const schema = addShuffleNodes(
   new Schema({ nodes, marks: basic.spec.marks }) as unknown as typeof basic,
-  "block+",
+  "block*",
   "block",
   { defaultStart: 0, defaultEnd: 13 },
 );
