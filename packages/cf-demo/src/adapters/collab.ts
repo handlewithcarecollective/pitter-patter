@@ -5,14 +5,20 @@ type BroadcastManager = CollabAuthorityConfig<null>["broadcastManager"];
 export class DurableObjectBroadcastManager implements BroadcastManager {
   private subscriptions: Map<string, Array<(version: number) => void>>;
   private timeout: number;
+  private ctx: DurableObjectState | undefined;
 
-  constructor(config: { timeout?: number }) {
+  constructor(config: { timeout?: number; ctx?: DurableObjectState }) {
     this.subscriptions = new Map();
     this.timeout = config.timeout ?? 5_000;
+    this.ctx = config.ctx;
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
     this.subscriptions.get(docId)?.forEach((subscription) => subscription(commitJSON.version));
+
+    this.ctx?.getWebSockets().forEach((ws) => {
+      ws.send(JSON.stringify({ type: "commits", commits: [commitJSON] }));
+    });
   }
 
   async createCommitListener(docId: string, version: number) {

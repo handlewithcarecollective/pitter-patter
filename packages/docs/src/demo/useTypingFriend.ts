@@ -23,7 +23,7 @@ import { schema } from "./schema.js";
  * collab & presence client that posts commits typing moby dick chapter 1
  * one character at a time
  */
-export function useTypingBuddy(docId: string) {
+export function useTypingFriend(docId: string) {
   const [isTyping, setIsTyping] = useState(false);
   const stateRef = useRef<EditorState | null>(null);
   const collabClientRef = useRef<CollabClient | null>(null);

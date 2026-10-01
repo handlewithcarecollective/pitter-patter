@@ -21,6 +21,11 @@ interface StoredDoc {
   lastUpdatedTimestamp: number;
 }
 
+type ClientMessage =
+  | { type: "subscribe"; version: number }
+  | { type: "commit"; commitJSON: CommitJSON }
+  | { type: "presence"; indicator: PresenceIndicator };
+
 export class PitterPatterAuthority extends DurableObject<Env> {
   private collabAuthority: CollabAuthority<null>;
   private presenceAuthority: PresenceAuthority;
@@ -29,7 +34,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
     super(ctx, env);
     this.presenceAuthority = new PresenceAuthority({
       persistenceManager: new DurableObjectPersistenceManager(this.ctx.storage),
-      broadcastManager: new PresenceBroadcastManager({}),
+      broadcastManager: new PresenceBroadcastManager({ ctx: this.ctx }),
     });
     this.collabAuthority = new CollabAuthority({
       schema,
@@ -40,10 +45,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
         const commits = (await this.ctx.storage.get<CommitJSON[]>("commits")) ?? [];
         return commits.find((c) => c.ref === commitRef) ?? null;
       },
-      getCommits: async (_tr, _docId, version) => {
-        const commits = (await this.ctx.storage.get<CommitJSON[]>("commits")) ?? [];
-        return commits.filter((c) => c.version > version);
-      },
+      getCommits: async (_tr, _docId, version) => this.getStoredCommitsAfter(version),
       saveDoc: async (_tr, _docId, docJSON, version) => {
         await this.ctx.storage.put("doc", { docJSON, version, lastUpdatedTimestamp: Date.now() });
       },
@@ -54,8 +56,48 @@ export class PitterPatterAuthority extends DurableObject<Env> {
           commits.concat({ ref: commitRef, version: commitVersion, steps: commitSteps }),
         );
       },
-      broadcastManager: new CollabBroadcastManager({}),
+      broadcastManager: new CollabBroadcastManager({ ctx: this.ctx }),
     });
+  }
+
+  override fetch(request: Request): Response {
+    if (request.headers.get("Upgrade") !== "websocket") {
+      return new Response("Expected Upgrade: websocket", { status: 426 });
+    }
+
+    const pair = new WebSocketPair();
+    const client = pair[0];
+    const server = pair[1];
+    this.ctx.acceptWebSocket(server);
+
+    return new Response(null, { status: 101, webSocket: client });
+  }
+
+  override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    if (typeof message !== "string") return;
+
+    const data = JSON.parse(message) as ClientMessage;
+    switch (data.type) {
+      case "subscribe": {
+        const commits = await this.getStoredCommitsAfter(data.version);
+        ws.send(JSON.stringify({ type: "commits", commits }));
+        break;
+      }
+      case "commit": {
+        await this.createCommit(data.commitJSON);
+        break;
+      }
+      case "presence": {
+        ws.serializeAttachment({ clientId: data.indicator.clientId });
+        await this.updatePresence(data.indicator);
+        break;
+      }
+    }
+  }
+
+  private async getStoredCommitsAfter(version: number): Promise<CommitJSON[]> {
+    const commits = (await this.ctx.storage.get<CommitJSON[]>("commits")) ?? [];
+    return commits.filter((c) => c.version > version);
   }
 
   async getDoc(): Promise<StoredDoc> {
@@ -68,19 +110,8 @@ export class PitterPatterAuthority extends DurableObject<Env> {
     );
   }
 
-  async getCommits(version: number): Promise<CommitJSON[]> {
-    return this.collabAuthority.listenForCommit("", version);
-  }
-
   async createCommit(commitJSON: CommitJSON): Promise<void> {
     await this.collabAuthority.receiveCommit("", commitJSON);
-  }
-
-  async getPresence(
-    clientId: string,
-    refs: Record<string, string>,
-  ): Promise<Record<string, PresenceIndicator>> {
-    return this.presenceAuthority.listenForPresence("", clientId, refs);
   }
 
   async updatePresence(indicator: PresenceIndicator): Promise<void> {
@@ -88,26 +119,13 @@ export class PitterPatterAuthority extends DurableObject<Env> {
   }
 }
 
-type CreateCommit = {
-  commitJSON: CommitJSON;
-};
-
-type GetPresence = {
-  clientId: string;
-  refs: Record<string, string>;
-};
-
-type UpdatePresence = {
-  indicator: PresenceIndicator;
-};
-
 export interface Env {
   PITTER_PATTER_AUTHORITY: DurableObjectNamespace<PitterPatterAuthority>;
 }
 
 export default {
   /**
-   * This is the standard fetch handler for a Cloudflare Worker
+   * This is the standard fetch handler for a Cloudflare Worker.
    *
    * @param request - The request submitted to the Worker from the client
    * @param env - The interface to reference bindings declared in wrangler.jsonc
@@ -116,63 +134,28 @@ export default {
    */
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
-    const path = url.pathname;
+    const [, docId, endpoint] = url.pathname.split("/");
 
     const headers = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "*",
       "Access-Control-Allow-Headers": "*",
     };
-    const [, docId, endpoint, clientId] = path.split("/");
-    if (!docId) return new Response(null, { status: 404, headers });
-    const stub = env.PITTER_PATTER_AUTHORITY.getByName(docId);
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers });
     }
-    if (request.method === "GET") {
-      switch (endpoint) {
-        case "doc": {
-          // oxlint-disable-next-line typescript/await-thenable
-          return new Response(JSON.stringify(await stub.getDoc()), { headers });
-        }
-        case "commits": {
-          const version = url.searchParams.get("version") ?? "0";
-          // oxlint-disable-next-line typescript/await-thenable
-          return new Response(JSON.stringify(await stub.getCommits(parseInt(version, 10))), {
-            headers,
-          });
-        }
-        default: {
-          return new Response(null, { status: 404, headers });
-        }
-      }
-    } else if (request.method === "POST") {
-      const body = await request.json();
-      switch (endpoint) {
-        case "commits": {
-          await stub.createCommit((body as CreateCommit).commitJSON);
-          return new Response(null, { status: 204, headers });
-        }
-        case "presence": {
-          if (clientId) {
-            const [, clientId] = path.split("/");
-            if (!clientId) throw new Error("Missing clientId");
 
-            await stub.updatePresence((body as UpdatePresence).indicator);
-            return new Response(null, { status: 204, headers });
-          }
-          return new Response(
-            JSON.stringify(
-              await stub.getPresence((body as GetPresence).clientId, (body as GetPresence).refs),
-            ),
-            { headers },
-          );
-        }
-        default: {
-          return new Response(null, { status: 404, headers });
-        }
-      }
+    if (!docId) return new Response(null, { status: 404, headers });
+    const stub = env.PITTER_PATTER_AUTHORITY.getByName(docId);
+
+    if (request.headers.get("Upgrade") === "websocket") {
+      return stub.fetch(request);
+    }
+
+    if (request.method === "GET" && endpoint === "doc") {
+      // oxlint-disable-next-line typescript/await-thenable
+      return new Response(JSON.stringify(await stub.getDoc()), { headers });
     }
 
     return new Response(null, { status: 405, headers });
