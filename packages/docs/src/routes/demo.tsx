@@ -5,7 +5,7 @@ import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
 import { Node } from "prosemirror-model";
 import { EditorState, Transaction } from "prosemirror-state";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   collab,
@@ -55,7 +55,7 @@ function randomRef() {
 }
 
 function Demo() {
-  const docId = useId();
+  const [docId] = useState(randomRef);
   const [initialState, setInitialState] = useState<null | EditorState>(null);
   const typingFriend = useTypingFriend(docId);
   const [rightOffline, setRightOffline] = useState(false);
@@ -161,7 +161,7 @@ function DemoEditor({
   const stateRef = useRef(state);
   stateRef.current = state;
   const seenCommitRefs = useRef(new Set<string>());
-  const userId = randomRef();
+  const [userId] = useState(randomRef);
   const url = new URL(`${COLLAB_SERVER_URL}/${docId}/socket`);
   url.protocol = url.protocol.replace("http", "ws");
 
