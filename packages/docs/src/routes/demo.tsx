@@ -5,20 +5,20 @@ import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
 import { Node } from "prosemirror-model";
 import { EditorState, Transaction } from "prosemirror-state";
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   collab,
+  Commit,
   CollabClient,
   CollabClientConfig,
-  LongPollListener as CollabLongPollListener,
+  getVersion,
   receiveCommitTransaction,
 } from "@pitter-patter/collab-client";
 import {
   presence,
   PresenceClient,
   receivePresenceTransaction,
-  LongPollListener as PresenceLongPollListener,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
 import {
@@ -32,7 +32,8 @@ import {
 
 import { COLLAB_SERVER_URL } from "@/demo/config.js";
 import { schema } from "@/demo/schema.js";
-import { useTypingBuddy } from "@/demo/useTypingBuddy.js";
+import { WebSocketConnection } from "@/demo/socket.js";
+import { useTypingFriend } from "@/demo/useTypingFriend.js";
 import { baseOptions } from "@/lib/layout.shared";
 
 import "@pitter-patter/presence-client/styles.css";
@@ -54,9 +55,9 @@ function randomRef() {
 }
 
 function Demo() {
-  const docId = useId();
+  const [docId] = useState(randomRef);
   const [initialState, setInitialState] = useState<null | EditorState>(null);
-  const typingBuddy = useTypingBuddy(docId);
+  const typingFriend = useTypingFriend(docId);
   const [rightOffline, setRightOffline] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
@@ -98,10 +99,10 @@ function Demo() {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={typingBuddy.isTyping ? typingBuddy.stop : typingBuddy.start}
+                onClick={typingFriend.isTyping ? typingFriend.stop : typingFriend.start}
                 className="cursor-pointer border-gray border rounded-md p-2 text-sm"
               >
-                {typingBuddy.isTyping ? "Stop Typing Buddy" : "Start Typing Buddy"}
+                {typingFriend.isTyping ? "Stop Typing Friend" : "Start Typing Friend"}
               </button>
               <button
                 onClick={() => setRightOffline((offline) => !offline)}
@@ -159,53 +160,54 @@ function DemoEditor({
   const [state, setState] = useState<EditorState>(initialState);
   const stateRef = useRef(state);
   stateRef.current = state;
-  const [listener] = useState(
-    () => new CollabLongPollListener(new URL(`${COLLAB_SERVER_URL}/${docId}/commits`)),
+  const seenCommitRefs = useRef(new Set<string>());
+  const [userId] = useState(randomRef);
+  const url = new URL(`${COLLAB_SERVER_URL}/${docId}/socket`);
+  url.protocol = url.protocol.replace("http", "ws");
+
+  const [socket] = useState(
+    () =>
+      new WebSocketConnection(url, {
+        onCommits: (commitJSONs) => {
+          const newCommits = commitJSONs
+            .filter((json) => !seenCommitRefs.current.has(json.ref))
+            .map((json) => Commit.FromJSON(schema, json));
+          newCommits.forEach((commit) => seenCommitRefs.current.add(commit.ref));
+
+          setState((prev) =>
+            newCommits.reduce(
+              (acc, commit) => acc?.apply(receiveCommitTransaction(acc, commit)) ?? null,
+              prev,
+            ),
+          );
+        },
+        onPresence: (indicators) => {
+          setState((prev) => prev?.apply(receivePresenceTransaction(prev, indicators)) ?? null);
+        },
+      }),
   );
-  const userId = randomRef();
 
   const collabConfig = useMemo<CollabClientConfig>(
     () => ({
       sendCommit: async (commit) => {
-        await fetch(`${COLLAB_SERVER_URL}/${docId}/commits`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ commitJSON: commit.toJSON() }),
-        });
+        await socket.sendCommit(commit.toJSON());
       },
-      listener,
-      receiveCommits: (commits) => {
-        setState((prev) =>
-          commits.reduce(
-            (acc, commit) => acc?.apply(receiveCommitTransaction(acc, commit)) ?? null,
-            prev,
-          ),
-        );
-      },
+      listener: { async *listen() {} },
+      receiveCommits: () => {},
     }),
-    [docId, listener],
-  );
-
-  const [presenceListener] = useState(
-    () => new PresenceLongPollListener(new URL(`${COLLAB_SERVER_URL}/${docId}/presence`)),
+    [socket],
   );
 
   const presenceConfig = useMemo<PresenceClientConfig>(
     () => ({
       userId,
-      sendIndicator: async (clientId, indicator) => {
-        await fetch(`${COLLAB_SERVER_URL}/${docId}/presence/${clientId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ indicator }),
-        });
+      sendIndicator: async (_clientId, indicator) => {
+        await socket.sendIndicator(indicator);
       },
-      receiveIndicators: (indicators) => {
-        setState((prev) => prev.apply(receivePresenceTransaction(prev, indicators)));
-      },
-      listener: presenceListener,
+      receiveIndicators: () => {},
+      listener: { async *listen() {} },
     }),
-    [presenceListener, docId, userId],
+    [socket, userId],
   );
 
   const [collabClient] = useState(() => new CollabClient(collabConfig));
@@ -217,6 +219,19 @@ function DemoEditor({
   }, []);
 
   useEffect(() => {
+    if (isOffline) {
+      socket.disconnect();
+      return;
+    }
+
+    socket.connect(getVersion(stateRef.current) ?? 0);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket, isOffline]);
+
+  useEffect(() => {
     if (!state || isOffline) return;
     collabClient.send(state).catch(console.error);
   }, [collabClient, state, isOffline]);
@@ -225,26 +240,6 @@ function DemoEditor({
     if (isOffline) return;
     presenceClient.send(state).catch((e) => console.error(e));
   }, [presenceClient, state, isOffline]);
-
-  useEffect(() => {
-    if (isOffline) return;
-    const abortController = new AbortController();
-    collabClient?.listen(stateRef.current, abortController.signal).catch((e) => console.error(e));
-
-    return () => {
-      abortController.abort();
-    };
-  }, [collabClient, isOffline]);
-
-  useEffect(() => {
-    if (isOffline) return;
-    const abortController = new AbortController();
-    presenceClient.listen(abortController.signal).catch((e) => console.error(e));
-
-    return () => {
-      abortController.abort();
-    };
-  }, [presenceClient, isOffline]);
 
   return (
     <div className="flex-1 min-w-0">

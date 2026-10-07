@@ -5,14 +5,24 @@ type BroadcastManager = PresenceAuthorityConfig["broadcastManager"];
 export class DurableObjectBroadcastManager implements BroadcastManager {
   private subscriptions: Array<(indicator: { ref: string; clientId: string }) => void>;
   private timeout: number;
+  private ctx: DurableObjectState | undefined;
 
-  constructor(config: { timeout?: number }) {
+  constructor(config: { timeout?: number; ctx?: DurableObjectState }) {
     this.subscriptions = [];
     this.timeout = config.timeout ?? 5_000;
+    this.ctx = config.ctx;
   }
 
   async broadcastIndicator(_docId: string, indicator: PresenceIndicator) {
     this.subscriptions.forEach((subscription) => subscription(indicator));
+
+    this.ctx?.getWebSockets().forEach((ws) => {
+      const attachment = ws.deserializeAttachment() as { clientId?: string } | null;
+      if (attachment?.clientId === indicator.clientId) return;
+      ws.send(
+        JSON.stringify({ type: "presence", indicators: { [indicator.clientId]: indicator } }),
+      );
+    });
   }
 
   async createPresenceListener(
@@ -71,7 +81,7 @@ export class DurableObjectPersistenceManager implements PersistenceManager {
       const { [clientId]: _, ...indicators } =
         (await this.storage.get<PresenceStore>("presence")) ?? {};
 
-      void this.storage.put(indicators);
+      void this.storage.put("presence", indicators);
     }, timeout);
   }
 
