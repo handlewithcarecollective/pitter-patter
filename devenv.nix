@@ -4,7 +4,6 @@
   # https://devenv.sh/packages/
   packages = [
     pkgs.git
-    pkgs.git-lfs
     pkgs.nil
     pkgs.sqlite-interactive
   ];
@@ -33,8 +32,4 @@
       };
     };
   };
-
-  enterShell = ''
-    git lfs install
-  '';
 }
