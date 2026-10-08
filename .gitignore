@@ -8,14 +8,8 @@ devenv.local.nix
 # pre-commit
 .pre-commit-config.yaml
 
-# Yarn
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 node_modules
+pnpm-debug.log
 
 # Typescript
 dist/

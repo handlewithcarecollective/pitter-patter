@@ -1,15 +1,15 @@
 [language-server.oxfmt]
-command = "yarn"
-args = ["oxfmt", "--lsp"]
+command = "pnpm"
+args = ["exec", "oxfmt", "--lsp"]
 provideFormatter = true
 
 [language-server.oxlint]
-command = "yarn"
-args = ["oxlint", "--lsp"]
+command = "pnpm"
+args = ["exec", "oxlint", "--lsp"]
 
 [language-server.tsgo]
-command = "yarn"
-args = ["tsgo", "--lsp", "--stdio"]
+command = "pnpm"
+args = ["exec", "tsgo", "--lsp", "--stdio"]
 
 [language-server.tsgo.config.typescript]
 updateImportsOnFileMove.enabled = "always"

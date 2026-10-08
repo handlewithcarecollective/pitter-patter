@@ -1,5 +1,0 @@
-releases:
-  "@pitter-patter/collab-server": patch
-
-declined:
-  - "@pitter-patter/version-history-server"

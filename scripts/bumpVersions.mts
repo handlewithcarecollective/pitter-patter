@@ -1,33 +1,21 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 
-import { getPluginConfiguration } from "@yarnpkg/cli";
-import { Project, Configuration, type Workspace } from "@yarnpkg/core";
-import { npath } from "@yarnpkg/fslib";
+import { git, listWorkspaces } from "./workspaces.mts";
 
-const startingCwd = npath.toPortablePath(process.cwd());
+for (const workspace of listWorkspaces()) {
+  if (workspace.version === null) continue;
 
-const configuration = await Configuration.find(startingCwd, getPluginConfiguration());
-const { project } = await Project.find(configuration, startingCwd);
-
-const upgradedWorkspaces: Workspace[] = [];
-
-for (const workspace of project.workspaces) {
-  if (!workspace.manifest.version) continue;
-
-  const diff = execSync(`git diff HEAD^ -- ${join(workspace.relativeCwd, "package.json")}`, {
-    encoding: "utf-8",
-  });
+  const diff = git(["diff", "HEAD^", "--", join(workspace.dir, "package.json")]);
   const hasBeenUpgraded = /^\+\s*"version":/gm.test(diff);
-  if (hasBeenUpgraded) upgradedWorkspaces.push(workspace);
-}
+  if (!hasBeenUpgraded) continue;
 
-for (const workspace of upgradedWorkspaces) {
-  const version = workspace.manifest.version!;
-  const shortName = workspace.manifest.name!.name;
+  const shortName = workspace.name.startsWith("@")
+    ? workspace.name.split("/").pop()!
+    : workspace.name;
+  const tagName = `${shortName}-v${workspace.version}`;
 
-  const tagName = `${shortName}-v${version}`;
-  execSync(`git tag ${tagName}`);
-  execSync(`git push origin tag ${tagName}`);
-  execSync(`gh workflow run release --ref ${tagName}`);
+  execFileSync("git", ["tag", tagName]);
+  execFileSync("git", ["push", "origin", "tag", tagName]);
+  execFileSync("gh", ["workflow", "run", "release", "--ref", tagName]);
 }

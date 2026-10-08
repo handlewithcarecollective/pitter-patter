@@ -38,6 +38,8 @@ jobs:
             | head -1)
           echo "tag=${PREV}" >> "$GITHUB_OUTPUT"
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
@@ -78,15 +80,16 @@ jobs:
           PACKAGE="${TAG%-v*}"
           echo "package=${PACKAGE}" >> "$GITHUB_OUTPUT"
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
 
-      - name: Install corepack
-        run: npm i -g corepack
-
       - name: Install dependencies
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
       - name: Publish to npm
-        run: yarn workspace @pitter-patter/${{ steps.tag.outputs.package }} npm publish
+        run: >-
+          pnpm publish -r --no-git-checks --provenance --filter @pitter-patter/${{
+          steps.tag.outputs.package }}

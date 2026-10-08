@@ -6,9 +6,6 @@
   "lsp": {
     "vtsls": {
       "initialization_options": {
-        "typescript": {
-          "tsdk": ".yarn/sdks/typescript/lib"
-        },
         "vtsls": {
           "autoUseWorkspaceTsdk": true
         }
@@ -19,40 +16,40 @@
     "TypeScript": {
       "formatter": {
         "external": {
-          "command": "yarn",
-          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+          "command": "pnpm",
+          "arguments": ["exec", "oxfmt", "--stdin-filepath", "{buffer_path}"]
         }
       }
     },
     "TSX": {
       "formatter": {
         "external": {
-          "command": "yarn",
-          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+          "command": "pnpm",
+          "arguments": ["exec", "oxfmt", "--stdin-filepath", "{buffer_path}"]
         }
       }
     },
     "JavaScript": {
       "formatter": {
         "external": {
-          "command": "yarn",
-          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+          "command": "pnpm",
+          "arguments": ["exec", "oxfmt", "--stdin-filepath", "{buffer_path}"]
         }
       }
     },
     "JSON": {
       "formatter": {
         "external": {
-          "command": "yarn",
-          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+          "command": "pnpm",
+          "arguments": ["exec", "oxfmt", "--stdin-filepath", "{buffer_path}"]
         }
       }
     },
     "JSONC": {
       "formatter": {
         "external": {
-          "command": "yarn",
-          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+          "command": "pnpm",
+          "arguments": ["exec", "oxfmt", "--stdin-filepath", "{buffer_path}"]
         }
       }
     }

@@ -12,8 +12,7 @@
   },
   "scripts": {
     "gen:ref": "typedoc",
-    "prepack": "yarn check:types",
-    "prepublish": "yarn check:format && yarn check:lint"
+    "prepack": "pnpm -w run check"
   },
   "dependencies": {
     "redis": "^5.8.2"
@@ -25,6 +24,5 @@
     "typedoc-plugin-frontmatter": "^1.3.1",
     "typedoc-plugin-markdown": "^4.11.0",
     "typescript": "^6.0.3"
-  },
-  "packageManager": "yarn@4.9.1"
+  }
 }

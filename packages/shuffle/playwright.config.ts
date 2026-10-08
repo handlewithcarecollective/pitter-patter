@@ -30,8 +30,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command:
-      "yarn workspace @pitter-patter/shuffle exec vite --config tests/harness/vite.config.ts",
+    command: "pnpm exec vite --config tests/harness/vite.config.ts",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
