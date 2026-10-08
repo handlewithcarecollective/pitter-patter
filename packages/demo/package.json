@@ -46,7 +46,6 @@
     "parcel": "^2.15.4",
     "typescript": "^6.0.3"
   },
-  "packageManager": "yarn@4.9.2",
   "server": "dist/server.js",
   "targets": {
     "server": {

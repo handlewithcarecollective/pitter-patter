@@ -12,8 +12,7 @@
   },
   "scripts": {
     "gen:ref": "typedoc",
-    "prepack": "yarn check:types",
-    "prepublish": "yarn check:format && yarn check:lint"
+    "prepack": "pnpm -w run check"
   },
   "dependencies": {
     "@stepwisehq/prosemirror-collab-commit": "^1.0.0"
@@ -33,6 +32,5 @@
     "prosemirror-model": "^1.0.0",
     "prosemirror-state": "^1.0.0",
     "prosemirror-transform": "^1.0.0"
-  },
-  "packageManager": "yarn@4.9.1"
+  }
 }

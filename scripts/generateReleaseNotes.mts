@@ -1,5 +1,5 @@
-// Generates release notes for a single package in a Yarn monorepo by walking
-// merge commits in the release range and checking .yarn/versions/ declarations.
+// Generates release notes for a single package in this pnpm workspace by walking
+// merge commits in the release range and checking .changeset/ change intents.
 
 import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
@@ -26,30 +26,44 @@ function ghApi(path: string) {
   return JSON.parse(execSync(`gh api "${path.replaceAll('"', '\\"')}"`, { encoding: "utf8" }));
 }
 
+const INTENT_FILE = /^\.changeset\/[^/]+\.md$/;
+
 /**
- * Minimal parser for Yarn's deferred version files:
+ * Whether a change intent asks for a release of the package. Intents are markdown
+ * with a semver frontmatter:
  *
- *   releases:
- *     my-package: minor
- *     other-package: patch
+ *   ---
+ *   "@pitter-patter/shuffle": minor
+ *   "@pitter-patter/refs": none
+ *   ---
+ *
+ *   Summary that becomes the changelog entry.
+ *
+ * A `none` bump is an explicit decline, so it does not count.
  */
-function isPackageInVersionFile(yamlContent: string, packageName: string) {
-  let inReleases = false;
-  for (const raw of yamlContent.split("\n")) {
-    const line = raw.trimEnd();
-    if (/^releases\s*:/.test(line)) {
-      inReleases = true;
-      continue;
-    }
-    if (inReleases) {
-      if (/^\s+\S/.test(line)) {
-        const key = line.trim().split(":")[0].trim();
-        if (key === `"@pitter-patter/${packageName}"`) return true;
-      } else if (/^\S/.test(line)) {
-        break;
-      }
-    }
+function isPackageReleasedByIntent(intentContent: string, packageName: string) {
+  const lines = intentContent.split(/\r?\n/);
+  if (lines[0]?.trim() !== "---") return false;
+
+  for (const raw of lines.slice(1)) {
+    const line = raw.trim();
+    if (line === "---") break;
+
+    const colon = line.indexOf(":");
+    if (colon === -1) continue;
+
+    const ident = line
+      .slice(0, colon)
+      .trim()
+      .replace(/^["']|["']$/g, "");
+    const bump = line
+      .slice(colon + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
+
+    if (ident === `@pitter-patter/${packageName}` && bump !== "none") return true;
   }
+
   return false;
 }
 
@@ -70,15 +84,17 @@ for (const sha of mergeCommits) {
   const changedFiles = git(`diff-tree --no-commit-id -r --name-only --diff-filter=A ${sha}`).split(
     "\n",
   );
-  const versionFiles = changedFiles.filter((f) => /^\.yarn\/versions\/.*\.ya?ml$/.test(f));
+  const intentFiles = changedFiles.filter(
+    (f) => INTENT_FILE.test(f) && f !== ".changeset/README.md",
+  );
 
-  if (versionFiles.length === 0) continue;
+  if (intentFiles.length === 0) continue;
 
   let affectsPackage = false;
-  for (const file of versionFiles) {
+  for (const file of intentFiles) {
     try {
       const content = git(`show ${sha}:${file}`);
-      if (isPackageInVersionFile(content, PACKAGE)) {
+      if (isPackageReleasedByIntent(content, PACKAGE)) {
         affectsPackage = true;
         break;
       }

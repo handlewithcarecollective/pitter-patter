@@ -6,40 +6,29 @@
   ],
   "type": "module",
   "scripts": {
-    "check:format": "yarn oxfmt --check",
-    "check:lint": "yarn oxlint scripts/ packages/",
-    "check:types": "yarn tsgo --build .",
-    "check": "yarn check:format && yarn check:types && yarn check:lint",
-    "fix:format": "yarn oxfmt",
-    "fix:lint": "yarn oxlint --fix scripts/ packages/",
-    "fix": "yarn fix:format && yarn fix:lint",
-    "demo:full": "yarn check:types && yarn workspace @pitter-patter/demo start",
-    "dev:docs": "yarn workspace @pitter-patter/docs dev",
-    "build:docs": "yarn workspace @pitter-patter/docs build",
-    "test": "yarn workspaces foreach --all run test",
+    "check:format": "oxfmt --check",
+    "check:lint": "oxlint scripts/ packages/",
+    "check:types": "tsgo --build .",
+    "check:versions": "node scripts/checkVersions.mts",
+    "check": "pnpm run check:format && pnpm run check:types && pnpm run check:lint && pnpm run check:versions",
+    "fix:format": "oxfmt",
+    "fix:lint": "oxlint --fix scripts/ packages/",
+    "fix": "pnpm run fix:format && pnpm run fix:lint",
+    "demo:full": "pnpm run check:types && pnpm --filter @pitter-patter/demo run start",
+    "dev:docs": "pnpm --filter @pitter-patter/docs run dev",
+    "build:docs": "pnpm --filter @pitter-patter/docs run build",
+    "test": "pnpm -r --if-present run test",
+    "change:new": "pnpm change",
+    "change:status": "pnpm change status",
+    "release": "node scripts/bumpVersions.mts",
     "w": "./scripts/workspace-exec.sh"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@types/semver": "^7",
     "@typescript/native-preview": "7.0.0-dev.20260421.2",
-    "@yarnpkg/cli": "^4.14.1",
-    "@yarnpkg/core": "^4.7.0",
-    "@yarnpkg/fslib": "^3.1.5",
-    "@yarnpkg/libzip": "^3.2.2",
-    "@yarnpkg/parsers": "^3.0.3",
-    "@yarnpkg/plugin-git": "^3.2.0",
-    "@yarnpkg/plugin-version": "^4.2.0",
-    "@yarnpkg/sdks": "^3.2.3",
-    "es-toolkit": "^1.46.1",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.70.0",
-    "oxlint-tsgolint": "^0.23.0",
-    "semver": "^7.8.0"
+    "oxlint-tsgolint": "^0.23.0"
   },
-  "resolutions": {
-    "prosemirror-view": "1.42.0",
-    "tsconfck@npm:^3.1.6": "patch:tsconfck@npm%3A3.1.6#~/.yarn/patches/tsconfck-npm-3.1.6-2dccdb1bd5.patch"
-  },
-  "packageManager": "yarn@4.13.0+sha512.5c20ba010c99815433e5c8453112165e673f1c7948d8d2b267f4b5e52097538658388ebc9f9580656d9b75c5cc996f990f611f99304a2197d4c56d21eea370e7"
+  "packageManager": "pnpm@12.3.4"
 }

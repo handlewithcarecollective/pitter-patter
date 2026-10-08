@@ -11,12 +11,10 @@
     "access": "public"
   },
   "scripts": {
-    "prepack": "yarn check:types",
-    "prepublish": "yarn check:format && yarn check:lint"
+    "prepack": "pnpm -w run check"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.5",
     "@typescript/native-preview": "7.0.0-dev.20260421.2"
-  },
-  "packageManager": "yarn@4.9.1"
+  }
 }

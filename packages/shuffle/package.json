@@ -24,8 +24,7 @@
   "scripts": {
     "gen:ref": "typedoc",
     "fix:toc": "markdown-toc --bullets='-' -i README.md",
-    "prepack": "yarn check:types",
-    "prepublish": "yarn check:format && yarn check:lint",
+    "prepack": "pnpm -w run check",
     "test": "playwright test",
     "test:harness": "vite --config tests/harness/vite.config.ts"
   },
@@ -72,6 +71,5 @@
     "prosemirror-state": "^1.0.0",
     "prosemirror-transform": "^1.0.0",
     "prosemirror-view": "^1.0.0"
-  },
-  "packageManager": "yarn@4.9.1"
+  }
 }

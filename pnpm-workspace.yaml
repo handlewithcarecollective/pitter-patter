@@ -1,0 +1,48 @@
+packages:
+  - packages/*
+
+overrides:
+  prosemirror-view: 1.42.0
+
+# pnpm 10+ refuses to run dependency lifecycle scripts unless allow-listed
+# (`allowBuilds` replaces the older `onlyBuiltDependencies` in pnpm 12).
+# These are the native/post-install builds the workspace needs to run at all.
+allowBuilds:
+  "@parcel/watcher": true
+  "@swc/core": true
+  better-sqlite3: true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  workerd: true
+
+patchedDependencies:
+  tsconfck@3.1.6: patches/tsconfck-npm-3.1.6.patch
+
+packageExtensions:
+  "@fumadocs/tailwind@*":
+    dependencies:
+      tailwindcss: 4.2.4
+  "@parcel/node-resolver-core@*":
+    dependencies:
+      "@parcel/core": 2.15.4
+  "@parcel/runtime-rsc@*":
+    peerDependencies:
+      react: ^19.1.0
+  "@stepwisehq/prosemirror-collab-commit@*":
+    peerDependencies:
+      prosemirror-model: ^1.0.0
+      prosemirror-transform: ^1.0.0
+  "@tanstack/start-plugin-core@*":
+    dependencies:
+      vite: 8.0.10
+  tsconfck@*:
+    dependencies:
+      typescript: ^6.0.0
+  typedoc@*:
+    peerDependencies:
+      typedoc-plugin-markdown: ^4.0.0
+      typedoc-plugin-frontmatter: ^1.0.0
+  typedoc-plugin-frontmatter@*:
+    peerDependencies:
+      typedoc: ^0.28.0

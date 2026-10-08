@@ -21,8 +21,7 @@
   },
   "scripts": {
     "gen:ref": "typedoc",
-    "prepack": "yarn check:types",
-    "prepublish": "yarn check:format && yarn check:lint"
+    "prepack": "pnpm -w run check"
   },
   "dependencies": {
     "@pitter-patter/collab-client": "workspace:^",
@@ -71,6 +70,5 @@
     "react-reconciler": {
       "optional": true
     }
-  },
-  "packageManager": "yarn@4.9.1"
+  }
 }

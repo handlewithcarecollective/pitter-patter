@@ -18,27 +18,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
-
-      - name: Install corepack
-        run: npm i -g corepack
+          cache: pnpm
 
       - name: Install dependencies
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
       - name: Format
-        run: yarn check:format
+        run: pnpm run check:format
 
       - name: Types
-        run: yarn check:types
+        run: pnpm run check:types
 
       - name: Lint
-        run: yarn check:lint
+        run: pnpm run check:lint
 
       - name: Versions
-        run: yarn node scripts/checkVersions.mts
+        run: node scripts/checkVersions.mts
 
   test:
     runs-on: ubuntu-latest
@@ -48,21 +48,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
-
-      - name: Install corepack
-        run: npm i -g corepack
+          cache: pnpm
 
       - name: Install dependencies
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: yarn workspace @pitter-patter/shuffle exec playwright install --with-deps chromium
+        run: pnpm --filter @pitter-patter/shuffle exec playwright install --with-deps chromium
 
       - name: Test
-        run: yarn test
+        run: pnpm test
 
   bump-version:
     runs-on: ubuntu-latest
@@ -78,17 +78,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
-
-      - name: Install corepack
-        run: npm i -g corepack
+          cache: pnpm
 
       - name: Install dependencies
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
       - name: Check for version bump
-        run: yarn node scripts/bumpVersions.mts
+        run: node scripts/bumpVersions.mts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

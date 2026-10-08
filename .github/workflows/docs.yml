@@ -18,18 +18,17 @@ jobs:
         id: pages
         uses: actions/configure-pages@v6
 
+      - uses: pnpm/action-setup@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 24.x
 
-      - name: Install corepack
-        run: npm i -g corepack
-
       - name: Install dependencies
-        run: yarn workspaces focus @pitter-patter/docs
+        run: pnpm install --frozen-lockfile --filter "@pitter-patter/docs..."
 
       - name: Build
-        run: yarn build:docs
+        run: pnpm run build:docs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
