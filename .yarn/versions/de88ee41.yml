@@ -1,0 +1,7 @@
+releases:
+  "@pitter-patter/collab-server": minor
+  "@pitter-patter/presence-client": minor
+  "@pitter-patter/presence-server": minor
+
+declined:
+  - "@pitter-patter/version-history-server"

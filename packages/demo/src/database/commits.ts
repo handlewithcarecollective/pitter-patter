@@ -1,10 +1,8 @@
-import { Insertable, Transaction } from "kysely";
+import { Insertable, Kysely, Transaction } from "kysely";
 
-import { getDb } from "./db";
 import { DB } from "./schema";
 
-export async function getCommitByRef(tr: Transaction<DB> | null, docId: string, ref: string) {
-  const db = tr ?? (await getDb());
+export async function getCommitByRef(db: Transaction<DB> | Kysely<DB>, docId: string, ref: string) {
   return await db
     .selectFrom("commit")
     .selectAll()
@@ -13,8 +11,11 @@ export async function getCommitByRef(tr: Transaction<DB> | null, docId: string, 
     .executeTakeFirst();
 }
 
-export async function getCommitsAfter(tr: Transaction<DB> | null, docId: string, version: number) {
-  const db = tr ?? (await getDb());
+export async function getCommitsAfter(
+  db: Transaction<DB> | Kysely<DB>,
+  docId: string,
+  version: number,
+) {
   return await db
     .selectFrom("commit")
     .selectAll()
@@ -23,7 +24,9 @@ export async function getCommitsAfter(tr: Transaction<DB> | null, docId: string,
     .execute();
 }
 
-export async function createCommit(tr: Transaction<DB> | null, commit: Insertable<DB["commit"]>) {
-  const db = tr ?? (await getDb());
+export async function createCommit(
+  db: Transaction<DB> | Kysely<DB>,
+  commit: Insertable<DB["commit"]>,
+) {
   return await db.insertInto("commit").values(commit).execute();
 }

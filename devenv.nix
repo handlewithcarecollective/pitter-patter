@@ -17,7 +17,8 @@
   services = {
     redis = {
       enable = true;
-      extraConfig = "save \"\"";
+      # databases: 2147483647 is the maximum allowed index for databases
+      extraConfig = "save \"\" \n databases 214";
       port = 6379;
     };
   };
