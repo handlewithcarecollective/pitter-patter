@@ -41,6 +41,31 @@ jobs:
       - name: Versions
         run: yarn node scripts/checkVersions.mts
 
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+
+      - name: Install corepack
+        run: npm i -g corepack
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Install Playwright browsers
+        run: yarn workspace @pitter-patter/shuffle exec playwright install --with-deps chromium
+
+      - name: Test
+        run: yarn test
+
   bump-version:
     runs-on: ubuntu-latest
 

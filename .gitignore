@@ -23,3 +23,7 @@ dist/
 
 # Parcel
 .parcel-cache
+
+# Playwright
+test-results/
+playwright-report/

@@ -7,7 +7,7 @@ import throttle from "raf-throttle";
 
 import { randomRef } from "@pitter-patter/refs";
 
-import { isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
+import { isShuffleContainer, isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
 import { AutoScroller, findScrollParent, getScrollingElement, ScrollCalculator } from "./scroll.ts";
 import { autogroup } from "./transform/autogroup.ts";
 import { inflate } from "./transform/inflate.ts";
@@ -225,14 +225,17 @@ export function shuffle({
       const tr = newState.tr;
 
       if (endTr) {
-        const collapsibleRows: [number, Node][] = [];
+        const collapsible: [number, Node][] = [];
         newState.doc.descendants((node, pos) => {
           if (isShuffleRow(node) && node.childCount <= 1) {
-            collapsibleRows.push([pos, node]);
+            collapsible.push([pos, node]);
+          }
+          if (isShuffleContainer(node) && node.childCount === 0) {
+            collapsible.push([pos, node]);
           }
         });
 
-        for (const [pos, node] of collapsibleRows) {
+        for (const [pos, node] of collapsible) {
           tr.replaceWith(tr.mapping.map(pos), tr.mapping.map(pos + node.nodeSize), node.children);
         }
       } else if (startTr) {
