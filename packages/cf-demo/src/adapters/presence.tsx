@@ -2,6 +2,16 @@ import { PresenceAuthorityConfig, PresenceIndicator } from "@pitter-patter/prese
 
 type BroadcastManager = PresenceAuthorityConfig["broadcastManager"];
 
+export function getIndicators(ctx: DurableObjectState, ws: WebSocket) {
+  const indicators: Record<string, PresenceIndicator> = {};
+  for (const socket of ctx.getWebSockets()) {
+    if (socket === ws) continue;
+    const attachment = socket.deserializeAttachment();
+    if (attachment) indicators[attachment.clientId] = attachment.indicator;
+  }
+  return indicators;
+}
+
 export class DurableObjectBroadcastManager implements BroadcastManager {
   private subscriptions: Array<(indicator: { ref: string; clientId: string }) => void>;
   private timeout: number;
@@ -16,12 +26,19 @@ export class DurableObjectBroadcastManager implements BroadcastManager {
   async broadcastIndicator(_docId: string, indicator: PresenceIndicator) {
     this.subscriptions.forEach((subscription) => subscription(indicator));
 
-    this.ctx?.getWebSockets().forEach((ws) => {
-      const attachment = ws.deserializeAttachment() as { clientId?: string } | null;
+    const ctx = this.ctx;
+    if (!ctx) return;
+
+    ctx.getWebSockets().forEach((ws) => {
+      const attachment = ws.deserializeAttachment() as {
+        clientId: string;
+        indicator: PresenceIndicator;
+      } | null;
       if (attachment?.clientId === indicator.clientId) return;
-      ws.send(
-        JSON.stringify({ type: "presence", indicators: { [indicator.clientId]: indicator } }),
-      );
+      // ws.send(
+      //   JSON.stringify({ type: "presence", indicators: { [indicator.clientId]: indicator } }),
+      // );
+      ws.send(JSON.stringify({ type: "presence", indicators: getIndicators(ctx, ws) }));
     });
   }
 
