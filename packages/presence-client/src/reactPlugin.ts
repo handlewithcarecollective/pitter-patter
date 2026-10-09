@@ -7,6 +7,7 @@ export const presence = createPresence((pos, indicator) =>
   // @ts-expect-error I dunno
   widget(pos, PresenceAnchor, {
     ignoreSelection: true,
+    side: -1,
     key: indicator.clientId,
     indicator,
   }),

@@ -12,6 +12,7 @@ import { DurableObjectBroadcastManager as CollabBroadcastManager } from "./adapt
 import {
   DurableObjectBroadcastManager as PresenceBroadcastManager,
   DurableObjectPersistenceManager,
+  getIndicators,
 } from "./adapters/presence.tsx";
 import { schema } from "./schema.ts";
 
@@ -81,6 +82,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
       case "subscribe": {
         const commits = await this.getStoredCommitsAfter(data.version);
         ws.send(JSON.stringify({ type: "commits", commits }));
+        ws.send(JSON.stringify({ type: "presence", indicators: getIndicators(this.ctx, ws) }));
         break;
       }
       case "commit": {
@@ -88,7 +90,8 @@ export class PitterPatterAuthority extends DurableObject<Env> {
         break;
       }
       case "presence": {
-        ws.serializeAttachment({ clientId: data.indicator.clientId });
+        // ws.serializeAttachment({ clientId: data.indicator.clientId });
+        ws.serializeAttachment({ clientId: data.indicator.clientId, indicator: data.indicator });
         await this.updatePresence(data.indicator);
         break;
       }
@@ -103,7 +106,8 @@ export class PitterPatterAuthority extends DurableObject<Env> {
   async getDoc(): Promise<StoredDoc> {
     return (
       (await this.ctx.storage.get<StoredDoc>("doc")) ?? {
-        docJSON: schema.nodes.doc.create().toJSON(),
+        // docJSON: schema.nodes.doc.create().toJSON(),
+        docJSON: { type: "doc", content: [{ type: "paragraph" }] },
         version: 0,
         lastUpdatedTimestamp: Date.now(),
       }
