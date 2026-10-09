@@ -6,6 +6,7 @@ import { createVanillaPresenceIndicator } from "./decorations/VanillaPresenceAnc
 export const presence = createPresence((pos, indicator) =>
   Decoration.widget(pos, createVanillaPresenceIndicator(indicator), {
     ignoreSelection: true,
+    side: -1,
     key: indicator.clientId,
     indicator,
   }),

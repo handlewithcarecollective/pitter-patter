@@ -1,4 +1,8 @@
-import { ProseMirror, ProseMirrorDoc } from "@handlewithcare/react-prosemirror";
+import {
+  ProseMirror,
+  ProseMirrorDoc,
+  useEditorEventListener,
+} from "@handlewithcare/react-prosemirror";
 import { createFileRoute } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { baseKeymap } from "prosemirror-commands";
@@ -16,11 +20,11 @@ import {
   receiveCommitTransaction,
 } from "@pitter-patter/collab-client";
 import {
-  presence,
   PresenceClient,
   receivePresenceTransaction,
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
+import { presence } from "@pitter-patter/presence-client/react";
 import {
   DragHandle,
   DragHandleProps,
@@ -148,6 +152,19 @@ function InflatableMenu() {
   );
 }
 
+function DemoDoc({ isOffline }: { isOffline: boolean }) {
+  useEditorEventListener("pointerenter", (view) => {
+    if (!view.root.shuffleDragging) return;
+    view.focus();
+  });
+
+  return (
+    <ProseMirrorDoc
+      className={`border rounded-md min-h-[350px] p-2 ${isOffline ? "border-red-500" : "border-gray"}`}
+    />
+  );
+}
+
 function DemoEditor({
   docId,
   initialState,
@@ -245,9 +262,7 @@ function DemoEditor({
     <div className="flex-1 min-w-0">
       <ProseMirror state={state} dispatchTransaction={dispatchTransaction}>
         <ShuffleSkeleton>
-          <ProseMirrorDoc
-            className={`border rounded-md min-h-[350px] p-2 ${isOffline ? "border-red-500" : "border-gray"}`}
-          />
+          <DemoDoc isOffline={isOffline} />
           <ResizeHandles />
           <DragHandles handleComponent={CustomHandle} />
         </ShuffleSkeleton>
