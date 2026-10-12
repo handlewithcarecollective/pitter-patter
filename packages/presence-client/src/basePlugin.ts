@@ -108,11 +108,6 @@ export function createPresence(
                 style: `background-color: ${getPresenceColor(indicator.userId)}50;`,
               }),
             );
-            nextDecorations.push(
-              Decoration.inline(Math.min(anchor, head), Math.max(anchor, head), {
-                style: `background-color: ${getPresenceColor(indicator.userId)}50;`,
-              }),
-            );
 
             nextDecorations.push(createWidget(anchor, indicator));
           }
@@ -120,7 +115,6 @@ export function createPresence(
           return {
             decorations: DecorationSet.create(editorState.doc, nextDecorations),
             indicators: nextIndicators,
-            stepMaps,
           };
         },
       },
