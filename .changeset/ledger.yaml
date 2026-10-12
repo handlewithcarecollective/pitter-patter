@@ -1,0 +1,16 @@
+"@pitter-patter/collab-client@0.1.4":
+  dir: packages/collab-client
+  intents:
+    - little-lamps-promise
+"@pitter-patter/collab-server@0.1.4":
+  dir: packages/collab-server
+  intents:
+    - olive-donkeys-rotate
+"@pitter-patter/presence-client@0.2.2":
+  dir: packages/presence-client
+  intents:
+    - little-lamps-promise
+"@pitter-patter/shuffle@0.3.7":
+  dir: packages/shuffle
+  intents:
+    - tidy-moons-gather
