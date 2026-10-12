@@ -13,10 +13,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   collab,
-  Commit,
   CollabClient,
   CollabClientConfig,
-  getVersion,
   receiveCommitTransaction,
 } from "@pitter-patter/collab-client";
 import {
@@ -34,6 +32,8 @@ import {
   ShuffleSkeleton,
 } from "@pitter-patter/shuffle";
 
+import { WebSocketListener as CollabListener } from "@/demo/adapters/collab.js";
+import { WebSocketListener as PresenceListener } from "@/demo/adapters/presence.js";
 import { COLLAB_SERVER_URL } from "@/demo/config.js";
 import { schema } from "@/demo/schema.js";
 import { WebSocketConnection } from "@/demo/socket.js";
@@ -177,40 +177,26 @@ function DemoEditor({
   const [state, setState] = useState<EditorState>(initialState);
   const stateRef = useRef(state);
   stateRef.current = state;
-  const seenCommitRefs = useRef(new Set<string>());
   const [userId] = useState(randomRef);
   const url = new URL(`${COLLAB_SERVER_URL}/${docId}/socket`);
   url.protocol = url.protocol.replace("http", "ws");
 
-  const [socket] = useState(
-    () =>
-      new WebSocketConnection(url, {
-        onCommits: (commitJSONs) => {
-          const newCommits = commitJSONs
-            .filter((json) => !seenCommitRefs.current.has(json.ref))
-            .map((json) => Commit.FromJSON(schema, json));
-          newCommits.forEach((commit) => seenCommitRefs.current.add(commit.ref));
-
-          setState((prev) =>
-            newCommits.reduce(
-              (acc, commit) => acc?.apply(receiveCommitTransaction(acc, commit)) ?? null,
-              prev,
-            ),
-          );
-        },
-        onPresence: (indicators) => {
-          setState((prev) => prev?.apply(receivePresenceTransaction(prev, indicators)) ?? null);
-        },
-      }),
-  );
+  const [socket] = useState(() => new WebSocketConnection(url));
 
   const collabConfig = useMemo<CollabClientConfig>(
     () => ({
       sendCommit: async (commit) => {
         await socket.sendCommit(commit.toJSON());
       },
-      listener: { async *listen() {} },
-      receiveCommits: () => {},
+      listener: new CollabListener(socket.getCommits.bind(socket), socket.commits()),
+      receiveCommits: (commits) => {
+        setState((prev) =>
+          commits.reduce(
+            (acc, commit) => acc?.apply(receiveCommitTransaction(acc, commit)) ?? null,
+            prev,
+          ),
+        );
+      },
     }),
     [socket],
   );
@@ -221,8 +207,10 @@ function DemoEditor({
       sendIndicator: async (_clientId, indicator) => {
         await socket.sendIndicator(indicator);
       },
-      receiveIndicators: () => {},
-      listener: { async *listen() {} },
+      receiveIndicators: (indicators) => {
+        setState((prev) => prev?.apply(receivePresenceTransaction(prev, indicators)) ?? null);
+      },
+      listener: new PresenceListener(socket.getPresence.bind(socket), socket.presence()),
     }),
     [socket, userId],
   );
@@ -241,7 +229,7 @@ function DemoEditor({
       return;
     }
 
-    socket.connect(getVersion(stateRef.current) ?? 0);
+    socket.connect();
 
     return () => {
       socket.disconnect();
@@ -257,6 +245,24 @@ function DemoEditor({
     if (isOffline) return;
     presenceClient.send(state).catch((e) => console.error(e));
   }, [presenceClient, state, isOffline]);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    collabClient?.listen(initialState, abortController.signal).catch((e) => console.error(e));
+
+    return () => {
+      abortController.abort();
+    };
+  }, [collabClient, initialState]);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    presenceClient.listen(abortController.signal).catch((e) => console.error(e));
+
+    return () => {
+      abortController.abort();
+    };
+  }, [presenceClient, initialState]);
 
   return (
     <div className="flex-1 min-w-0">

@@ -14,32 +14,13 @@ export function getIndicators(ctx: DurableObjectState, ws: WebSocket) {
 
 export class DurableObjectBroadcastManager implements BroadcastManager {
   private subscriptions: Array<(indicator: { ref: string; clientId: string }) => void>;
-  private timeout: number;
-  private ctx: DurableObjectState | undefined;
 
-  constructor(config: { timeout?: number; ctx?: DurableObjectState }) {
+  constructor() {
     this.subscriptions = [];
-    this.timeout = config.timeout ?? 5_000;
-    this.ctx = config.ctx;
   }
 
   async broadcastIndicator(_docId: string, indicator: PresenceIndicator) {
     this.subscriptions.forEach((subscription) => subscription(indicator));
-
-    const ctx = this.ctx;
-    if (!ctx) return;
-
-    ctx.getWebSockets().forEach((ws) => {
-      const attachment = ws.deserializeAttachment() as {
-        clientId: string;
-        indicator: PresenceIndicator;
-      } | null;
-      if (attachment?.clientId === indicator.clientId) return;
-      // ws.send(
-      //   JSON.stringify({ type: "presence", indicators: { [indicator.clientId]: indicator } }),
-      // );
-      ws.send(JSON.stringify({ type: "presence", indicators: getIndicators(ctx, ws) }));
-    });
   }
 
   async createPresenceListener(
@@ -56,12 +37,7 @@ export class DurableObjectBroadcastManager implements BroadcastManager {
     this.subscriptions.push(listener);
 
     const listen = async () => {
-      return await Promise.race([
-        promise,
-        new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(false), this.timeout);
-        }),
-      ]).finally(async () => {
+      return await promise.finally(async () => {
         const index = this.subscriptions.indexOf(listener);
         this.subscriptions.splice(index, 1);
       });
