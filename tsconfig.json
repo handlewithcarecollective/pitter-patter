@@ -32,6 +32,9 @@
       "path": "packages/demo"
     },
     {
+      "path": "packages/docs"
+    },
+    {
       "path": "packages/cf-demo"
     },
     {
