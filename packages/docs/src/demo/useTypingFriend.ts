@@ -2,18 +2,15 @@ import { Node } from "prosemirror-model";
 import { EditorState, TextSelection } from "prosemirror-state";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  collab,
-  Commit,
-  CollabClient,
-  receiveCommitTransaction,
-} from "@pitter-patter/collab-client";
+import { collab, CollabClient, receiveCommitTransaction } from "@pitter-patter/collab-client";
 import {
   presence,
   PresenceClient,
   receivePresenceTransaction,
 } from "@pitter-patter/presence-client";
 
+import { WebSocketListener as CollabListener } from "./adapters/collab.js";
+import { WebSocketListener as PresenceListener } from "./adapters/presence.js";
 import { COLLAB_SERVER_URL } from "./config.js";
 import { MOBY_DICK_EXCERPT } from "./mobyDickExcerpt.js";
 import { schema } from "./schema.js";
@@ -30,12 +27,14 @@ export function useTypingFriend(docId: string) {
   const collabClientRef = useRef<CollabClient | null>(null);
   const presenceClientRef = useRef<PresenceClient | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const seenCommitRefs = useRef(new Set<string>());
+  const abortRef = useRef<AbortController | null>(null);
   const cancelledRef = useRef(false);
 
   const stop = useCallback(() => {
     cancelledRef.current = true;
     clearTimeout(timeoutRef.current);
+    abortRef.current?.abort();
+    abortRef.current = null;
     socketRef.current?.disconnect();
     socketRef.current = null;
     stateRef.current = null;
@@ -61,31 +60,20 @@ export function useTypingFriend(docId: string) {
     const url = new URL(`${COLLAB_SERVER_URL}/${docId}/socket`);
     url.protocol = url.protocol.replace("http", "ws");
 
-    const socket = new WebSocketConnection(url, {
-      onCommits: (commitJSONs) => {
-        const newCommits = commitJSONs
-          .filter((json) => !seenCommitRefs.current.has(json.ref))
-          .map((json) => Commit.FromJSON(schema, json));
-        newCommits.forEach((commit) => seenCommitRefs.current.add(commit.ref));
-
-        const current = stateRef.current ?? state;
-        stateRef.current = newCommits.reduce(
-          (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
-          current,
-        );
-      },
-      onPresence: (indicators) => {
-        const current = stateRef.current ?? state;
-        stateRef.current = current.apply(receivePresenceTransaction(current, indicators));
-      },
-    });
+    const socket = new WebSocketConnection(url);
 
     const collabClient = new CollabClient({
       sendCommit: async (commit) => {
         await socket.sendCommit(commit.toJSON());
       },
-      listener: { async *listen() {} },
-      receiveCommits: () => {},
+      listener: new CollabListener(socket.getCommits.bind(socket), socket.commits()),
+      receiveCommits: (commits) => {
+        const current = stateRef.current ?? state;
+        stateRef.current = commits.reduce(
+          (acc, commit) => acc.apply(receiveCommitTransaction(acc, commit)),
+          current,
+        );
+      },
     });
 
     const presenceClient = new PresenceClient({
@@ -93,11 +81,19 @@ export function useTypingFriend(docId: string) {
       sendIndicator: async (_clientId, indicator) => {
         await socket.sendIndicator(indicator);
       },
-      receiveIndicators: () => {},
-      listener: { async *listen() {} },
+      listener: new PresenceListener(socket.getPresence.bind(socket), socket.presence()),
+      receiveIndicators: (indicators) => {
+        const current = stateRef.current ?? state;
+        stateRef.current = current.apply(receivePresenceTransaction(current, indicators));
+      },
     });
 
-    socket.connect(version);
+    socket.connect();
+
+    const abortController = new AbortController();
+    abortRef.current = abortController;
+    collabClient.listen(state, abortController.signal).catch((e) => console.error(e));
+    presenceClient.listen(abortController.signal).catch((e) => console.error(e));
 
     socketRef.current = socket;
     collabClientRef.current = collabClient;
