@@ -41,6 +41,7 @@ export interface PresenceAuthorityConfig {
       docId: string,
       clientId: string,
       refs: Record<string, string>,
+      signal?: AbortSignal,
     ) => Promise<PresenceListener>;
   };
 }
@@ -79,11 +80,13 @@ export class PresenceAuthority {
     docId: string,
     excludeClientId: string,
     refs: Record<string, string> = {},
+    signal?: AbortSignal,
   ) {
     const { listen, abort } = await this.broadcastManager.createPresenceListener(
       docId,
       excludeClientId,
       refs,
+      signal,
     );
 
     const prePresence = await this.persistenceManager.getIndicators(docId);

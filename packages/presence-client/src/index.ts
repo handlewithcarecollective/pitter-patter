@@ -161,7 +161,10 @@ export class LongPollListener {
           Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
         );
 
-        if (Object.entries(newRefs).every(([clientId, ref]) => refs[clientId] === ref)) {
+        if (
+          Object.keys(newRefs).length === Object.keys(refs).length &&
+          Object.entries(newRefs).every(([clientId, ref]) => refs[clientId] === ref)
+        ) {
           continue;
         }
 

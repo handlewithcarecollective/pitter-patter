@@ -13,7 +13,7 @@ export class DurableObjectBroadcastManager implements BroadcastManager {
     this.subscriptions.get(docId)?.forEach((subscription) => subscription(commitJSON.version));
   }
 
-  async createCommitListener(docId: string, version: number) {
+  async createCommitListener(docId: string, version: number, signal?: AbortSignal) {
     const { promise, resolve } = PromiseWithResolvers<boolean>();
 
     function listener(v: number) {

@@ -30,6 +30,8 @@ type ClientMessage =
 export class PitterPatterAuthority extends DurableObject<Env> {
   private collabAuthority: CollabAuthority<null>;
   private presenceAuthority: PresenceAuthority;
+  private collabAbortController: AbortController | null = null;
+  private presenceAbortController: AbortController | null = null;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -72,6 +74,16 @@ export class PitterPatterAuthority extends DurableObject<Env> {
     this.ctx.acceptWebSocket(server);
 
     return new Response(null, { status: 101, webSocket: client });
+  }
+
+  override async webSocketClose() {
+    this.collabAbortController?.abort();
+    this.presenceAbortController?.abort();
+  }
+
+  override async webSocketError() {
+    this.collabAbortController?.abort();
+    this.presenceAbortController?.abort();
   }
 
   override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
@@ -123,7 +135,6 @@ export class PitterPatterAuthority extends DurableObject<Env> {
   async getDoc(): Promise<StoredDoc> {
     return (
       (await this.ctx.storage.get<StoredDoc>("doc")) ?? {
-        // docJSON: schema.nodes.doc.create().toJSON(),
         docJSON: { type: "doc", content: [{ type: "paragraph" }] },
         version: 0,
         lastUpdatedTimestamp: Date.now(),

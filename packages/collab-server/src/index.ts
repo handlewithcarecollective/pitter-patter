@@ -90,7 +90,11 @@ export interface CollabAuthorityConfig<Transaction> {
    */
   broadcastManager: {
     broadcastCommit: (docId: string, commit: CommitJSON) => Promise<void>;
-    createCommitListener: (docId: string, version: number) => Promise<CommitListener>;
+    createCommitListener: (
+      docId: string,
+      version: number,
+      signal?: AbortSignal,
+    ) => Promise<CommitListener>;
   };
 }
 
@@ -186,10 +190,14 @@ export class CollabAuthority<Transaction> {
    * Listens for remote changes to a document's editor state and returns when changes
    * are found or after a timeout specified in the CollabAuthority's `broadcastManager`.
    */
-  async listenForCommit(docId: string, version: number) {
+  async listenForCommit(docId: string, version: number, signal?: AbortSignal) {
     // Create listner to notify if commits are made. After this await, the listener is registered with
     // the notification service and will be notified if a commit is made.
-    const { listen, abort } = await this.broadcastManager.createCommitListener(docId, version);
+    const { listen, abort } = await this.broadcastManager.createCommitListener(
+      docId,
+      version,
+      signal,
+    );
 
     // Check if any commits were made between the last time this function was called and the
     // new commit listener being registered

@@ -123,6 +123,12 @@ export class WebSocketConnection {
   disconnect(): void {
     this.ws?.close();
     this.ws = null;
+    this.bufferedCommits = [];
+    this.bufferedPresence = null;
+    this.commitsPromise?.resolve();
+    this.presencePromise?.resolve();
+    this.commitsPromise = null;
+    this.presencePromise = null;
   }
 
   async sendCommit(commitJSON: CommitJSON): Promise<void> {
