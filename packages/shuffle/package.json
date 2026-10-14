@@ -2,6 +2,9 @@
   "name": "@pitter-patter/shuffle",
   "version": "0.3.7",
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/handlewithcarecollective/pitter-patter"
+  },
   "files": [
     "./style/shuffle.css",
     "./dist"

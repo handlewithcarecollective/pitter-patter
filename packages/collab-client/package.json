@@ -1,6 +1,9 @@
 {
   "name": "@pitter-patter/collab-client",
   "version": "0.1.4",
+  "repository": {
+    "url": "https://github.com/handlewithcarecollective/pitter-patter"
+  },
   "files": [
     "./dist"
   ],

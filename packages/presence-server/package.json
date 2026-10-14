@@ -1,6 +1,9 @@
 {
   "name": "@pitter-patter/presence-server",
   "version": "0.1.3",
+  "repository": {
+    "url": "https://github.com/handlewithcarecollective/pitter-patter"
+  },
   "files": [
     "./dist"
   ],
