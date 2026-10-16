@@ -4,31 +4,20 @@ type BroadcastManager = PresenceAuthorityConfig["broadcastManager"];
 
 export class DurableObjectBroadcastManager implements BroadcastManager {
   private subscriptions: Array<(indicator: { ref: string; clientId: string }) => void>;
-  private timeout: number;
-  private ctx: DurableObjectState | undefined;
 
-  constructor(config: { timeout?: number; ctx?: DurableObjectState }) {
+  constructor() {
     this.subscriptions = [];
-    this.timeout = config.timeout ?? 5_000;
-    this.ctx = config.ctx;
   }
 
   async broadcastIndicator(_docId: string, indicator: PresenceIndicator) {
     this.subscriptions.forEach((subscription) => subscription(indicator));
-
-    this.ctx?.getWebSockets().forEach((ws) => {
-      const attachment = ws.deserializeAttachment() as { clientId?: string } | null;
-      if (attachment?.clientId === indicator.clientId) return;
-      ws.send(
-        JSON.stringify({ type: "presence", indicators: { [indicator.clientId]: indicator } }),
-      );
-    });
   }
 
   async createPresenceListener(
     _docId: string,
     excludeClientId: string,
     refs: Record<string, string>,
+    signal?: AbortSignal,
   ) {
     const { promise, resolve } = PromiseWithResolvers<boolean>();
 
@@ -42,7 +31,12 @@ export class DurableObjectBroadcastManager implements BroadcastManager {
       return await Promise.race([
         promise,
         new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(false), this.timeout);
+          signal?.addEventListener("abort", () => {
+            resolve(false);
+          });
+        }),
+        new Promise<boolean>((resolve) => {
+          setTimeout(() => resolve(false), 5_000);
         }),
       ]).finally(async () => {
         const index = this.subscriptions.indexOf(listener);
@@ -89,7 +83,7 @@ export class DurableObjectPersistenceManager implements PersistenceManager {
     const indicators = await this.storage.get<PresenceStore>("presence");
     await this.storage.put("presence", { ...indicators, [indicator.clientId]: indicator });
 
-    this.expire(indicator.clientId, 30);
+    this.expire(indicator.clientId, 30_000);
   }
 
   async getIndicators() {

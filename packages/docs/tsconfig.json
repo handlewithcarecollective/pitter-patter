@@ -23,6 +23,12 @@
   },
   "references": [
     {
+      "path": "../collab-client"
+    },
+    {
+      "path": "../presence-client"
+    },
+    {
       "path": "../shuffle"
     }
   ]

@@ -4,24 +4,16 @@ type BroadcastManager = CollabAuthorityConfig<null>["broadcastManager"];
 
 export class DurableObjectBroadcastManager implements BroadcastManager {
   private subscriptions: Map<string, Array<(version: number) => void>>;
-  private timeout: number;
-  private ctx: DurableObjectState | undefined;
 
-  constructor(config: { timeout?: number; ctx?: DurableObjectState }) {
+  constructor() {
     this.subscriptions = new Map();
-    this.timeout = config.timeout ?? 5_000;
-    this.ctx = config.ctx;
   }
 
   async broadcastCommit(docId: string, commitJSON: CommitJSON) {
     this.subscriptions.get(docId)?.forEach((subscription) => subscription(commitJSON.version));
-
-    this.ctx?.getWebSockets().forEach((ws) => {
-      ws.send(JSON.stringify({ type: "commits", commits: [commitJSON] }));
-    });
   }
 
-  async createCommitListener(docId: string, version: number) {
+  async createCommitListener(docId: string, version: number, signal?: AbortSignal) {
     const { promise, resolve } = PromiseWithResolvers<boolean>();
 
     function listener(v: number) {
@@ -34,7 +26,12 @@ export class DurableObjectBroadcastManager implements BroadcastManager {
       return await Promise.race([
         promise,
         new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(false), this.timeout);
+          signal?.addEventListener("abort", () => {
+            resolve(false);
+          });
+        }),
+        new Promise<boolean>((resolve) => {
+          setTimeout(() => resolve(false), 5_000);
         }),
       ]).finally(async () => {
         this.subscriptions.set(

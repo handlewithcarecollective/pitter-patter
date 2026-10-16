@@ -12,7 +12,7 @@ import { DurableObjectBroadcastManager as CollabBroadcastManager } from "./adapt
 import {
   DurableObjectBroadcastManager as PresenceBroadcastManager,
   DurableObjectPersistenceManager,
-} from "./adapters/presence.tsx";
+} from "./adapters/presence.ts";
 import { schema } from "./schema.ts";
 
 interface StoredDoc {
@@ -22,19 +22,22 @@ interface StoredDoc {
 }
 
 type ClientMessage =
-  | { type: "subscribe"; version: number }
+  | { type: "getCommits"; version: number }
+  | { type: "getPresence"; clientId: string; refs: Record<string, string> }
   | { type: "commit"; commitJSON: CommitJSON }
   | { type: "presence"; indicator: PresenceIndicator };
 
 export class PitterPatterAuthority extends DurableObject<Env> {
   private collabAuthority: CollabAuthority<null>;
   private presenceAuthority: PresenceAuthority;
+  private collabAbortController: AbortController | null = null;
+  private presenceAbortController: AbortController | null = null;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.presenceAuthority = new PresenceAuthority({
       persistenceManager: new DurableObjectPersistenceManager(this.ctx.storage),
-      broadcastManager: new PresenceBroadcastManager({ ctx: this.ctx }),
+      broadcastManager: new PresenceBroadcastManager(),
     });
     this.collabAuthority = new CollabAuthority({
       schema,
@@ -56,7 +59,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
           commits.concat({ ref: commitRef, version: commitVersion, steps: commitSteps }),
         );
       },
-      broadcastManager: new CollabBroadcastManager({ ctx: this.ctx }),
+      broadcastManager: new CollabBroadcastManager(),
     });
   }
 
@@ -73,14 +76,44 @@ export class PitterPatterAuthority extends DurableObject<Env> {
     return new Response(null, { status: 101, webSocket: client });
   }
 
+  override async webSocketClose() {
+    this.collabAbortController?.abort();
+    this.presenceAbortController?.abort();
+  }
+
+  override async webSocketError() {
+    this.collabAbortController?.abort();
+    this.presenceAbortController?.abort();
+  }
+
   override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== "string") return;
 
     const data = JSON.parse(message) as ClientMessage;
     switch (data.type) {
-      case "subscribe": {
-        const commits = await this.getStoredCommitsAfter(data.version);
+      case "getCommits": {
+        this.collabAbortController?.abort();
+        this.collabAbortController = new AbortController();
+        const commits = await this.collabAuthority.listenForCommit(
+          "",
+          data.version,
+          this.collabAbortController.signal,
+        );
+        this.collabAbortController = null;
         ws.send(JSON.stringify({ type: "commits", commits }));
+        break;
+      }
+      case "getPresence": {
+        this.presenceAbortController?.abort();
+        this.presenceAbortController = new AbortController();
+        const indicators = await this.presenceAuthority.listenForPresence(
+          "",
+          data.clientId,
+          data.refs,
+          this.presenceAbortController.signal,
+        );
+        this.presenceAbortController = null;
+        ws.send(JSON.stringify({ type: "presence", indicators }));
         break;
       }
       case "commit": {
@@ -88,7 +121,6 @@ export class PitterPatterAuthority extends DurableObject<Env> {
         break;
       }
       case "presence": {
-        ws.serializeAttachment({ clientId: data.indicator.clientId });
         await this.updatePresence(data.indicator);
         break;
       }
@@ -103,7 +135,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
   async getDoc(): Promise<StoredDoc> {
     return (
       (await this.ctx.storage.get<StoredDoc>("doc")) ?? {
-        docJSON: schema.nodes.doc.create().toJSON(),
+        docJSON: { type: "doc", content: [{ type: "paragraph" }] },
         version: 0,
         lastUpdatedTimestamp: Date.now(),
       }
