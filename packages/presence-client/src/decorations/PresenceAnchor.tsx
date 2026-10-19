@@ -2,12 +2,10 @@ import { type WidgetViewComponentProps } from "@handlewithcare/react-prosemirror
 
 import { PresenceIndicator } from "../PresenceIndicator.ts";
 
-import { getPresenceColor } from "./getPresenceColor.ts";
-
 export function PresenceAnchor({ widget, getPos: _, ...props }: WidgetViewComponentProps) {
   const indicator = widget.type.spec["indicator"] as PresenceIndicator;
   const userId = indicator.userId;
-  const presenceColor = getPresenceColor(userId);
+  const presenceColor = widget.type.spec["color"] as string;
 
   return (
     <span {...props} className="pitter-patter-presence-anchor">

@@ -24,7 +24,7 @@ export function receivePresenceTransaction(
 }
 
 export function createPresence(
-  createWidget: (pos: number, indicator: PresenceIndicator) => Decoration,
+  createWidget: (pos: number, indicator: PresenceIndicator, color: string) => Decoration,
 ) {
   return function presence(
     config: {
@@ -103,13 +103,15 @@ export function createPresence(
             const anchor = mappables.reduce((acc, mappable) => mappable.map(acc), indicator.anchor);
             const head = mappables.reduce((acc, mappable) => mappable.map(acc), indicator.head);
 
+            const color = getPresenceColor(indicator.userId);
+
             nextDecorations.push(
               Decoration.inline(Math.min(anchor, head), Math.max(anchor, head), {
-                style: `background-color: ${getPresenceColor(indicator.userId)}50;`,
+                style: `background-color: ${color}50;`,
               }),
             );
 
-            nextDecorations.push(createWidget(anchor, indicator));
+            nextDecorations.push(createWidget(anchor, indicator, color));
           }
 
           return {

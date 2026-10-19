@@ -444,6 +444,9 @@ importers:
       '@pitter-patter/presence-client':
         specifier: workspace:*
         version: link:../presence-client
+      '@pitter-patter/refs':
+        specifier: workspace:*
+        version: link:../refs
       '@pitter-patter/shuffle':
         specifier: workspace:*
         version: link:../shuffle
