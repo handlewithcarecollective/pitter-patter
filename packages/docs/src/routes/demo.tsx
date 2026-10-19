@@ -3,9 +3,9 @@ import {
   ProseMirrorDoc,
   useEditorEventListener,
 } from "@handlewithcare/react-prosemirror";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
-import { GripVertical, ImageIcon, Keyboard, Pilcrow, Square } from "lucide-react";
+import { Check, GripVertical, ImageIcon, Keyboard, Link2, Pilcrow, Square } from "lucide-react";
 import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
 import { Node } from "prosemirror-model";
@@ -48,8 +48,43 @@ import "@pitter-patter/shuffle/style/shuffle.css";
 import "prosemirror-view/style/prosemirror.css";
 
 export const Route = createFileRoute("/demo")({
-  component: Demo,
+  component: DemoRoute,
+  validateSearch: parseDemoSearch,
 });
+
+const SHARE_LINK_PROMPT = "Copy this link to share the demo";
+
+const DOC_ID = /^[0-9a-z]{1,32}$/;
+
+type DemoSearch = { ref?: string };
+
+function parseDemoSearch({ ref }: Record<string, unknown>): DemoSearch {
+  return typeof ref === "string" && DOC_ID.test(ref) ? { ref } : {};
+}
+
+function DemoRoute() {
+  const { ref } = Route.useSearch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (ref) return;
+    void navigate({ to: "/demo", search: { ref: randomRef() }, replace: true });
+  }, [ref, navigate]);
+
+  return (
+    <HomeLayout {...baseOptions()}>
+      {ref ? <Demo key={ref} docId={ref} /> : <DemoStarting />}
+    </HomeLayout>
+  );
+}
+
+function DemoStarting() {
+  return (
+    <main className="mx-auto w-full max-w-[1400px] px-4 py-10 md:px-8">
+      <p className="text-lg text-fd-muted-foreground/80">Starting a new demo…</p>
+    </main>
+  );
+}
 
 const COLLABORATORS = {
   Ishmael: "#e8711f",
@@ -63,8 +98,7 @@ function getPresenceColor(userId: string) {
   return COLLABORATORS[userId as CollaboratorName] ?? "#7e6f62";
 }
 
-function Demo() {
-  const [docId] = useState(randomRef);
+function Demo({ docId }: { docId: string }) {
   const [initialState, setInitialState] = useState<null | EditorState>(null);
   const typingFriend = useTypingFriend(docId);
   const [offline, setOffline] = useState<Record<string, boolean>>({});
@@ -100,46 +134,44 @@ function Demo() {
     };
   }, [docId]);
   return (
-    <HomeLayout {...baseOptions()}>
-      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-10 md:px-8">
-        <header className="flex max-w-3xl flex-col gap-3">
-          <p className="font-handle text-sm font-extralight uppercase tracking-wider">Live demo</p>
-          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-            Full-stack collaborative editing
-          </h1>
-          <p className="text-lg text-fd-muted-foreground/80">
-            Ishmael and Queequeg are editing the same document. Type in either editor to watch edits
-            and cursors sync, drag blocks around to rearrange them, or take an editor offline and
-            see its changes merge when it reconnects.
-          </p>
-          <p className="text-lg text-fd-muted-foreground/80">
-            This page is connected to a Cloudflare Durable Object (with document ID{" "}
-            <code className="font-handle font-extralight uppercase tracking-wider">{docId}</code>)
-            with websockets. The editors are actually communicating over the network through the
-            durable object!
-          </p>
-        </header>
-        <Toolbar typingFriend={typingFriend} offline={offline} />
-        {initialState && (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <DemoEditor
-              name="Ishmael"
-              docId={docId}
-              initialState={initialState}
-              isOffline={!!offline["Ishmael"]}
-              onToggleOffline={toggleOffline}
-            />
-            <DemoEditor
-              name="Queequeg"
-              docId={docId}
-              initialState={initialState}
-              isOffline={!!offline["Queequeg"]}
-              onToggleOffline={toggleOffline}
-            />
-          </div>
-        )}
-      </main>
-    </HomeLayout>
+    <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-10 md:px-8">
+      <header className="flex max-w-3xl flex-col gap-3">
+        <p className="font-handle text-sm font-extralight uppercase tracking-wider">Live demo</p>
+        <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
+          Full-stack collaborative editing
+        </h1>
+        <p className="text-lg text-fd-muted-foreground/80">
+          Ishmael and Queequeg are editing the same document. Type in either editor to watch edits
+          and cursors sync, drag blocks around to rearrange them, or take an editor offline and see
+          its changes merge when it reconnects.
+        </p>
+        <p className="text-lg text-fd-muted-foreground/80">
+          This page is connected to a Cloudflare Durable Object (with document ID{" "}
+          <code className="font-handle font-extralight uppercase tracking-wider">{docId}</code>)
+          with websockets. The editors are actually communicating over the network through the
+          durable object!
+        </p>
+      </header>
+      <Toolbar typingFriend={typingFriend} offline={offline} />
+      {initialState && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <DemoEditor
+            name="Ishmael"
+            docId={docId}
+            initialState={initialState}
+            isOffline={!!offline["Ishmael"]}
+            onToggleOffline={toggleOffline}
+          />
+          <DemoEditor
+            name="Queequeg"
+            docId={docId}
+            initialState={initialState}
+            isOffline={!!offline["Queequeg"]}
+            onToggleOffline={toggleOffline}
+          />
+        </div>
+      )}
+    </main>
   );
 }
 
@@ -153,31 +185,72 @@ function Toolbar({
   return (
     <div className="z-20 md:sticky md:top-(--fd-nav-height,0px) flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border bg-fd-card/90 p-3 shadow-sm backdrop-blur">
       <InflatableMenu />
-      <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="ml-auto flex md:flex-wrap justify-between md:w-auto w-full md:justify-start items-center gap-x-6 gap-y-3">
         <Collaborators isTyping={typingFriend.isTyping} offline={offline} />
-        <button
-          onClick={typingFriend.isTyping ? typingFriend.stop : typingFriend.start}
-          title="Simulate a remote collaborator typing Moby-Dick into the top of the document"
-          className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-            typingFriend.isTyping
-              ? "border hover:bg-fd-muted"
-              : "bg-fd-primary text-fd-primary-foreground hover:brightness-105"
-          }`}
-        >
-          {typingFriend.isTyping ? (
-            <>
-              <Square className="size-3.5 fill-current" />
-              Stop Typing Buddy
-            </>
-          ) : (
-            <>
-              <Keyboard className="size-4" />
-              Invite Typing Buddy
-            </>
-          )}
-        </button>
+        <div className="md:contents flex flex-col gap-2">
+          <ShareButton />
+          <button
+            onClick={typingFriend.isTyping ? typingFriend.stop : typingFriend.start}
+            title="Simulate a remote collaborator typing Moby-Dick into the top of the document"
+            className={`flex cursor-pointer items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              typingFriend.isTyping
+                ? "border hover:bg-fd-muted"
+                : "bg-fd-primary text-fd-primary-foreground hover:brightness-105"
+            }`}
+          >
+            {typingFriend.isTyping ? (
+              <>
+                <Square className="size-3.5 fill-current hidden md:block" />
+                Stop Typing Buddy
+              </>
+            ) : (
+              <>
+                <Keyboard className="size-4 hidden md:block" />
+                Invite Typing Buddy
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
+  );
+}
+
+function ShareButton() {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 1500);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [copied]);
+
+  function copy() {
+    const url = window.location.href;
+    if (!navigator.clipboard) {
+      window.prompt(SHARE_LINK_PROMPT, url);
+      return;
+    }
+    navigator.clipboard.writeText(url).then(
+      () => {
+        setCopied(true);
+      },
+      () => {
+        window.prompt(SHARE_LINK_PROMPT, url);
+      },
+    );
+  }
+
+  return (
+    <button
+      onClick={copy}
+      className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors hover:bg-fd-muted"
+    >
+      {copied ? <Check className="size-4" /> : <Link2 className="size-4" />}
+      {copied ? "Link copied" : "Share demo"}
+    </button>
   );
 }
 
@@ -233,20 +306,22 @@ function Avatar({
 
 function InflatableMenu() {
   return (
-    <div className="flex flex-wrap items-center gap-2 text-sm">
+    <div className="flex md:flex-wrap justify-between md:w-auto w-full md:justify-start items-center gap-2 text-sm">
       <span className="text-fd-muted-foreground/70">Drag in a block</span>
-      <Inflatable
-        node={schema.nodes.paragraph.create(null, schema.text("A brand new paragraph!"))}
-        icon={<Pilcrow className="size-4" />}
-      >
-        Paragraph
-      </Inflatable>
-      <Inflatable
-        node={schema.nodes.image.create({ src: "/images/shuffle-dance.jpg" })}
-        icon={<ImageIcon className="size-4" />}
-      >
-        Image
-      </Inflatable>
+      <div className="flex flex-col gap-2 md:contents">
+        <Inflatable
+          node={schema.nodes.paragraph.create(null, schema.text("A brand new paragraph!"))}
+          icon={<Pilcrow className="size-4" />}
+        >
+          Paragraph
+        </Inflatable>
+        <Inflatable
+          node={schema.nodes.image.create({ src: "/images/shuffle-dance.jpg" })}
+          icon={<ImageIcon className="size-4" />}
+        >
+          Image
+        </Inflatable>
+      </div>
     </div>
   );
 }
