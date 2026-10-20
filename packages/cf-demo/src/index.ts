@@ -13,6 +13,7 @@ import {
   DurableObjectBroadcastManager as PresenceBroadcastManager,
   DurableObjectPersistenceManager,
 } from "./adapters/presence.ts";
+import { INITIAL_DOC_JSON } from "./initialDoc.ts";
 import { schema } from "./schema.ts";
 
 interface StoredDoc {
@@ -135,7 +136,7 @@ export class PitterPatterAuthority extends DurableObject<Env> {
   async getDoc(): Promise<StoredDoc> {
     return (
       (await this.ctx.storage.get<StoredDoc>("doc")) ?? {
-        docJSON: { type: "doc", content: [{ type: "paragraph" }] },
+        docJSON: INITIAL_DOC_JSON,
         version: 0,
         lastUpdatedTimestamp: Date.now(),
       }

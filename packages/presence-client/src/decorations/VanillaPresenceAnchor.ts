@@ -2,13 +2,13 @@ import { EditorView } from "prosemirror-view";
 
 import { PresenceIndicator } from "../PresenceIndicator.ts";
 
-import { getPresenceColor } from "./getPresenceColor.ts";
-
 type WidgetConstructor = ((view: EditorView, getPos: () => number | undefined) => Node) | Node;
 
-export function createVanillaPresenceIndicator(indicator: PresenceIndicator): WidgetConstructor {
+export function createVanillaPresenceIndicator(
+  indicator: PresenceIndicator,
+  presenceColor: string,
+): WidgetConstructor {
   const userId = indicator.userId;
-  const presenceColor = getPresenceColor(userId);
 
   const userIdEl = document.createElement("span");
   userIdEl.classList.add("pitter-patter-presence-anchor-user-id");

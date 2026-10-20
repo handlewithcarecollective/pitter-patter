@@ -5,11 +5,12 @@ import {
 } from "@handlewithcare/react-prosemirror";
 import { createFileRoute } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
+import { GripVertical, ImageIcon, Keyboard, Pilcrow, Square } from "lucide-react";
 import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
 import { Node } from "prosemirror-model";
 import { EditorState, Transaction } from "prosemirror-state";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   collab,
@@ -23,6 +24,7 @@ import {
   PresenceClientConfig,
 } from "@pitter-patter/presence-client";
 import { presence } from "@pitter-patter/presence-client/react";
+import { randomRef } from "@pitter-patter/refs";
 import {
   DragHandle,
   DragHandleProps,
@@ -40,6 +42,7 @@ import { WebSocketConnection } from "@/demo/socket.js";
 import { useTypingFriend } from "@/demo/useTypingFriend.js";
 import { baseOptions } from "@/lib/layout.shared";
 
+import "@/demo/demo.css";
 import "@pitter-patter/presence-client/styles.css";
 import "@pitter-patter/shuffle/style/shuffle.css";
 import "prosemirror-view/style/prosemirror.css";
@@ -48,21 +51,26 @@ export const Route = createFileRoute("/demo")({
   component: Demo,
 });
 
-function randomRef() {
-  try {
-    const bytes = new Uint32Array(2);
-    globalThis.crypto.getRandomValues(bytes);
-    return bytes.reduce((str, byte) => str + byte.toString(36), "");
-  } catch {
-    return Math.floor(Math.random() * 0xffffffffffff).toString(36);
-  }
+const COLLABORATORS = {
+  Ishmael: "#e8711f",
+  Queequeg: "#16a34a",
+  "Typing Buddy": "#7c5cbf",
+} as const;
+
+type CollaboratorName = keyof typeof COLLABORATORS;
+
+function getPresenceColor(userId: string) {
+  return COLLABORATORS[userId as CollaboratorName] ?? "#7e6f62";
 }
 
 function Demo() {
   const [docId] = useState(randomRef);
   const [initialState, setInitialState] = useState<null | EditorState>(null);
   const typingFriend = useTypingFriend(docId);
-  const [rightOffline, setRightOffline] = useState(false);
+  const [offline, setOffline] = useState<Record<string, boolean>>({});
+  const toggleOffline = useCallback((name: string) => {
+    setOffline((prev) => ({ ...prev, [name]: !prev[name] }));
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     async function run() {
@@ -75,7 +83,12 @@ function Demo() {
       setInitialState(
         EditorState.create({
           doc: Node.fromJSON(schema, doc),
-          plugins: [collab({ version }), shuffle(), presence(), keymap(baseKeymap)],
+          plugins: [
+            collab({ version }),
+            shuffle(),
+            presence({ getPresenceColor }),
+            keymap(baseKeymap),
+          ],
         }),
       );
     }
@@ -88,96 +101,203 @@ function Demo() {
   }, [docId]);
   return (
     <HomeLayout {...baseOptions()}>
-      {initialState && (
-        <div className="flex flex-col gap-4 p-10">
-          <h1 className="text-3xl font-semibold">Pitter Patter Demo</h1>
-          <p>
-            Try typing in the editors below, and see the edits and presence indicators update in the
-            other editor! You can also...
+      <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-10 md:px-8">
+        <header className="flex max-w-3xl flex-col gap-3">
+          <p className="font-handle text-sm font-extralight uppercase tracking-wider">Live demo</p>
+          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
+            Full-stack collaborative editing
+          </h1>
+          <p className="text-lg text-fd-muted-foreground/80">
+            Ishmael and Queequeg are editing the same document. Type in either editor to watch edits
+            and cursors sync, drag blocks around to rearrange them, or take an editor offline and
+            see its changes merge when it reconnects.
           </p>
-          <InflatableMenu />
-          <div className="flex flex-col gap-2">
-            <div>
-              Use Typing Buddy to simulate a remote collaborator typing Moby Dick into the end of
-              your doc, or take the right editor offline to simulate network problems!
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={typingFriend.isTyping ? typingFriend.stop : typingFriend.start}
-                className="cursor-pointer border-gray border rounded-md p-2 text-sm"
-              >
-                {typingFriend.isTyping ? "Stop Typing Friend" : "Start Typing Friend"}
-              </button>
-              <button
-                onClick={() => setRightOffline((offline) => !offline)}
-                className="cursor-pointer border-gray border rounded-md p-2 text-sm"
-              >
-                {rightOffline ? "Bring Right Editor Online" : "Take Right Editor Offline"}
-              </button>
-            </div>
+          <p className="text-lg text-fd-muted-foreground/80">
+            This page is connected to a Cloudflare Durable Object (with document ID{" "}
+            <code className="font-handle font-extralight uppercase tracking-wider">{docId}</code>)
+            with websockets. The editors are actually communicating over the network through the
+            durable object!
+          </p>
+        </header>
+        <Toolbar typingFriend={typingFriend} offline={offline} />
+        {initialState && (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <DemoEditor
+              name="Ishmael"
+              docId={docId}
+              initialState={initialState}
+              isOffline={!!offline["Ishmael"]}
+              onToggleOffline={toggleOffline}
+            />
+            <DemoEditor
+              name="Queequeg"
+              docId={docId}
+              initialState={initialState}
+              isOffline={!!offline["Queequeg"]}
+              onToggleOffline={toggleOffline}
+            />
           </div>
-          <div className="flex gap-6 flex-col md:flex-row py-6">
-            <DemoEditor docId={docId} initialState={initialState} />
-            <DemoEditor docId={docId} initialState={initialState} isOffline={rightOffline} />
-          </div>
-        </div>
-      )}
+        )}
+      </main>
     </HomeLayout>
   );
 }
 
-function InflatableMenu() {
+function Toolbar({
+  typingFriend,
+  offline,
+}: {
+  typingFriend: ReturnType<typeof useTypingFriend>;
+  offline: Record<string, boolean>;
+}) {
   return (
-    <div className="flex flex-col gap-2">
-      <div>Drag one of the items below to insert a node of that type into either editor:</div>
-      <div className="flex gap-2 sticky top-0 z-10">
-        <div
-          data-shuffle-inflatable={JSON.stringify(
-            schema.nodes.paragraph.create(null, schema.text("A brand new paragraph!")).toJSON(),
-          )}
-          className="border-gray border rounded-md p-2 cursor-grab touch-none select-none text-sm"
+    <div className="z-20 md:sticky md:top-(--fd-nav-height,0px) flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border bg-fd-card/90 p-3 shadow-sm backdrop-blur">
+      <InflatableMenu />
+      <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3">
+        <Collaborators isTyping={typingFriend.isTyping} offline={offline} />
+        <button
+          onClick={typingFriend.isTyping ? typingFriend.stop : typingFriend.start}
+          title="Simulate a remote collaborator typing Moby-Dick into the top of the document"
+          className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            typingFriend.isTyping
+              ? "border hover:bg-fd-muted"
+              : "bg-fd-primary text-fd-primary-foreground hover:brightness-105"
+          }`}
         >
-          Paragraph
-        </div>
-        <div
-          data-shuffle-inflatable={JSON.stringify(
-            schema.nodes.image.create({ src: "/images/shuffle-dance.jpg" }).toJSON(),
+          {typingFriend.isTyping ? (
+            <>
+              <Square className="size-3.5 fill-current" />
+              Stop Typing Buddy
+            </>
+          ) : (
+            <>
+              <Keyboard className="size-4" />
+              Invite Typing Buddy
+            </>
           )}
-          className="border-gray border rounded-md p-2 cursor-grab touch-none select-none text-sm"
-        >
-          Image
-        </div>
+        </button>
       </div>
     </div>
   );
 }
 
-function DemoDoc({ isOffline }: { isOffline: boolean }) {
+function Collaborators({
+  isTyping,
+  offline,
+}: {
+  isTyping: boolean;
+  offline: Record<string, boolean>;
+}) {
+  const present: { name: CollaboratorName; isOffline: boolean }[] = [
+    { name: "Ishmael", isOffline: !!offline["Ishmael"] },
+    { name: "Queequeg", isOffline: !!offline["Queequeg"] },
+  ];
+  if (isTyping) present.push({ name: "Typing Buddy", isOffline: false });
+
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span className="text-fd-muted-foreground/70">In this doc</span>
+      <div className="flex -space-x-1.5">
+        {present.map(({ name, isOffline }) => (
+          <Avatar key={name} name={name} isOffline={isOffline} ringed />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Avatar({
+  name,
+  isOffline = false,
+  ringed = false,
+}: {
+  name: CollaboratorName;
+  isOffline?: boolean;
+  ringed?: boolean;
+}) {
+  return (
+    <span
+      title={isOffline ? `${name} (offline)` : name}
+      className={`relative flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white transition ${
+        ringed ? "ring-2 ring-fd-card" : ""
+      } ${isOffline ? "opacity-40 grayscale" : ""}`}
+      style={{ backgroundColor: COLLABORATORS[name] }}
+    >
+      {name === "Typing Buddy" ? <Keyboard className="size-4" /> : name[0]}
+      {name === "Typing Buddy" && (
+        <span className="absolute -right-0.5 -bottom-0.5 size-2.5 animate-pulse rounded-full bg-green-500 ring-2 ring-fd-card" />
+      )}
+    </span>
+  );
+}
+
+function InflatableMenu() {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="text-fd-muted-foreground/70">Drag in a block</span>
+      <Inflatable
+        node={schema.nodes.paragraph.create(null, schema.text("A brand new paragraph!"))}
+        icon={<Pilcrow className="size-4" />}
+      >
+        Paragraph
+      </Inflatable>
+      <Inflatable
+        node={schema.nodes.image.create({ src: "/images/shuffle-dance.jpg" })}
+        icon={<ImageIcon className="size-4" />}
+      >
+        Image
+      </Inflatable>
+    </div>
+  );
+}
+
+function Inflatable({
+  node,
+  icon,
+  children,
+}: {
+  node: Node;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      data-shuffle-inflatable={JSON.stringify(node.toJSON())}
+      className="flex cursor-grab touch-none items-center gap-1.5 rounded-lg [&_svg]:pointer-events-none border bg-fd-background py-1.5 pr-3 pl-1.5 shadow-xs transition select-none hover:border-fd-primary hover:shadow-sm active:cursor-grabbing"
+    >
+      <GripVertical className="size-4 opacity-40" />
+      {icon}
+      {children}
+    </div>
+  );
+}
+
+function DemoDoc() {
   useEditorEventListener("pointerenter", (view) => {
     if (!view.root.shuffleDragging) return;
     view.focus();
   });
 
-  return (
-    <ProseMirrorDoc
-      className={`border rounded-md min-h-[350px] p-2 ${isOffline ? "border-red-500" : "border-gray"}`}
-    />
-  );
+  return <ProseMirrorDoc className="demo-editor" />;
 }
 
 function DemoEditor({
+  name,
   docId,
   initialState,
-  isOffline = false,
+  isOffline,
+  onToggleOffline,
 }: {
+  name: CollaboratorName;
   docId: string;
   initialState: EditorState;
-  isOffline?: boolean;
+  isOffline: boolean;
+  onToggleOffline: (name: string) => void;
 }) {
   const [state, setState] = useState<EditorState>(initialState);
   const stateRef = useRef(state);
   stateRef.current = state;
-  const [userId] = useState(randomRef);
+  const userId = name;
   const url = new URL(`${COLLAB_SERVER_URL}/${docId}/socket`);
   url.protocol = url.protocol.replace("http", "ws");
 
@@ -265,20 +385,70 @@ function DemoEditor({
   }, [presenceClient, initialState]);
 
   return (
-    <div className="flex-1 min-w-0">
-      <ProseMirror state={state} dispatchTransaction={dispatchTransaction}>
-        <ShuffleSkeleton>
-          <DemoDoc isOffline={isOffline} />
-          <ResizeHandles />
-          <DragHandles handleComponent={CustomHandle} />
-        </ShuffleSkeleton>
-      </ProseMirror>
-      {isOffline && (
-        <p className="text-red-500 mb-2">
-          Editor is offline. Edits are local-only and will sync when back online.
-        </p>
-      )}
-    </div>
+    <section
+      className={`demo-editor-frame flex min-w-0 flex-col rounded-xl border bg-fd-card shadow-sm transition-colors ${
+        isOffline ? "border-dashed" : "focus-within:border-fd-foreground/40"
+      }`}
+    >
+      <header
+        className="flex items-center gap-3 rounded-t-xl border-b px-4 py-2.5"
+        style={
+          isOffline
+            ? {
+                backgroundImage:
+                  "repeating-linear-gradient(-45deg, transparent 0 10px, color-mix(in srgb, var(--color-fd-primary) 12%, transparent) 10px 20px)",
+              }
+            : undefined
+        }
+      >
+        <Avatar name={name} />
+        <div className="flex flex-col leading-tight">
+          <span className="font-medium">{name}</span>
+          <span className="text-xs text-fd-muted-foreground/70">
+            {isOffline ? "Edits are saved locally and will sync when back online" : "Syncing live"}
+          </span>
+        </div>
+        <ConnectionSwitch
+          isOnline={!isOffline}
+          onToggle={() => {
+            onToggleOffline(name);
+          }}
+        />
+      </header>
+      <div className="px-2 md:px-4">
+        <ProseMirror state={state} dispatchTransaction={dispatchTransaction}>
+          <ShuffleSkeleton>
+            <DemoDoc />
+            <ResizeHandles />
+            <DragHandles handleComponent={CustomHandle} />
+          </ShuffleSkeleton>
+        </ProseMirror>
+      </div>
+    </section>
+  );
+}
+
+function ConnectionSwitch({ isOnline, onToggle }: { isOnline: boolean; onToggle: () => void }) {
+  return (
+    <button
+      role="switch"
+      aria-checked={isOnline}
+      onClick={onToggle}
+      className="ml-auto flex shrink-0 cursor-pointer items-center gap-2 rounded-full border bg-fd-background py-1 pr-1 pl-3 text-xs font-medium"
+    >
+      {isOnline ? "Online" : "Offline"}
+      <span
+        className={`flex h-5 w-9 items-center rounded-full p-0.5 transition-colors ${
+          isOnline ? "bg-green-600" : "bg-fd-foreground/25"
+        }`}
+      >
+        <span
+          className={`size-4 rounded-full bg-white shadow-sm transition-transform ${
+            isOnline ? "translate-x-4" : ""
+          }`}
+        />
+      </span>
+    </button>
   );
 }
 

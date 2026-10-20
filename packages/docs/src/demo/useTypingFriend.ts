@@ -111,11 +111,12 @@ export function useTypingFriend(docId: string) {
       }
 
       let nextState = currentState;
-      const firstChild = nextState.doc.firstChild;
-      if (!firstChild || firstChild.type.name !== "paragraph") {
-        nextState = nextState.apply(nextState.tr.insert(0, schema.nodes.paragraph.create()));
+      if (charIndex === 0 || nextState.selection.$head.parent.type !== schema.nodes.paragraph) {
+        const tr = nextState.tr.insert(0, schema.nodes.paragraph.create());
+        tr.setSelection(TextSelection.create(tr.doc, 1));
+        nextState = nextState.apply(tr);
       }
-      const pos = nextState.doc.firstChild!.nodeSize - 1;
+      const pos = nextState.selection.head;
 
       const char = MOBY_DICK_EXCERPT[charIndex]!;
       const tr = nextState.tr.insertText(char, pos);

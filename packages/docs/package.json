@@ -16,6 +16,7 @@
     "@orama/orama": "^3.1.18",
     "@pitter-patter/collab-client": "workspace:*",
     "@pitter-patter/presence-client": "workspace:*",
+    "@pitter-patter/refs": "workspace:*",
     "@pitter-patter/shuffle": "workspace:*",
     "@tanstack/react-router": "1.169.1",
     "@tanstack/react-router-devtools": "1.166.13",

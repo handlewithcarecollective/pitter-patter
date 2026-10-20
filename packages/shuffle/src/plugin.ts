@@ -339,7 +339,7 @@ export function shuffle({
     view(view) {
       function handleInflatePointerDown(event: PointerEvent) {
         if (!view.editable) return;
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!(event.target instanceof Element)) return;
 
         if (view.dom.contains(event.target)) return;
 
