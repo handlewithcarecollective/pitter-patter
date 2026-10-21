@@ -1,4 +1,4 @@
-import { animate as tween, AutoLayout, createLayout, JSAnimation, Timeline } from "animejs";
+import { AutoLayout, createLayout, Timeline } from "animejs";
 import { animate } from "motion/mini";
 import { Node, Node as PmNode } from "prosemirror-model";
 import { NodeSelection, Plugin, PluginKey, Selection } from "prosemirror-state";
@@ -8,7 +8,7 @@ import throttle from "raf-throttle";
 import { randomRef } from "@pitter-patter/refs";
 
 import { isShuffleContainer, isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
-import { AutoScroller, findScrollParent, getScrollingElement, ScrollCalculator } from "./scroll.ts";
+import { AutoScroller, ScrollCalculator } from "./scroll.ts";
 import { autogroup } from "./transform/autogroup.ts";
 import { inflate } from "./transform/inflate.ts";
 import { reorder } from "./transform/reorder.ts";
@@ -385,29 +385,6 @@ const LAYOUT_DURATION = 150;
 const LAYOUT_EASE = "inOut(3.5)";
 
 /**
- * Picks the block to hold visually still on screen while a transform reflows the
- * document, given the dragged node's position in `doc`.
- */
-function findScrollReference(doc: PmNode, pos: number, fromAbove: boolean): number | null {
-  const $pos = doc.resolve(pos);
-  for (let d = $pos.depth; d >= 0; d--) {
-    const index = $pos.index(d) + (fromAbove ? 1 : -1);
-    if (index < 0 || index >= $pos.node(d).childCount) continue;
-    return $pos.posAtIndex(index, d);
-  }
-
-  return null;
-}
-
-/** The document-space top of the DOM of the node at `pos`, or null. */
-function docTopOf(view: EditorView, pos: number, scrollTop: number): number | null {
-  const dom = view.nodeDOM(pos);
-  if (!(dom instanceof HTMLElement)) return null;
-
-  return dom.getBoundingClientRect().top + scrollTop;
-}
-
-/**
  * Whether a layout timeline is still tweening the DOM (so it can't be
  * measured). A timeline that hasn't completed but is paused is finished from
  * our point of view; anime never marks an empty one (a transform that moved
@@ -472,7 +449,6 @@ export function startDragOnPointerDown(
 
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
-  let currentScrollAnimation: JSAnimation | null = null;
   let skeletonOn = false;
 
   let pendingMoveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -480,25 +456,6 @@ export function startDragOnPointerDown(
   function rerunMove() {
     pendingMoveTimer = null;
     move(translateCalc.lastSlideX, translateCalc.lastSlideY);
-  }
-
-  /**
-   * Re-derive the clone's transform from the current scroll offset, so that
-   * it stays under the pointer while the document scrolls beneath it.
-   */
-  function syncCloneWithScroll() {
-    const { x, y } = scrollCalc.diff();
-    translateCalc.scroll(x, y);
-
-    if (!clone) return;
-
-    const { transform, transformOrigin } = translateCalc.slide(
-      translateCalc.lastSlideX,
-      translateCalc.lastSlideY,
-    );
-
-    clone.style.transform = transform;
-    clone.style.transformOrigin = transformOrigin;
   }
 
   function move(x: number, y: number) {
@@ -537,76 +494,12 @@ export function startDragOnPointerDown(
 
     if (!tr) return;
 
-    currentScrollAnimation?.cancel();
-    currentScrollAnimation = null;
-
-    const scrollParent = getScrollingElement(findScrollParent(view.dom));
-    const scrollTopBefore = scrollParent.scrollTop;
-
-    // Hold the content ahead of the pointer still. Note where the reference
-    // block sits in document coordinates before the transaction, then scroll
-    // by however much it moved.
-    const activeDomBefore = before != null ? view.nodeDOM(before) : null;
-    const activeRectBefore =
-      activeDomBefore instanceof HTMLElement ? activeDomBefore.getBoundingClientRect() : null;
-    const fromAbove =
-      activeRectBefore !== null && activeRectBefore.top + activeRectBefore.height / 2 < centerY;
-    const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined;
-    const refPosNew =
-      activeRectBefore !== null && meta?.type === "map"
-        ? findScrollReference(tr.doc, meta.payload.newPos, fromAbove)
-        : null;
-    const refNode = refPosNew !== null ? tr.doc.nodeAt(refPosNew) : null;
-    const refPosOld = refPosNew !== null ? tr.mapping.invert().map(refPosNew, 1) : null;
-    // The transform doesn't touch the reference block itself, so mapping its
-    // position back must land on an equal node in the old document.
-    const refTopBefore =
-      refNode !== null && refPosOld !== null && tr.before.nodeAt(refPosOld)?.eq(refNode)
-        ? docTopOf(view, refPosOld, scrollTopBefore)
-        : null;
-
-    let scrollTopAfter: number | null = null;
-
     currentAnimation = layout.update(() => {
       view.dispatch(tr);
-
-      // Autoscroll is already moving the page; a competing tween just fights it.
-      if (autoScroller.active) return;
-      if (refTopBefore === null) return;
-
-      const activePos = shufflePluginKey.getState(view.state)?.activeNodePos;
-      if (activePos === undefined) return;
-      const refPosAfter = findScrollReference(view.state.doc, activePos, fromAbove);
-      if (refPosAfter === null) return;
-
-      // Inside this callback the DOM is already in its final layout.
-      const refTopAfter = docTopOf(view, refPosAfter, scrollParent.scrollTop);
-      if (refTopAfter === null) return;
-
-      const delta = refTopAfter - refTopBefore;
-      if (Math.abs(delta) < 1) return;
-
-      scrollTopAfter = scrollTopBefore + delta;
     });
 
     if (pendingMoveTimer === null) {
       pendingMoveTimer = setTimeout(rerunMove, 40);
-    }
-
-    if (scrollTopAfter !== null && Math.abs(scrollTopAfter - scrollTopBefore) >= 1) {
-      // Drive the scroll offset with the same timing as the layout animation
-      // so the two read as a single motion. Anime ticks both on the same
-      // frame.
-      const scrollState = { top: scrollTopBefore };
-      currentScrollAnimation = tween(scrollState, {
-        top: scrollTopAfter,
-        duration: LAYOUT_DURATION,
-        ease: LAYOUT_EASE,
-        onUpdate() {
-          scrollParent.scrollTop = scrollState.top;
-          syncCloneWithScroll();
-        },
-      });
     }
 
     const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
@@ -709,12 +602,6 @@ export function startDragOnPointerDown(
 
     if (isAnimating(currentAnimation)) {
       currentAnimation.complete();
-    }
-
-    if (currentScrollAnimation && !currentScrollAnimation.completed) {
-      currentScrollAnimation.complete();
-      currentScrollAnimation = null;
-      syncCloneWithScroll();
     }
 
     const before = shufflePluginKey.getState(view.state)?.activeNodePos;
