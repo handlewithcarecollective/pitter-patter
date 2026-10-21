@@ -24,10 +24,8 @@ export function reorder(
   // the browser reports the nearest *editable* position,
   // which may be in an unrelated block.
   const fromDom = view.nodeDOM(from);
-  if (
-    fromDom instanceof HTMLElement &&
-    contains(fromDom.getBoundingClientRect(), clientX, clientY)
-  ) {
+  if (!(fromDom instanceof Element)) return null;
+  if (contains(fromDom.getBoundingClientRect(), clientX, clientY)) {
     return null;
   }
 
@@ -59,6 +57,11 @@ export function reorder(
 
   if (gap <= from + node.nodeSize && gap >= from) return null;
 
+  const $gap = view.state.doc.resolve(gap);
+  if ($gap.parent === $from.parent && isShuffleRow($gap.parent)) {
+    return null;
+  }
+
   const tr = view.state.tr;
   tr.delete(from, from + node.nodeSize);
 
@@ -71,7 +74,7 @@ export function reorder(
   });
   tr.setMeta(shufflePluginKey, {
     type: "map",
-    payload: { newPos },
+    payload: { newPos, oldRect: fromDom.getBoundingClientRect() },
   } satisfies ShufflePluginMeta);
   tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 
@@ -132,7 +135,7 @@ export function findGap(
   if (!nearby) return null;
 
   if (from !== null && isInCenter(candidateRect, clientX, clientY, horizontal ?? false)) {
-    const grouped = autogroup(view, doc.resolve(candidateStart), from);
+    const grouped = autogroup(view, doc.resolve(candidateStart), from, fromRect);
     if (grouped) return grouped;
   }
 
@@ -228,7 +231,12 @@ function isInCenter(rect: DOMRect, clientX: number, clientY: number, horizontal:
   return clientY > mid - half && clientY < mid + half;
 }
 
-function autogroup(view: EditorView, $pos: ResolvedPos, from: number): Transaction | null {
+function autogroup(
+  view: EditorView,
+  $pos: ResolvedPos,
+  from: number,
+  fromRect: DOMRect | undefined,
+): Transaction | null {
   const rowType = getShuffleRowType(view.state.schema);
   if (!rowType) return null;
 
@@ -275,7 +283,7 @@ function autogroup(view: EditorView, $pos: ResolvedPos, from: number): Transacti
   });
   tr.setMeta(shufflePluginKey, {
     type: "map",
-    payload: { newPos },
+    payload: { newPos, oldRect: fromRect },
   } satisfies ShufflePluginMeta);
   tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 

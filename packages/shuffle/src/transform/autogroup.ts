@@ -83,6 +83,8 @@ export function autogroup(
 
     const newPos = tr.mapping.map(gap) - 1;
 
+    const fromDom = view.nodeDOM(from);
+
     tr.insert(newPos, node);
 
     tr.setMeta(reactKeys().spec.key!, {
@@ -90,7 +92,10 @@ export function autogroup(
     });
     tr.setMeta(shufflePluginKey, {
       type: "map",
-      payload: { newPos },
+      payload: {
+        newPos,
+        oldRect: fromDom instanceof Element ? fromDom.getBoundingClientRect() : undefined,
+      },
     } satisfies ShufflePluginMeta);
     tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
 
