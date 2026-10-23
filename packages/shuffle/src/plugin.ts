@@ -1,19 +1,15 @@
-import { animate as tween, AutoLayout, createLayout, JSAnimation, Timeline } from "animejs";
-import { animate } from "motion/mini";
-import { Node, Node as PmNode } from "prosemirror-model";
-import { NodeSelection, Plugin, PluginKey, Selection } from "prosemirror-state";
-import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
+import { widget } from "@handlewithcare/react-prosemirror";
+import { Node } from "prosemirror-model";
+import { EditorState, Plugin, PluginKey, Transaction } from "prosemirror-state";
+import { Decoration, DecorationSet } from "prosemirror-view";
 import throttle from "raf-throttle";
 
 import { randomRef } from "@pitter-patter/refs";
 
+import { DragPlaceholder } from "./components/DragPlaceholder.tsx";
+import { startDragOnPointerDown } from "./dragHandlers.ts";
 import { isShuffleContainer, isShuffleRow, supportsDrag, supportsResize } from "./schema.ts";
-import { AutoScroller, findScrollParent, getScrollingElement, ScrollCalculator } from "./scroll.ts";
-import { autogroup } from "./transform/autogroup.ts";
-import { inflate } from "./transform/inflate.ts";
-import { reorder } from "./transform/reorder.ts";
-import { reposition } from "./transform/reposition.ts";
-import { TranslateCalculator } from "./translation.ts";
+import { ViewDesc } from "./viewDesc.ts";
 
 declare global {
   interface Document {
@@ -46,6 +42,7 @@ interface ShufflePluginMapMeta {
   type: "map";
   payload: {
     newPos: number;
+    oldRect: DOMRect | undefined;
   };
 }
 
@@ -56,12 +53,20 @@ interface ShufflePluginHoverMeta {
   };
 }
 
+interface ShufflePluginRepositionMeta {
+  type: "reposition";
+  payload: {
+    newPos: number;
+  };
+}
+
 export type ShufflePluginMeta =
   | ShufflePluginStartMeta
   | ShufflePluginEndMeta
   | ShufflePluginMapMeta
   | ShufflePluginResizeMeta
-  | ShufflePluginHoverMeta;
+  | ShufflePluginHoverMeta
+  | ShufflePluginRepositionMeta;
 
 export interface ShufflePluginState {
   deco: DecorationSet;
@@ -69,6 +74,8 @@ export interface ShufflePluginState {
   activeNodePos: number | undefined;
   hoverPositions: { from: number; to: number }[];
   startDragInContentDOM: boolean;
+  placeholderRect: DOMRect | undefined;
+  placeholderPos: number | undefined;
 }
 
 export const shufflePluginKey = new PluginKey<ShufflePluginState>("@pitter-patter/shuffle");
@@ -130,87 +137,19 @@ export function shuffle({
           comp: undefined,
           activeNodePos: undefined,
           hoverPositions: [],
+          placeholderRect: undefined,
           startDragInContentDOM,
+          placeholderPos: undefined,
         };
       },
-      apply(tr, value, _oldState, newState) {
-        const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
-        let nextComp = value.comp;
-        let nextHoverPositions = value.hoverPositions;
+      apply(tr, value, oldState, newState) {
+        const next = reduceState(tr, value, oldState, newState);
 
-        if (meta?.type === "hover") {
-          nextHoverPositions = meta.payload.positions;
-        }
-
-        if (meta?.type === "start") {
-          nextComp = randomRef();
-        }
-
-        let nextActiveNodePos = value.activeNodePos;
-        if (meta?.type === "map") {
-          nextActiveNodePos = meta.payload.newPos;
-        } else if (meta?.type === "end") {
-          nextComp = undefined;
-          nextActiveNodePos = undefined;
-        } else if (nextActiveNodePos) {
-          nextActiveNodePos = tr.mapping.map(nextActiveNodePos);
-        }
-
-        const decorations: Decoration[] = [];
-        tr.doc.descendants((node, pos, _parent, index) => {
-          const { shuffleStart, shuffleEnd, zIndex, alignment } = node.attrs;
-
-          if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
-            return true;
-          }
-
-          decorations.push(
-            Decoration.node(pos, pos + node.nodeSize, {
-              ...(!isShuffleRow(node) && {
-                class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
-              }),
-              style: `grid-row: ${index + 1}; z-index: ${zIndex ?? 0};${alignment ? ` align-items: ${alignment};` : ""}`,
-            }),
-          );
-
-          return true;
-        });
-
-        if (hoverDecorations) {
-          nextHoverPositions.forEach(({ from, to }) => {
-            const $from = tr.doc.resolve(from);
-            const node = $from.nodeAfter;
-
-            if (!node) return;
-
-            const hoverDeco = hoverDecorations(from, to, node);
-            if (hoverDeco) {
-              decorations.push(hoverDeco);
-            }
-          });
-        }
-
-        if (nextActiveNodePos !== undefined) {
-          const node = newState.doc.resolve(nextActiveNodePos).nodeAfter;
-
-          if (node) {
-            decorations.push(
-              Decoration.node(
-                nextActiveNodePos,
-                nextActiveNodePos + node.nodeSize,
-                { style: "opacity: 0.4" },
-                { shuffleActive: true },
-              ),
-            );
-          }
-        }
+        const decorations = buildDecorations(tr, next, newState, hoverDecorations);
 
         return {
+          ...next,
           deco: DecorationSet.create(tr.doc, decorations),
-          comp: nextComp,
-          activeNodePos: nextActiveNodePos,
-          hoverPositions: nextHoverPositions,
-          startDragInContentDOM,
         };
       },
     },
@@ -370,457 +309,152 @@ export function shuffle({
   });
 }
 
-interface WidgetViewDesc {
-  widget: Decoration;
-}
+function reduceState(
+  tr: Transaction,
+  value: ShufflePluginState,
+  oldState: EditorState,
+  newState: EditorState,
+): ShufflePluginState {
+  const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta;
 
-interface NodeViewDesc {
-  node: PmNode;
-  dom: HTMLElement;
-  contentDOM?: HTMLElement;
-  posBefore: number;
-}
+  switch (meta?.type) {
+    case "hover": {
+      return {
+        ...value,
+        hoverPositions: meta.payload.positions,
+      };
+    }
+    case "start": {
+      return {
+        ...value,
+        comp: randomRef(),
+        placeholderRect: undefined,
+        placeholderPos: undefined,
+      };
+    }
+    case "end": {
+      return {
+        ...value,
+        comp: undefined,
+        activeNodePos: undefined,
+        placeholderRect: undefined,
+        placeholderPos: undefined,
+      };
+    }
+    case "reposition":
+    case "map": {
+      const nextActiveNodePos = meta.payload.newPos;
+      const activeDepth =
+        value.activeNodePos === undefined
+          ? undefined
+          : oldState.doc.resolve(value.activeNodePos).depth;
+      const nextActiveDepth =
+        nextActiveNodePos === undefined ? undefined : newState.doc.resolve(nextActiveNodePos).depth;
 
-const LAYOUT_DURATION = 150;
-const LAYOUT_EASE = "inOut(3.5)";
+      if (meta.type === "reposition") {
+        return {
+          ...value,
+          activeNodePos: nextActiveNodePos,
+        };
+      }
 
-/**
- * Picks the block to hold visually still on screen while a transform reflows the
- * document, given the dragged node's position in `doc`.
- */
-function findScrollReference(doc: PmNode, pos: number, fromAbove: boolean): number | null {
-  const $pos = doc.resolve(pos);
-  for (let d = $pos.depth; d >= 0; d--) {
-    const index = $pos.index(d) + (fromAbove ? 1 : -1);
-    if (index < 0 || index >= $pos.node(d).childCount) continue;
-    return $pos.posAtIndex(index, d);
+      return {
+        ...value,
+        activeNodePos: nextActiveNodePos,
+        placeholderRect: activeDepth !== nextActiveDepth ? meta.payload.oldRect : undefined,
+        ...(value.activeNodePos !== undefined && {
+          placeholderPos: tr.mapping.map(value.activeNodePos),
+        }),
+      };
+    }
+    default: {
+      return {
+        ...value,
+        ...(value.activeNodePos !== undefined && {
+          activeNodePos: tr.mapping.map(value.activeNodePos),
+        }),
+      };
+    }
   }
-
-  return null;
 }
 
-/** The document-space top of the DOM of the node at `pos`, or null. */
-function docTopOf(view: EditorView, pos: number, scrollTop: number): number | null {
-  const dom = view.nodeDOM(pos);
-  if (!(dom instanceof HTMLElement)) return null;
-
-  return dom.getBoundingClientRect().top + scrollTop;
-}
-
-/**
- * Whether a layout timeline is still tweening the DOM (so it can't be
- * measured). A timeline that hasn't completed but is paused is finished from
- * our point of view; anime never marks an empty one (a transform that moved
- * nothing visually, e.g. reordering within a row whose grid columns fix the
- * layout) as `completed` (??).
- */
-function isAnimating(timeline: Timeline | null): timeline is Timeline {
-  return timeline !== null && !timeline.completed && !timeline.paused;
-}
-
-export function startDragOnPointerDown(
-  view: EditorView,
-  pos: number | null,
-  dom: HTMLElement & { pmViewDesc?: ViewDesc },
-  clientX: number,
-  clientY: number,
+function buildDecorations(
+  tr: Transaction,
+  next: ShufflePluginState,
+  newState: EditorState,
+  hoverDecorations: ShufflePluginOptions["hoverDecorations"],
 ) {
-  const startDragInContentDOM =
-    shufflePluginKey.getState(view.state)?.startDragInContentDOM ?? false;
+  let placeholderGridRow = 0;
+  let placeholderParent: Node | null = null;
+  const decorations: Decoration[] = [];
+  tr.doc.descendants((node, pos, parent, index) => {
+    let i = index;
+    if (pos === next.placeholderPos) {
+      placeholderParent = parent;
+      placeholderGridRow = index + 1;
+      i++;
+    } else if (placeholderParent === parent) {
+      i++;
+    }
+    const { shuffleStart, shuffleEnd, zIndex, alignment } = node.attrs;
 
-  const { selection } = view.state;
-  const preserveSelection = selection instanceof NodeSelection && selection.from === pos;
+    if ((shuffleStart === undefined || shuffleEnd === undefined) && !isShuffleRow(node)) {
+      return true;
+    }
 
-  const startTr = view.state.tr;
-
-  startTr.setMeta(shufflePluginKey, {
-    type: "start",
-  } satisfies ShufflePluginMeta);
-
-  if (pos !== null) {
-    startTr.setSelection(NodeSelection.create(view.state.doc, pos));
-  }
-
-  view.dispatch(startTr);
-  view.root.shuffleDragging = true;
-
-  const domRect = dom.getBoundingClientRect();
-
-  const domStyle = getComputedStyle(dom);
-  const transform = new DOMMatrixReadOnly(domStyle.transform);
-  const originX = transform.m41;
-  const originY = transform.m42;
-
-  const startX = clientX;
-  const startY = clientY;
-
-  const translateCalc = new TranslateCalculator(
-    originX,
-    originY,
-    startX,
-    startY,
-    domRect,
-    parseInt(domStyle.marginTop, 10),
-  );
-
-  const scrollCalc = new ScrollCalculator();
-
-  const autoScroller = new AutoScroller();
-
-  let clone: HTMLElement | null = null;
-  let initialStyles: InitialStyles | null = null;
-
-  let layout: AutoLayout | null = null;
-  let currentAnimation: Timeline | null = null;
-  let currentScrollAnimation: JSAnimation | null = null;
-  let skeletonOn = false;
-
-  let pendingMoveTimer: ReturnType<typeof setTimeout> | null = null;
-
-  function rerunMove() {
-    pendingMoveTimer = null;
-    move(translateCalc.lastSlideX, translateCalc.lastSlideY);
-  }
-
-  /**
-   * Re-derive the clone's transform from the current scroll offset, so that
-   * it stays under the pointer while the document scrolls beneath it.
-   */
-  function syncCloneWithScroll() {
-    const { x, y } = scrollCalc.diff();
-    translateCalc.scroll(x, y);
-
-    if (!clone) return;
-
-    const { transform, transformOrigin } = translateCalc.slide(
-      translateCalc.lastSlideX,
-      translateCalc.lastSlideY,
+    decorations.push(
+      Decoration.node(pos, pos + node.nodeSize, {
+        ...(!isShuffleRow(node) && {
+          class: `shuffle-block start-${getShuffleGridClass(shuffleStart)} end-${getShuffleGridClass(shuffleEnd)}`,
+        }),
+        style: `grid-row: ${i + 1}; z-index: ${zIndex ?? 0};${alignment ? ` align-items: ${alignment};` : ""}`,
+      }),
     );
 
-    clone.style.transform = transform;
-    clone.style.transformOrigin = transformOrigin;
-  }
-
-  function move(x: number, y: number) {
-    if (!clone || !layout) return;
-    if (!(dom instanceof HTMLElement)) return;
-
-    const { transform, transformOrigin } = translateCalc.slide(x, y);
-
-    clone.style.transform = transform;
-    clone.style.transformOrigin = transformOrigin;
-
-    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-    if (isAnimating(currentAnimation)) {
-      // Mid-animation the DOM is in FLIP positions and can't be measured. If
-      // the pointer then comes to rest, no further event would re-evaluate
-      // this position, so schedule a re-run for when the animation is done.
-      if (pendingMoveTimer === null) {
-        pendingMoveTimer = setTimeout(rerunMove, 40);
-      }
-      return;
-    }
-
-    // Drive the transforms from where the clone visually is rather than from
-    // the pointer.
-    const cloneRect = clone.getBoundingClientRect();
-    const centerX = cloneRect.left + cloneRect.width / 2;
-    const centerY = cloneRect.top + cloneRect.height / 2;
-
-    const tr =
-      before != null
-        ? (reposition(view, before, cloneRect) ??
-          autogroup(view, before, centerX, centerY) ??
-          reorder(view, before, centerX, centerY))
-        : inflate(view, clone, centerX, centerY);
-
-    if (!tr) return;
-
-    currentScrollAnimation?.cancel();
-    currentScrollAnimation = null;
-
-    const scrollParent = getScrollingElement(findScrollParent(view.dom));
-    const scrollTopBefore = scrollParent.scrollTop;
-
-    // Hold the content ahead of the pointer still. Note where the reference
-    // block sits in document coordinates before the transaction, then scroll
-    // by however much it moved.
-    const activeDomBefore = before != null ? view.nodeDOM(before) : null;
-    const activeRectBefore =
-      activeDomBefore instanceof HTMLElement ? activeDomBefore.getBoundingClientRect() : null;
-    const fromAbove =
-      activeRectBefore !== null && activeRectBefore.top + activeRectBefore.height / 2 < centerY;
-    const meta = tr.getMeta(shufflePluginKey) as ShufflePluginMeta | undefined;
-    const refPosNew =
-      activeRectBefore !== null && meta?.type === "map"
-        ? findScrollReference(tr.doc, meta.payload.newPos, fromAbove)
-        : null;
-    const refNode = refPosNew !== null ? tr.doc.nodeAt(refPosNew) : null;
-    const refPosOld = refPosNew !== null ? tr.mapping.invert().map(refPosNew, 1) : null;
-    // The transform doesn't touch the reference block itself, so mapping its
-    // position back must land on an equal node in the old document.
-    const refTopBefore =
-      refNode !== null && refPosOld !== null && tr.before.nodeAt(refPosOld)?.eq(refNode)
-        ? docTopOf(view, refPosOld, scrollTopBefore)
-        : null;
-
-    let scrollTopAfter: number | null = null;
-
-    currentAnimation = layout.update(() => {
-      view.dispatch(tr);
-
-      // Autoscroll is already moving the page; a competing tween just fights it.
-      if (autoScroller.active) return;
-      if (refTopBefore === null) return;
-
-      const activePos = shufflePluginKey.getState(view.state)?.activeNodePos;
-      if (activePos === undefined) return;
-      const refPosAfter = findScrollReference(view.state.doc, activePos, fromAbove);
-      if (refPosAfter === null) return;
-
-      // Inside this callback the DOM is already in its final layout.
-      const refTopAfter = docTopOf(view, refPosAfter, scrollParent.scrollTop);
-      if (refTopAfter === null) return;
-
-      const delta = refTopAfter - refTopBefore;
-      if (Math.abs(delta) < 1) return;
-
-      scrollTopAfter = scrollTopBefore + delta;
-    });
-
-    if (pendingMoveTimer === null) {
-      pendingMoveTimer = setTimeout(rerunMove, 40);
-    }
-
-    if (scrollTopAfter !== null && Math.abs(scrollTopAfter - scrollTopBefore) >= 1) {
-      // Drive the scroll offset with the same timing as the layout animation
-      // so the two read as a single motion. Anime ticks both on the same
-      // frame.
-      const scrollState = { top: scrollTopBefore };
-      currentScrollAnimation = tween(scrollState, {
-        top: scrollTopAfter,
-        duration: LAYOUT_DURATION,
-        ease: LAYOUT_EASE,
-        onUpdate() {
-          scrollParent.scrollTop = scrollState.top;
-          syncCloneWithScroll();
-        },
-      });
-    }
-
-    const updatedBefore = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-    if (updatedBefore === undefined) return;
-
-    const nodeDom = view.nodeDOM(updatedBefore);
-    if (nodeDom === dom) return;
-    if (!(nodeDom instanceof HTMLElement)) return;
-
-    dom = nodeDom;
-    dom.dataset["shuffleActive"] = "true";
-  }
-
-  const onMove = throttle(function onMove(e: PointerEvent) {
-    if (!skeletonOn || !clone || !initialStyles || !layout) {
-      const startResult = startDrag(dom!, translateCalc);
-
-      if (pos !== null) {
-        view.dispatch(
-          view.state.tr.setMeta(shufflePluginKey, {
-            type: "map",
-            payload: { newPos: pos },
-          } satisfies ShufflePluginMeta),
-        );
-      }
-
-      clone = startResult.clone;
-      clone.dataset["shuffleClone"] = "true";
-      initialStyles = startResult.initialStyles;
-
-      const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-      if (!gridWrapper) return;
-      const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-      if (!skeleton) return;
-
-      skeletonOn = true;
-      animate(skeleton, { opacity: 0.5 }, { duration: 0.25 });
-      layout = createLayout(view.dom, { duration: LAYOUT_DURATION, ease: LAYOUT_EASE });
-    }
-
-    autoScroller.start(dom, e.clientX, e.clientY);
-
-    move(e.clientX, e.clientY);
+    return true;
   });
 
-  function endDrag(domRect?: DOMRect) {
-    if (!clone || !initialStyles) {
-      if (startDragInContentDOM && !preserveSelection) {
-        const result = view.posAtCoords({ left: clientX, top: clientY });
-        if (result) {
-          view.dispatch(
-            view.state.tr.setSelection(Selection.near(view.state.doc.resolve(result.pos))),
-          );
-        }
+  if (hoverDecorations) {
+    next.hoverPositions.forEach(({ from, to }) => {
+      const $from = tr.doc.resolve(from);
+      const node = $from.nodeAfter;
+
+      if (!node) return;
+
+      const hoverDeco = hoverDecorations(from, to, node);
+      if (hoverDeco) {
+        decorations.push(hoverDeco);
       }
-      return;
-    }
-
-    clone.style.transition = "transform 0.2s ease";
-    clone.style.boxShadow = initialStyles.boxShadow;
-
-    const { transform, transformOrigin } = domRect
-      ? translateCalc.place(domRect.left, domRect.top)
-      : translateCalc.reset();
-
-    clone.style.transform = transform;
-    clone.style.transformOrigin = transformOrigin;
-
-    setTimeout(() => {
-      clone!.style.transition = "none";
-      delete dom.dataset["shuffleActive"];
-      clone!.remove();
-    }, 250);
+    });
   }
 
-  function onUp() {
-    view.root.removeEventListener("mousedown", preventSelection);
-    view.root.removeEventListener("mousemove", preventSelection);
-    (view.root as Document).removeEventListener("pointermove", onMove);
-    view.root.removeEventListener("pointerup", onUp);
-    view.root.removeEventListener("scroll", onScroll, { capture: true });
+  if (next.activeNodePos !== undefined) {
+    const node = newState.doc.nodeAt(next.activeNodePos);
 
-    autoScroller.stop();
-    if (pendingMoveTimer !== null) {
-      clearTimeout(pendingMoveTimer);
-      pendingMoveTimer = null;
+    if (node) {
+      decorations.push(
+        Decoration.node(
+          next.activeNodePos,
+          next.activeNodePos + node.nodeSize,
+          { style: "opacity: 0.4" },
+          { shuffleActive: true },
+        ),
+      );
     }
+  }
 
-    view.root.shuffleDragging = false;
-
-    const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-    if (!gridWrapper) return;
-    const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-    if (!skeleton) return;
-
-    animate(skeleton, { opacity: 0 }, { duration: 0.25 });
-
-    if (!clone || !initialStyles) return endDrag();
-
-    if (isAnimating(currentAnimation)) {
-      currentAnimation.complete();
-    }
-
-    if (currentScrollAnimation && !currentScrollAnimation.completed) {
-      currentScrollAnimation.complete();
-      currentScrollAnimation = null;
-      syncCloneWithScroll();
-    }
-
-    const before = shufflePluginKey.getState(view.state)?.activeNodePos;
-
-    if (before === undefined) return endDrag();
-
-    const dom = view.nodeDOM(before);
-    if (!(dom instanceof HTMLElement)) return endDrag();
-
-    view.dispatch(
-      view.state.tr.setMeta(shufflePluginKey, {
-        type: "end",
-      } satisfies ShufflePluginMeta),
+  if (next.placeholderRect && next.placeholderPos !== undefined) {
+    decorations.push(
+      widget(next.placeholderPos, DragPlaceholder, {
+        width: next.placeholderRect.width,
+        height: next.placeholderRect.height,
+        gridRow: placeholderGridRow,
+        key: "shuffle-placeholder",
+      }),
     );
-
-    const domRect = dom.getBoundingClientRect();
-
-    return endDrag(domRect);
   }
 
-  const preventSelection = (e: Event) => {
-    e.preventDefault();
-  };
-
-  function onScroll() {
-    const { x, y } = scrollCalc.diff();
-    translateCalc.scroll(x, y);
-    move(translateCalc.lastSlideX, translateCalc.lastSlideY);
-  }
-
-  view.root.addEventListener("pointerup", onUp);
-  (view.root as Document).addEventListener("pointermove", onMove);
-  view.root.addEventListener("mousedown", preventSelection);
-  view.root.addEventListener("mousemove", preventSelection);
-  // Scroll events don't bubble, so listen in the capture phase to also see
-  // scrolling of nested scroll containers, not just the window.
-  view.root.addEventListener("scroll", onScroll, { capture: true });
-
-  return true;
-}
-
-export type ViewDesc = NodeViewDesc & WidgetViewDesc;
-
-interface InitialStyles {
-  boxShadow: string;
-}
-
-function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
-  const domRect = dom.getBoundingClientRect();
-  const bodyRect = document.body.getBoundingClientRect();
-
-  const clone = dom.cloneNode(true) as HTMLElement;
-
-  let cloneQueue: Element[] = [clone];
-  let domQueue: Element[] = [dom];
-
-  while (cloneQueue.length && domQueue.length) {
-    const domElement = domQueue.pop();
-    const cloneElement = cloneQueue.pop();
-
-    if (!(domElement instanceof HTMLElement && cloneElement instanceof HTMLElement)) {
-      continue;
-    }
-
-    const domStyles = getComputedStyle(domElement);
-    for (let i = 0; i < domStyles.length; i++) {
-      const property = domStyles.item(i);
-      cloneElement.style.setProperty(property, domStyles.getPropertyValue(property));
-    }
-    cloneElement.style.pointerEvents = "none";
-
-    cloneQueue.push(...cloneElement.children);
-    domQueue.push(...domElement.children);
-  }
-
-  clone.dataset["shuffleClone"] = "true";
-  clone.style.position = "absolute";
-  clone.style.top = `${domRect.top - bodyRect.top}px`;
-  clone.style.left = `${domRect.left - bodyRect.left}px`;
-  document.body.appendChild(clone);
-
-  dom.dataset["shuffleActive"] = "true";
-
-  const initialBoxShadow = dom.style.boxShadow;
-
-  clone.style.transition = "transform 0.1s ease";
-  const { transform, transformOrigin } = translateCalc.slide(
-    translateCalc.startX,
-    translateCalc.startY,
-  );
-
-  clone.style.transform = transform;
-  clone.style.transformOrigin = transformOrigin;
-  clone.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
-  clone.style.zIndex = "100";
-
-  setTimeout(() => {
-    clone.style.transition = "none";
-  }, 100);
-
-  return {
-    clone,
-    initialStyles: {
-      boxShadow: initialBoxShadow,
-    } satisfies InitialStyles,
-  };
+  return decorations;
 }
 
 function getShuffleGridClass(col: number) {

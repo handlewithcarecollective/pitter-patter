@@ -22,7 +22,8 @@ import {
   type HarnessBlock,
   type HarnessOptions,
   type ShuffleHarness,
-} from "./protocol.ts";
+} from "../protocol.ts";
+
 import { schema } from "./schema.ts";
 
 function hoverDecorations(from: number, to: number) {
@@ -92,10 +93,6 @@ function Harness({
         </ShuffleSkeleton>
         <Ready onReady={onReady} />
       </ProseMirror>
-      {/* A short document is not scrollable, and the library's scroll adjustment only runs when the
-          page can scroll. This keeps every test document inside a scrolling window without moving
-          the editor itself. */}
-      <div className="scroll-runway" />
     </div>
   );
 }

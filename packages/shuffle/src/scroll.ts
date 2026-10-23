@@ -77,17 +77,14 @@ export function autoScroll(element: Element, x: number, y: number) {
   const scrollY =
     -Math.max(75 - (y - scrollRect.top), 0) || Math.max(75 - (scrollRect.bottom - y), 0);
 
-  if (!scrollX && !scrollY) return false;
+  if (!scrollX && !scrollY) return;
 
   getScrollingElement(scrollParent).scrollBy({ top: scrollY / 3, left: scrollX / 3 });
-  return true;
 }
 
 export class AutoScroller {
   private handler: (() => void) | undefined = undefined;
   private scrollTarget: EventTarget = window;
-  /** Whether the pointer is currently near an edge and the page is being scrolled. */
-  active = false;
 
   constructor() {}
 
@@ -98,10 +95,10 @@ export class AutoScroller {
 
     this.scrollTarget = getScrollEventTarget(findScrollParent(element));
 
-    this.active = autoScroll(element, x, y);
+    autoScroll(element, x, y);
 
     this.handler = () => {
-      this.active = autoScroll(element, x, y);
+      autoScroll(element, x, y);
     };
 
     // Recursively call autoScroll, triggered by its own scroll
@@ -115,7 +112,6 @@ export class AutoScroller {
       this.scrollTarget.removeEventListener("scroll", this.handler);
       this.handler = undefined;
     }
-    this.active = false;
   }
 }
 

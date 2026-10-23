@@ -3,7 +3,7 @@ import { EditorState, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 import { setShuffleColumns } from "../commands.ts";
-import { shufflePluginKey } from "../plugin.ts";
+import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
 
 export function reposition(view: EditorView, before: number, rect: DOMRect): Transaction | null {
   const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
@@ -87,9 +87,9 @@ export function reposition(view: EditorView, before: number, rect: DOMRect): Tra
   const newPos = transaction.getMeta(reactKeys().spec.key!)!.overrides[before];
 
   transaction.setMeta(shufflePluginKey, {
-    type: "map",
+    type: "reposition",
     payload: { newPos },
-  });
+  } satisfies ShufflePluginMeta);
 
   return transaction;
 }

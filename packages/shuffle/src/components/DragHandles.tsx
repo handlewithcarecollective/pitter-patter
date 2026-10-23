@@ -15,7 +15,9 @@ import {
   useState,
 } from "react";
 
-import { shufflePluginKey, startDragOnPointerDown, ViewDesc } from "../plugin.ts";
+import { startDragOnPointerDown } from "../dragHandlers.ts";
+import { shufflePluginKey } from "../plugin.ts";
+import { ViewDesc } from "../viewDesc.ts";
 
 const EMPTY: { from: number; to: number }[] = [];
 

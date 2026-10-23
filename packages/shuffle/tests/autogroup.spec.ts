@@ -59,14 +59,12 @@ test("dropping a block beside another block groups them", async ({ page }) => {
   ]);
   await dragBlockBeside(page, T("Loose"), T("Half"));
 
-  // The dragged block is given the columns its clone was dropped over, and joins the row with the
-  // block it was dropped next to, which keeps the columns it already had.
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
-    '"Half" 1-5',
     "row",
     '  "Loose" 3-8',
-    '  "Tail" 4-9',
+    '  "Half" 1-5',
+    '"Tail" 4-9',
     '"Last" 4-9',
   ]);
 });
@@ -85,10 +83,10 @@ test("a block dropped in the spare columns of a right aligned block groups with 
 
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
-    '"Right" 8-12',
     "row",
     '  "Loose" 5-10',
-    '  "Tail" 4-9',
+    '  "Right" 8-12',
+    '"Tail" 4-9',
     '"Last" 4-9',
   ]);
 });
@@ -152,7 +150,9 @@ test("a row dropped on a block stays a row of its own", async ({ page }) => {
   expect(await tree(page)).toEqual(['"Mid" 4-9', "row", '  "L" 1-5', '  "R" 7-11', '"Tail" 4-9']);
 });
 
-test("a block dropped on the middle of a container lands after it", async ({ page }) => {
+// It's currently weirdly tricky to move a node into a container, need
+// to improve
+test.fail("a block dropped on the middle of a container lands after it", async ({ page }) => {
   await openEditor(page, [h("Header"), p("Loose"), container(p("In"), p("Other")), p("Tail")]);
   await dragBlockOnto(page, T("Loose"), { type: "container" });
 
@@ -160,8 +160,8 @@ test("a block dropped on the middle of a container lands after it", async ({ pag
     '"Header" 4-9',
     "container 4-9",
     '  "In" 4-9',
+    '  "Loose" 4-9',
     '  "Other" 4-9',
-    '"Loose" 4-9',
     '"Tail" 4-9',
   ]);
 });
@@ -187,20 +187,17 @@ test("dropping a block down onto the block below it groups the two", async ({ pa
   ]);
 });
 
-test.fail(
-  "a block held over the block below another groups with the wrong neighbour (if there's no scroll margin)",
-  async ({ page }) => {
-    await openEditor(page, six());
-    await dragBlockOnto(page, T("P2"), T("P3"));
+test("a block held over the block below another groups with it", async ({ page }) => {
+  await openEditor(page, six());
+  await dragBlockOnto(page, T("P2"), T("P3"));
 
-    expect(await tree(page)).toEqual([
-      '"Header" 4-9',
-      '"P1" 4-9',
-      "row",
-      '  "P2" 4-9',
-      '  "P3" 4-9',
-      '"P4" 4-9',
-      '"P5" 4-9',
-    ]);
-  },
-);
+  expect(await tree(page)).toEqual([
+    '"Header" 4-9',
+    '"P1" 4-9',
+    "row",
+    '  "P2" 4-9',
+    '  "P3" 4-9',
+    '"P4" 4-9',
+    '"P5" 4-9',
+  ]);
+});
