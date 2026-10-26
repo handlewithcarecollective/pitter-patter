@@ -373,6 +373,13 @@ function reduceState(
         ...(value.activeNodePos !== undefined && {
           activeNodePos: tr.mapping.map(value.activeNodePos),
         }),
+        hoverPositions: value.hoverPositions
+          .map(({ from, to }) => ({
+            from: tr.mapping.mapResult(from),
+            to: tr.mapping.mapResult(to),
+          }))
+          .filter(({ from, to }) => !from.deleted && !to.deleted)
+          .map(({ from, to }) => ({ from: from.pos, to: to.pos })),
       };
     }
   }
