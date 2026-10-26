@@ -6,11 +6,30 @@
   dir: packages/collab-server
   intents:
     - olive-donkeys-rotate
+"@pitter-patter/collab-server@0.1.5":
+  dir: packages/collab-server
+  intents:
+    - gentle-apes-serve
 "@pitter-patter/presence-client@0.2.2":
   dir: packages/presence-client
   intents:
     - little-lamps-promise
+"@pitter-patter/presence-client@0.2.3":
+  dir: packages/presence-client
+  intents:
+    - brave-whales-sing
+    - gentle-apes-serve
+"@pitter-patter/presence-server@0.1.4":
+  dir: packages/presence-server
+  intents:
+    - gentle-apes-serve
 "@pitter-patter/shuffle@0.3.7":
   dir: packages/shuffle
   intents:
     - tidy-moons-gather
+"@pitter-patter/shuffle@0.3.8":
+  dir: packages/shuffle
+  intents:
+    - chilly-lamps-raise
+    - thin-trees-pretend
+    - wet-pots-buy
