@@ -3,7 +3,7 @@ import { PresenceIndicator } from "@pitter-patter/presence-client";
 
 type ServerMessage =
   | { type: "commits"; commits: CommitJSON[] }
-  | { type: "presence"; indicators: Record<string, PresenceIndicator> };
+  | { type: "presence"; indicators: Record<string, PresenceIndicator> | null };
 
 interface WebSocketHandlers {
   onCommits?: (commits: CommitJSON[]) => void;

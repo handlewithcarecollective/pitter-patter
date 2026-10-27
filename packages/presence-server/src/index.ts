@@ -103,7 +103,7 @@ export class PresenceAuthority {
     }
 
     const presenceChanged = await listen();
-    if (!presenceChanged) return {};
+    if (!presenceChanged) return null;
 
     const postPresence = await this.persistenceManager.getIndicators(docId);
     return Object.fromEntries(
@@ -111,6 +111,8 @@ export class PresenceAuthority {
     );
   }
 }
+
+const getKey = (docId: string) => `pitter-patter:presence:${docId}`;
 
 export interface RedisPresencePersistenceManagerConfig {
   redisUrl: string;
@@ -133,19 +135,12 @@ export class RedisPresencePersistenceManager {
   }
 
   async saveIndicator(docId: string, indicator: PresenceIndicator) {
-    await this.kv.hSet(
-      `pitter-patter:presence:${docId}`,
-      indicator.clientId,
-      JSON.stringify(indicator),
-    );
-    await this.kv.hExpire(`pitter-patter:presence:${docId}`, indicator.clientId, 30);
+    await this.kv.hSet(getKey(docId), indicator.clientId, JSON.stringify(indicator));
+    await this.kv.hExpire(getKey(docId), indicator.clientId, 30);
   }
 
   async getIndicators(docId: string) {
-    const result = (await this.kv.hGetAll(`pitter-patter:presence:${docId}`)) as Record<
-      string,
-      string
-    >;
+    const result = (await this.kv.hGetAll(getKey(docId))) as Record<string, string>;
 
     return Object.fromEntries(
       Object.entries(result).map(([clientId, indicatorString]) => [
@@ -190,7 +185,7 @@ export class RedisPresenceBroadcastManager {
 
   async broadcastIndicator(docId: string, indicator: PresenceIndicator) {
     await this.pub.publish(
-      `pitter-patter:presence:${docId}`,
+      getKey(docId),
       JSON.stringify({ ref: indicator.ref, clientId: indicator.clientId }),
     );
   }
@@ -213,7 +208,7 @@ export class RedisPresenceBroadcastManager {
       }
     }
 
-    await this.sub.subscribe(`pitter-patter:presence:${docId}`, listener);
+    await this.sub.subscribe(getKey(docId), listener);
 
     const listen = async () => {
       return await Promise.race([
@@ -222,12 +217,12 @@ export class RedisPresenceBroadcastManager {
           setTimeout(() => resolve(false), this.timeout);
         }),
       ]).finally(async () => {
-        await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
+        await this.sub.unsubscribe(getKey(docId), listener);
       });
     };
 
     const abort = async () => {
-      await this.sub.unsubscribe(`pitter-patter:persistence:${docId}`, listener);
+      await this.sub.unsubscribe(getKey(docId), listener);
     };
 
     return { listen, abort };
