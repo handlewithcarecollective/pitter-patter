@@ -23,6 +23,10 @@
   dir: packages/presence-server
   intents:
     - gentle-apes-serve
+"@pitter-patter/presence-server@0.2.0":
+  dir: packages/presence-server
+  intents:
+    - sharp-peaches-drum
 "@pitter-patter/shuffle@0.3.7":
   dir: packages/shuffle
   intents:
