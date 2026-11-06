@@ -353,7 +353,7 @@ function DemoDoc() {
     view.focus();
   });
 
-  return <ProseMirrorDoc className="demo-editor" />;
+  return <ProseMirrorDoc className="demo-editor" spellCheck={false} />;
 }
 
 function DemoEditor({
