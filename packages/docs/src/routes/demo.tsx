@@ -7,7 +7,8 @@ import {
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import { Check, GripVertical, ImageIcon, Keyboard, Link2, Pilcrow, Square } from "lucide-react";
-import { baseKeymap } from "prosemirror-commands";
+import { baseKeymap, toggleMark } from "prosemirror-commands";
+import { history, undo, redo } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
 import { Node } from "prosemirror-model";
 import { EditorState, Transaction } from "prosemirror-state";
@@ -123,7 +124,16 @@ function Demo({ docId }: { docId: string }) {
             shuffle(),
             presence({ getPresenceColor }),
             reactKeys(),
-            keymap(baseKeymap),
+            history(),
+            keymap({
+              ...baseKeymap,
+              "Mod-i": toggleMark(schema.marks.em),
+              "Mod-b": toggleMark(schema.marks.strong),
+              "Mod-Shift-c": toggleMark(schema.marks.code),
+              "Mod-z": undo,
+              "Mod-y": redo,
+              "Mod-Shift-z": redo,
+            }),
           ],
         }),
       );
