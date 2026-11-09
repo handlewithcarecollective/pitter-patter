@@ -59,7 +59,7 @@ app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
   const indicator = req.body as PresenceIndicator;
   await presenceAuthority.updatePresence(req.params.docId, indicator);
 
-  res.status(204).send(null);
+  res.status(201).send(null);
 });
 ```
 
@@ -72,7 +72,7 @@ below.
 
 The body of this endpoint submits the new PresenceIndicator to the
 [PresenceAuthority](https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority)
-and returns a 204. The
+and returns a 201. The
 [PresenceAuthority](https://pitter-patter.dev/docs/presence/reference/presence-server/classes/PresenceAuthority)
 will then notify any clients listening to this document of the update.
 
@@ -87,7 +87,7 @@ app.post("/api/docs/:docId/presence", async (req, res) => {
 
   const presence = await presenceAuthority.listenForPresence(req.params.docId, clientId, refs);
 
-  res.status(200).send(presence);
+  res.status(presence ? 200 : 204).send(presence);
 });
 ```
 

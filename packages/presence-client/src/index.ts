@@ -147,6 +147,7 @@ export class LongPollListener {
             clientId,
             refs,
           }),
+          ...(options?.signal && { signal: options.signal }),
         });
 
         if (!response.ok) {
@@ -155,7 +156,11 @@ export class LongPollListener {
           );
         }
 
-        const indicators = (await response.json()) as Record<string, PresenceIndicator>;
+        const body = await response.text();
+        if (!body) continue;
+
+        const indicators = JSON.parse(body) as Record<string, PresenceIndicator> | null;
+        if (!indicators) continue;
 
         const newRefs = Object.fromEntries(
           Object.entries(indicators).map(([clientId, indicator]) => [clientId, indicator.ref]),
