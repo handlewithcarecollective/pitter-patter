@@ -19,6 +19,10 @@
   intents:
     - brave-whales-sing
     - gentle-apes-serve
+"@pitter-patter/presence-client@0.2.4":
+  dir: packages/presence-client
+  intents:
+    - vast-ravens-juggle
 "@pitter-patter/presence-server@0.1.4":
   dir: packages/presence-server
   intents:
@@ -37,3 +41,8 @@
     - chilly-lamps-raise
     - thin-trees-pretend
     - wet-pots-buy
+"@pitter-patter/shuffle@0.3.9":
+  dir: packages/shuffle
+  intents:
+    - chilly-rings-brush
+    - young-doors-cheat
