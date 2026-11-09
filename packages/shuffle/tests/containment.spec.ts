@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 import {
+  centerX,
   dragBlockBelow,
-  dragBlockOnto,
+  dragBlockTo,
   dragBlockToPoint,
   endDrag,
   findBlock,
@@ -56,10 +57,14 @@ test("a card dropped on the left half of another card lands before it", async ({
 
 test("a card dropped on the middle of another card lands after it", async ({ page }) => {
   await openEditor(page, deckOfCards());
-  await dragBlockOnto(
+  await dragBlockTo(
     page,
     { type: "card", text: "Card three" },
     { type: "card", text: "Card one" },
+    (rect) => ({
+      x: centerX(rect) + 1,
+      y: rect.top + rect.height / 2,
+    }),
   );
 
   // Cards sit side by side, so the half that is measured is horizontal: dropping on the centre
