@@ -165,14 +165,14 @@ app.post("/api/docs/:docId/presence", async (req, res) => {
 
   const presence = await presenceAuthority.listenForPresence(req.params.docId, clientId, refs);
 
-  res.status(200).send(presence);
+  res.status(presence ? 200 : 204).send(presence);
 });
 
 app.post("/api/docs/:docId/presence/:clientId", async (req, res) => {
   const indicator = req.body as PresenceIndicator;
   await presenceAuthority.updatePresence(req.params.docId, indicator);
 
-  res.status(204).send(null);
+  res.status(201).send(null);
 });
 
 app.post("/api/docs/:docId/commits", async (req, res) => {
