@@ -332,7 +332,7 @@ export async function dragBlockToPoint(
   await endDrag(page);
 }
 
-async function dragBlockTo(
+export async function dragBlockTo(
   page: Page,
   source: BlockSpec,
   target: BlockSpec,
@@ -343,7 +343,7 @@ async function dragBlockTo(
   await endDrag(page);
 }
 
-const centerX = (rect: { left: number; width: number }) => rect.left + rect.width / 2;
+export const centerX = (rect: { left: number; width: number }) => rect.left + rect.width / 2;
 
 export function inflatable(page: Page, label: string): Locator {
   return page.locator(".inflatable").filter({ hasText: label }).first();
