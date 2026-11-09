@@ -4,11 +4,8 @@ import {
   dragBlockBeside,
   dragBlockOnto,
   dragBlockToPoint,
-  endDrag,
   findBlock,
   openEditor,
-  placeCloneAt,
-  startDragOnHandle,
   tree,
   type BlockSpec,
 } from "./helpers.ts";
@@ -23,31 +20,6 @@ import { container, h, p, rowWith } from "./nodes.ts";
  */
 
 const T = (text: string): BlockSpec => ({ type: "paragraph", text });
-
-const six = () => [h("Header"), p("P1"), p("P2"), p("P3"), p("P4"), p("P5")];
-
-test("dropping a block up onto another block groups the two", async ({ page }) => {
-  await openEditor(page, six());
-  await dragBlockOnto(page, T("P4"), T("P3"));
-
-  expect(await tree(page)).toEqual([
-    '"Header" 4-9',
-    '"P1" 4-9',
-    '"P2" 4-9',
-    "row",
-    '  "P4" 4-9',
-    '  "P3" 4-9',
-    '"P5" 4-9',
-  ]);
-});
-
-test("the dragged block comes first in the new row", async ({ page }) => {
-  await openEditor(page, six());
-  await dragBlockOnto(page, T("P5"), T("P4"));
-
-  const lines = await tree(page);
-  expect(lines.slice(lines.indexOf("row"))).toEqual(["row", '  "P5" 4-9', '  "P4" 4-9']);
-});
 
 test("dropping a block beside another block groups them", async ({ page }) => {
   await openEditor(page, [
@@ -163,41 +135,5 @@ test.fail("a block dropped on the middle of a container lands after it", async (
     '  "Loose" 4-9',
     '  "Other" 4-9',
     '"Tail" 4-9',
-  ]);
-});
-
-test("dropping a block down onto the block below it groups the two", async ({ page }) => {
-  await openEditor(page, six());
-  const target = await findBlock(page, T("P3"));
-  const session = await startDragOnHandle(page, T("P2"));
-  await placeCloneAt(page, session, {
-    x: target.left + target.width / 2,
-    y: target.top + target.height / 2,
-  });
-  await endDrag(page);
-
-  expect(await tree(page)).toEqual([
-    '"Header" 4-9',
-    '"P1" 4-9',
-    "row",
-    '  "P2" 4-9',
-    '  "P3" 4-9',
-    '"P4" 4-9',
-    '"P5" 4-9',
-  ]);
-});
-
-test("a block held over the block below another groups with it", async ({ page }) => {
-  await openEditor(page, six());
-  await dragBlockOnto(page, T("P2"), T("P3"));
-
-  expect(await tree(page)).toEqual([
-    '"Header" 4-9',
-    '"P1" 4-9',
-    "row",
-    '  "P2" 4-9',
-    '  "P3" 4-9',
-    '"P4" 4-9',
-    '"P5" 4-9',
   ]);
 });

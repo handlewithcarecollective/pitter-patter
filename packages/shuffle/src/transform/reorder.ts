@@ -1,11 +1,11 @@
 import { reactKeys } from "@handlewithcare/react-prosemirror";
-import { Fragment, NodeType, ResolvedPos } from "prosemirror-model";
+import { NodeType, ResolvedPos } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
-import { findWrapping, insertPoint } from "prosemirror-transform";
+import { insertPoint } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
-import { getBeforeContainedBy, getShuffleRowType, isShuffleRow, supportsDrag } from "../schema.ts";
+import { getBeforeContainedBy, isShuffleRow, supportsDrag } from "../schema.ts";
 
 export function reorder(
   view: EditorView,
@@ -49,10 +49,6 @@ export function reorder(
 
   const gap = findGap(view, pos, node.type, from, clientX, clientY, posResult.inside);
 
-  if (gap instanceof Transaction) {
-    return gap;
-  }
-
   if (gap === null) return null;
 
   if (gap <= from + node.nodeSize && gap >= from) return null;
@@ -89,7 +85,7 @@ export function findGap(
   clientX: number,
   clientY: number,
   inside = -1,
-): number | Transaction | null {
+): number | null {
   const { doc } = view.state;
   const $pos = doc.resolve(pos);
 
@@ -133,11 +129,6 @@ export function findGap(
     : clientY >= candidateRect.top - CANDIDATE_SLACK &&
       clientY <= candidateRect.bottom + CANDIDATE_SLACK;
   if (!nearby) return null;
-
-  if (from !== null && isInCenter(candidateRect, clientX, clientY, horizontal ?? false)) {
-    const grouped = autogroup(view, doc.resolve(candidateStart), from, fromRect);
-    if (grouped) return grouped;
-  }
 
   const isInFirstHalf = horizontal
     ? clientX < (candidateRect.left + candidateRect.right) / 2
@@ -206,86 +197,4 @@ function contains(rect: DOMRect, clientX: number, clientY: number) {
   return (
     clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom
   );
-}
-
-/**
- * The widest the center band (the zone that triggers an autogroup rather than
- * a reorder) may extend to either side of a block's midpoint, in pixels.
- */
-const CENTER_BAND = 30;
-
-/**
- * Whether the pointer is in the block's center band. The band is capped at
- * the middle third of the block so short blocks (headings, buttons, list
- * items) always keep a reorder zone at their leading and trailing edges.
- */
-function isInCenter(rect: DOMRect, clientX: number, clientY: number, horizontal: boolean) {
-  if (horizontal) {
-    const mid = (rect.left + rect.right) / 2;
-    const half = Math.min(CENTER_BAND, rect.width / 6);
-    return clientX > mid - half && clientX < mid + half;
-  }
-
-  const mid = (rect.top + rect.bottom) / 2;
-  const half = Math.min(CENTER_BAND, rect.height / 6);
-  return clientY > mid - half && clientY < mid + half;
-}
-
-function autogroup(
-  view: EditorView,
-  $pos: ResolvedPos,
-  from: number,
-  fromRect: DOMRect | undefined,
-): Transaction | null {
-  const rowType = getShuffleRowType(view.state.schema);
-  if (!rowType) return null;
-
-  const node = $pos.doc.nodeAt(from);
-  // Rows don't nest: dragging a row over another block's center reorders it.
-  if (!node || isShuffleRow(node)) return null;
-
-  const candidate = $pos.doc.nodeAt($pos.pos);
-  if (!candidate || isShuffleRow(candidate)) return null;
-
-  if (!rowType.validContent(Fragment.from([node, candidate]))) return null;
-
-  let d = $pos.depth;
-  while (d >= 0) {
-    if (isShuffleRow($pos.node(d))) return null;
-    d--;
-  }
-
-  const blockRange = $pos.blockRange($pos.doc.resolve($pos.pos + candidate.nodeSize));
-
-  if (!blockRange) return null;
-
-  const wrapping = findWrapping(blockRange, rowType, {
-    shuffleStart: $pos.parent.attrs["shuffleStart"] ?? 0,
-    shuffleEnd: $pos.parent.attrs["shuffleEnd"] ?? 13,
-  });
-
-  if (!wrapping) return null;
-
-  const { tr } = view.state;
-
-  tr.wrap(blockRange, wrapping);
-
-  const gap = $pos.pos + 1;
-
-  tr.delete(tr.mapping.map(from), tr.mapping.map(from + node.nodeSize));
-
-  const newPos = tr.mapping.map(gap) - 1;
-
-  tr.insert(newPos, node);
-
-  tr.setMeta(reactKeys().spec.key!, {
-    overrides: { [from]: newPos },
-  });
-  tr.setMeta(shufflePluginKey, {
-    type: "map",
-    payload: { newPos, oldRect: fromRect },
-  } satisfies ShufflePluginMeta);
-  tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
-
-  return tr;
 }
