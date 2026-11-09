@@ -250,6 +250,17 @@ export const harness: ShuffleHarness = {
     return null;
   },
 
+  remoteInsert(ref, text) {
+    const view = editor();
+    const block = harness.blocks().find((b) => matches(b, ref));
+    if (!block) throw new Error(`shuffle harness: no ${ref.type} block in document`);
+
+    const node = view.state.doc.nodeAt(block.pos);
+    if (!node) throw new Error(`shuffle harness: no node at ${block.pos}`);
+
+    view.dispatch(view.state.tr.insertText(text, block.pos + node.nodeSize - 1));
+  },
+
   columnLeft(column) {
     const bar = document.querySelector(`[data-shuffle-skeleton-bar="${column}"]`);
     if (!bar) throw new Error(`shuffle harness: no skeleton column ${column}`);

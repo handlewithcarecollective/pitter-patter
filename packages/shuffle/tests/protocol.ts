@@ -82,6 +82,10 @@ export interface ShuffleHarness {
   hoverPoint(ref: BlockRef): Point | null;
   /** The x coordinate of the left edge of a skeleton column (1-12). */
   columnLeft(column: number): number;
+  /**
+   * Append `text` to `ref`.
+   */
+  remoteInsert(ref: BlockRef, text: string): void;
   /** Whether a shuffle drag is in progress. */
   dragging(): boolean;
 }

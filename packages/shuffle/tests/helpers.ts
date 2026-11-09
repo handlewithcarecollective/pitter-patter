@@ -38,16 +38,22 @@ export interface DragSession {
 
 type Content = readonly NodeJSON[];
 
-export async function openEditor(
-  page: Page,
-  content: Content,
-  options: Record<string, unknown> = {},
-): Promise<void> {
+export function trackErrors(page: Page): () => string[] {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(String(error)));
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
+  return () => [...errors];
+}
+
+/** Opens the harness and returns everything the page throws from now on. */
+export async function openEditor(
+  page: Page,
+  content: Content,
+  options: Record<string, unknown> = {},
+): Promise<() => string[]> {
+  const errors = trackErrors(page);
 
   await page.goto(URL);
   await page.waitForFunction(() => !!window.__shuffle, null, { timeout: 20_000 });
@@ -55,8 +61,9 @@ export async function openEditor(
     content,
     options,
   });
-  expect.soft(errors, "the harness reported an error while loading").toEqual([]);
+  expect.soft(errors(), "the harness reported an error while loading").toEqual([]);
   await settle(page);
+  return errors;
 }
 
 export async function blocks(page: Page): Promise<HarnessBlock[]> {
@@ -94,6 +101,14 @@ function matches(block: HarnessBlock, spec: BlockSpec): boolean {
 
 export function draggingFlag(page: Page): Promise<boolean> {
   return page.evaluate(() => window.__shuffle.dragging());
+}
+
+export async function remoteInsert(page: Page, spec: BlockSpec, text: string): Promise<void> {
+  const ref = { type: spec.type ?? "", ...(spec.text !== undefined && { text: spec.text }) };
+  await page.evaluate(({ ref, text }) => window.__shuffle.remoteInsert(ref, text), {
+    ref,
+    text,
+  });
 }
 
 export async function settle(page: Page, ms = SETTLE_MS): Promise<void> {
@@ -151,16 +166,22 @@ export function handleButtons(page: Page): Promise<HandleButton[]> {
   );
 }
 
-export async function startDragOnHandle(page: Page, spec: BlockSpec): Promise<DragSession> {
+export async function pressHandle(page: Page, spec: BlockSpec): Promise<DragSession> {
   const handle = await findHandle(page, spec);
   const pointer = { x: handle.left + handle.width / 2, y: handle.top + handle.height / 2 };
   await page.mouse.move(pointer.x, pointer.y);
   await settle(page, 50);
   await page.mouse.down();
   await settle(page, 50);
+  return { block: spec, pointer };
+}
 
-  const session: DragSession = { block: spec, pointer };
-  await movePointerTo(page, session, { x: pointer.x + 1, y: pointer.y + 1 });
+export async function startDragOnHandle(page: Page, spec: BlockSpec): Promise<DragSession> {
+  const session = await pressHandle(page, spec);
+  await movePointerTo(page, session, {
+    x: session.pointer.x + 1,
+    y: session.pointer.y + 1,
+  });
   await settle(page);
 
   if (!(await cloneRect(page)))
@@ -168,6 +189,16 @@ export async function startDragOnHandle(page: Page, spec: BlockSpec): Promise<Dr
       `Pressing the handle of ${describeBlock(await findBlock(page, spec))} did not start a drag`,
     );
   return session;
+}
+
+export async function movePointerBy(
+  page: Page,
+  session: DragSession,
+  dx: number,
+  dy: number,
+): Promise<void> {
+  await movePointerTo(page, session, { x: session.pointer.x + dx, y: session.pointer.y + dy });
+  await settle(page);
 }
 
 export async function placeCloneAt(
@@ -189,7 +220,7 @@ export async function moveCloneTo(
 ): Promise<void> {
   await placeCloneAt(page, session, point);
   await settle(page);
-  await nudge(page, session, NUDGE_PX, NUDGE_PX);
+  await movePointerBy(page, session, NUDGE_PX, NUDGE_PX);
 }
 
 async function cloneCentre(page: Page): Promise<{ x: number; y: number }> {
@@ -205,11 +236,6 @@ async function movePointerTo(
 ): Promise<void> {
   session.pointer = point;
   await page.mouse.move(point.x, point.y, { steps: 1 });
-}
-
-async function nudge(page: Page, session: DragSession, dx: number, dy: number): Promise<void> {
-  await movePointerTo(page, session, { x: session.pointer.x + dx, y: session.pointer.y + dy });
-  await settle(page);
 }
 
 export async function endDrag(page: Page): Promise<void> {
