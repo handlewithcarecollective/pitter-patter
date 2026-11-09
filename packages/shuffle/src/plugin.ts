@@ -23,6 +23,9 @@ declare global {
 
 interface ShufflePluginStartMeta {
   type: "start";
+  payload: {
+    pos: number | null;
+  };
 }
 
 interface ShufflePluginEndMeta {
@@ -41,7 +44,7 @@ interface ShufflePluginResizeMeta {
 interface ShufflePluginMapMeta {
   type: "map";
   payload: {
-    newPos: number;
+    newPos: number | undefined;
     oldRect: DOMRect | undefined;
   };
 }
@@ -328,6 +331,7 @@ function reduceState(
       return {
         ...value,
         comp: randomRef(),
+        activeNodePos: meta.payload.pos ?? undefined,
         placeholderRect: undefined,
         placeholderPos: undefined,
       };
@@ -343,7 +347,7 @@ function reduceState(
     }
     case "reposition":
     case "map": {
-      const nextActiveNodePos = meta.payload.newPos;
+      const nextActiveNodePos = meta.payload.newPos ?? value.activeNodePos;
       const activeDepth =
         value.activeNodePos === undefined
           ? undefined
@@ -362,17 +366,21 @@ function reduceState(
         ...value,
         activeNodePos: nextActiveNodePos,
         placeholderRect: activeDepth !== nextActiveDepth ? meta.payload.oldRect : undefined,
-        ...(value.activeNodePos !== undefined && {
-          placeholderPos: tr.mapping.map(value.activeNodePos),
-        }),
+        ...(meta.payload.newPos !== undefined &&
+          value.activeNodePos !== undefined && {
+            placeholderPos: tr.mapping.map(value.activeNodePos),
+          }),
       };
     }
     default: {
+      const mappedPos =
+        value.activeNodePos === undefined ? undefined : tr.mapping.mapResult(value.activeNodePos);
       return {
         ...value,
-        ...(value.activeNodePos !== undefined && {
-          activeNodePos: tr.mapping.map(value.activeNodePos),
-        }),
+        ...(mappedPos &&
+          !mappedPos.deleted && {
+            activeNodePos: mappedPos.pos,
+          }),
         hoverPositions: value.hoverPositions
           .map(({ from, to }) => ({
             from: tr.mapping.mapResult(from),

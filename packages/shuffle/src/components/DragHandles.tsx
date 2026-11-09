@@ -1,4 +1,5 @@
 import {
+  reactKeys,
   useEditorEffect,
   useEditorEventCallback,
   useEditorStateSelector,
@@ -68,6 +69,14 @@ export function DragHandles(props: { handleComponent?: ComponentType<DragHandleP
     [hoverPositions],
   );
 
+  // We need a key that is stable across transactions!
+  const posToKey = useEditorStateSelector((state) => {
+    const reactKeyState = reactKeys().spec.key!.getState(state) as {
+      posToKey: Map<number, string>;
+    };
+    return reactKeyState.posToKey;
+  });
+
   const [hoverOffsets, setHoverOffsets] = useState<Offsets[]>([]);
 
   useEditorEffect(
@@ -107,7 +116,7 @@ export function DragHandles(props: { handleComponent?: ComponentType<DragHandleP
     <>
       {hoverStarts.map((pos, index) => (
         <DragHandleRenderer
-          key={pos}
+          key={posToKey.get(pos)}
           pos={pos}
           left={hoverOffsets[index]?.left ?? 0}
           top={hoverOffsets[index]?.top ?? 0}

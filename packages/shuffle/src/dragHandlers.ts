@@ -44,6 +44,7 @@ export function startDragOnPointerDown(
 
   startTr.setMeta(shufflePluginKey, {
     type: "start",
+    payload: { pos },
   } satisfies ShufflePluginMeta);
 
   if (pos !== null) {
@@ -154,7 +155,7 @@ export function startDragOnPointerDown(
         view.dispatch(
           view.state.tr.setMeta(shufflePluginKey, {
             type: "map",
-            payload: { newPos: pos, oldRect: undefined },
+            payload: { newPos: undefined, oldRect: undefined },
           } satisfies ShufflePluginMeta),
         );
       }

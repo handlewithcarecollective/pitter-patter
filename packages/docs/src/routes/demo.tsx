@@ -1,6 +1,7 @@
 import {
   ProseMirror,
   ProseMirrorDoc,
+  reactKeys,
   useEditorEventListener,
 } from "@handlewithcare/react-prosemirror";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -121,6 +122,7 @@ function Demo({ docId }: { docId: string }) {
             collab({ version }),
             shuffle(),
             presence({ getPresenceColor }),
+            reactKeys(),
             keymap(baseKeymap),
           ],
         }),
