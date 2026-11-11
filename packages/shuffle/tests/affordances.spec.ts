@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 import {
+  aimPointerAt,
+  cloneOffset,
   draggingFlag,
   findBlock,
   handleButtons,
   hoverPoint,
-  moveCloneTo,
   openEditor,
   settle,
   startDragOnHandle,
@@ -95,7 +96,7 @@ test("the dragged block is marked, and the page is told a drag is running", asyn
   await openEditor(page, six());
   const session = await startDragOnHandle(page, T("P3"));
   const p5 = await findBlock(page, T("P5"));
-  await moveCloneTo(page, session, { x: p5.left + p5.width / 2, y: p5.bottom - 3 });
+  await aimPointerAt(page, session, { x: session.pointer.x, y: p5.bottom - 3 });
 
   const marks = await page.evaluate(() => {
     const marked = document.querySelector("[data-shuffle-active]");
@@ -116,7 +117,8 @@ test("the dragged block is marked, and the page is told a drag is running", asyn
 test("the clone is a child of the body that the pointer can pass through", async ({ page }) => {
   await openEditor(page, six());
   const session = await startDragOnHandle(page, T("P3"));
-  await moveCloneTo(page, session, { x: 512, y: 400 });
+  const grab = await cloneOffset(page, session);
+  await aimPointerAt(page, session, { x: 512, y: 400 });
 
   const clone = await page.evaluate(() => {
     const element = document.querySelector("[data-shuffle-clone]");
@@ -125,17 +127,14 @@ test("the clone is a child of the body that the pointer can pass through", async
     return {
       parent: element.parentElement?.tagName,
       pointerEvents: getComputedStyle(element).pointerEvents,
-      centre: {
-        x: Math.round(rect.left + rect.width / 2),
-        y: Math.round(rect.top + rect.height / 2),
-      },
+      corner: { x: Math.round(rect.left), y: Math.round(rect.top) },
     };
   });
   expect(clone?.parent).toBe("BODY");
   expect(clone?.pointerEvents).toBe("none");
-  // The clone rests within a pixel of where it was aimed.
-  expect(Math.abs((clone?.centre.x ?? 0) - 512)).toBeLessThanOrEqual(1);
-  expect(Math.abs((clone?.centre.y ?? 0) - 400)).toBeLessThanOrEqual(1);
+  // The clone rests within a pixel of the pointer, holding the offset it was grabbed at.
+  expect(Math.abs((clone?.corner.x ?? 0) - Math.round(512 + grab.x))).toBeLessThanOrEqual(1);
+  expect(Math.abs((clone?.corner.y ?? 0) - Math.round(400 + grab.y))).toBeLessThanOrEqual(1);
 
   await page.mouse.up();
   await page.waitForTimeout(400);

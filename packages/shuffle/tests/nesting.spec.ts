@@ -1,14 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import {
-  dragBlockBelow,
-  dragBlockBy,
-  dragBlockToPoint,
-  findBlock,
-  openEditor,
-  tree,
-  type BlockSpec,
-} from "./helpers.ts";
+import { dragBlockBelow, dragBlockBy, openEditor, tree, type BlockSpec } from "./helpers.ts";
 import { container, h, p, rowWith } from "./nodes.ts";
 
 /**
@@ -65,12 +57,13 @@ test("taking a child out of a row leaves the other one on its own", async ({ pag
   await openEditor(page, twoChildRow());
   await dragBlockBelow(page, T("R"), T("Mid"));
 
-  // A row with one child is unwrapped, so L is a top level block again - at the columns it had.
+  // A row with one child is unwrapped, so both blocks are top level again - each at the columns
+  // it had, because the drag never moved sideways.
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     '"L" 1-5',
     '"Mid" 4-9',
-    '"R" 4-8',
+    '"R" 7-11',
     '"Tail" 4-9',
     '"Last" 4-9',
   ]);
@@ -86,7 +79,7 @@ test("taking the first child out of a row leaves the other one on its own", asyn
     '"Mid" 4-9',
     '"Tail" 4-9',
     '"Last" 4-9',
-    '"L" 4-8',
+    '"L" 3-7',
   ]);
 });
 
@@ -119,8 +112,7 @@ test("a block taken out of a container leaves the container behind", async ({ pa
 
 test("a block dropped on a container's bottom edge goes inside it", async ({ page }) => {
   await openEditor(page, [h("Header"), container(p("A"), p("B")), p("Loose"), p("Tail")]);
-  const box = await findBlock(page, { type: "container" });
-  await dragBlockToPoint(page, T("Loose"), { x: box.left + box.width / 2, y: box.bottom - 3 });
+  await dragBlockBelow(page, T("Loose"), { type: "container" });
 
   const lines = await tree(page);
   const containerIndex = lines.indexOf("container 4-9");

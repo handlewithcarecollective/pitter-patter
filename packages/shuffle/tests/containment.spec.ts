@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 import {
+  aimPointerAt,
   centerX,
   dragBlockBelow,
   dragBlockTo,
   dragBlockToPoint,
   endDrag,
   findBlock,
-  moveCloneTo,
   openEditor,
   startDragOnHandle,
   tree,
@@ -33,7 +33,7 @@ test("cards can be reordered within their deck", async ({ page }) => {
   await openEditor(page, deckOfCards());
   const session = await startDragOnHandle(page, { type: "card", text: "Card one" });
   const three = await findBlock(page, { type: "card", text: "Card three" });
-  await moveCloneTo(page, session, {
+  await aimPointerAt(page, session, {
     x: three.left + three.width / 2,
     y: three.top + three.height / 2,
   });
@@ -49,7 +49,10 @@ test("a card dropped on the left half of another card lands before it", async ({
   await openEditor(page, deckOfCards());
   const one = await findBlock(page, { type: "card", text: "Card one" });
   const session = await startDragOnHandle(page, { type: "card", text: "Card three" });
-  await moveCloneTo(page, session, { x: one.left + one.width * 0.25, y: one.top + one.height / 2 });
+  await aimPointerAt(page, session, {
+    x: one.left + one.width * 0.25,
+    y: one.top + one.height / 2,
+  });
   await endDrag(page);
 
   expect(await tree(page)).toEqual(cardsInOrder(["Card three", "Card one", "Card two"]));

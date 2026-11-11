@@ -628,3 +628,9 @@
 .shuffle-drag-handle:hover {
   background-color: #82c3d9;
 }
+
+.shuffle-clone {
+  box-shadow:
+    0 8px 11px 0 rgb(0 0 0 / 0.1),
+    0 8px 9px -1px rgb(0 0 0 / 0.1);
+}

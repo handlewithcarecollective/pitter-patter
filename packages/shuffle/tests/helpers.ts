@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-import { type BlockRef, type HarnessBlock } from "./protocol.ts";
+import { type BlockRef, type HarnessBlock, type Point } from "./protocol.ts";
 
 const URL = "http://127.0.0.1:5199/";
 
@@ -178,7 +178,7 @@ export async function pressHandle(page: Page, spec: BlockSpec): Promise<DragSess
 
 export async function startDragOnHandle(page: Page, spec: BlockSpec): Promise<DragSession> {
   const session = await pressHandle(page, spec);
-  await movePointerTo(page, session, {
+  await sendPointerTo(page, session, {
     x: session.pointer.x + 1,
     y: session.pointer.y + 1,
   });
@@ -197,43 +197,43 @@ export async function movePointerBy(
   dx: number,
   dy: number,
 ): Promise<void> {
-  await movePointerTo(page, session, { x: session.pointer.x + dx, y: session.pointer.y + dy });
+  await sendPointerTo(page, session, { x: session.pointer.x + dx, y: session.pointer.y + dy });
   await settle(page);
 }
 
-export async function placeCloneAt(
-  page: Page,
-  session: DragSession,
-  point: { x: number; y: number },
-): Promise<void> {
-  const centre = await cloneCentre(page);
-  await movePointerTo(page, session, {
-    x: session.pointer.x + (point.x - centre.x),
-    y: session.pointer.y + (point.y - centre.y),
-  });
+/**
+ * Put the pointer on `point`, which is where a drag's transforms look. The clone keeps the
+ * distance the handle was grabbed at, so it ends up beside the point rather than on it.
+ */
+export async function aimPointerAt(page: Page, session: DragSession, point: Point): Promise<void> {
+  await sendPointerTo(page, session, point);
+  await settle(page);
+  // A pointer that comes to rest fires no further move, so this gives the transforms one more
+  // look: enough for a move that repositioned the block to then be grouped or reordered.
+  await nudgePointer(page, session);
 }
 
-export async function moveCloneTo(
-  page: Page,
-  session: DragSession,
-  point: { x: number; y: number },
-): Promise<void> {
-  await placeCloneAt(page, session, point);
-  await settle(page);
+async function nudgePointer(page: Page, session: DragSession): Promise<void> {
   await movePointerBy(page, session, NUDGE_PX, NUDGE_PX);
 }
 
-async function cloneCentre(page: Page): Promise<{ x: number; y: number }> {
-  const rect = await cloneRect(page);
-  if (!rect) throw new Error("No clone in the page: is a drag in progress?");
-  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+/**
+ * Put the clone on `point` rather than the pointer. The clone is what the user steers, and it is
+ * what repositioning measures - the column comes out of its left edge.
+ */
+async function aimCloneAt(page: Page, session: DragSession, point: Point): Promise<void> {
+  const offset = await cloneOffset(page, session);
+  await aimPointerAt(page, session, { x: point.x - offset.x, y: point.y - offset.y });
 }
 
-async function movePointerTo(
-  page: Page,
-  session: DragSession,
-  point: { x: number; y: number },
-): Promise<void> {
+/** The clone's top left corner relative to the pointer, which a drag holds constant. */
+export async function cloneOffset(page: Page, session: DragSession): Promise<Point> {
+  const rect = await cloneRect(page);
+  if (!rect) throw new Error("No clone in the page: is a drag in progress?");
+  return { x: rect.left - session.pointer.x, y: rect.top - session.pointer.y };
+}
+
+async function sendPointerTo(page: Page, session: DragSession, point: Point): Promise<void> {
   session.pointer = point;
   await page.mouse.move(point.x, point.y, { steps: 1 });
 }
@@ -288,12 +288,30 @@ export function hoverPoint(page: Page, spec: BlockSpec): Promise<{ x: number; y:
   );
 }
 
+/**
+ * Where to aim a drag, given the block it is aimed at and the pointer the drag started from.
+ * Keeping the pointer's own x drags straight up or down and the block keeps the columns it had; an
+ * x taken from the target pulls the block sideways into whichever column the clone lands over.
+ */
+type Aim = (target: HarnessBlock, pointer: Point) => Point;
+
+/**
+ * The closest point on the target's own column span to where the pointer already is. A drop aimed
+ * short of this misses the block: the transforms take the pointer to be in the free columns beside
+ * it and group the two blocks into a row instead of ordering them.
+ */
+const overBlock = (rect: HarnessBlock, pointer: Point) =>
+  Math.min(Math.max(pointer.x, rect.left + 1), rect.right - 1);
+
 export async function dragBlockBelow(
   page: Page,
   source: BlockSpec,
   target: BlockSpec,
 ): Promise<void> {
-  await dragBlockTo(page, source, target, (rect) => ({ x: centerX(rect), y: rect.bottom - 3 }));
+  await dragBlockTo(page, source, target, (rect, pointer) => ({
+    x: overBlock(rect, pointer),
+    y: rect.bottom - 3,
+  }));
 }
 
 export async function dragBlockAbove(
@@ -301,7 +319,10 @@ export async function dragBlockAbove(
   source: BlockSpec,
   target: BlockSpec,
 ): Promise<void> {
-  await dragBlockTo(page, source, target, (rect) => ({ x: centerX(rect), y: rect.top + 3 }));
+  await dragBlockTo(page, source, target, (rect, pointer) => ({
+    x: overBlock(rect, pointer),
+    y: rect.top + 3,
+  }));
 }
 
 export async function dragBlockOnto(
@@ -309,8 +330,8 @@ export async function dragBlockOnto(
   source: BlockSpec,
   target: BlockSpec,
 ): Promise<void> {
-  await dragBlockTo(page, source, target, (rect) => ({
-    x: centerX(rect),
+  await dragBlockTo(page, source, target, (rect, pointer) => ({
+    x: overBlock(rect, pointer),
     y: rect.top + rect.height / 2,
   }));
 }
@@ -329,6 +350,10 @@ export async function dragBlockBeside(
   });
 }
 
+/**
+ * Slide a block until it snaps to a grid column: the clone's left edge ends up over the column's
+ * left edge, where repositioning looks.
+ */
 export async function dragBlockToColumn(
   page: Page,
   source: BlockSpec,
@@ -337,10 +362,9 @@ export async function dragBlockToColumn(
   const session = await startDragOnHandle(page, source);
   const rect = await cloneRect(page);
   if (!rect) throw new Error("No clone in the page: is a drag in progress?");
-  const centre = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-  await moveCloneTo(page, session, {
-    x: (await columnLeft(page, column)) + rect.width / 2,
-    y: centre.y,
+  await aimCloneAt(page, session, {
+    x: await columnLeft(page, column),
+    y: rect.top,
   });
   await endDrag(page);
 }
@@ -352,18 +376,13 @@ export async function dragBlockBy(
   dy: number,
 ): Promise<void> {
   const session = await startDragOnHandle(page, source);
-  const centre = await cloneCentre(page);
-  await moveCloneTo(page, session, { x: centre.x + dx, y: centre.y + dy });
+  await aimPointerAt(page, session, { x: session.pointer.x + dx, y: session.pointer.y + dy });
   await endDrag(page);
 }
 
-export async function dragBlockToPoint(
-  page: Page,
-  source: BlockSpec,
-  point: { x: number; y: number },
-): Promise<void> {
+export async function dragBlockToPoint(page: Page, source: BlockSpec, point: Point): Promise<void> {
   const session = await startDragOnHandle(page, source);
-  await moveCloneTo(page, session, point);
+  await aimPointerAt(page, session, point);
   await endDrag(page);
 }
 
@@ -371,10 +390,10 @@ export async function dragBlockTo(
   page: Page,
   source: BlockSpec,
   target: BlockSpec,
-  pointFor: (target: HarnessBlock) => { x: number; y: number },
+  aim: Aim,
 ): Promise<void> {
   const session = await startDragOnHandle(page, source);
-  await moveCloneTo(page, session, pointFor(await findBlock(page, target)));
+  await aimPointerAt(page, session, aim(await findBlock(page, target), session.pointer));
   await endDrag(page);
 }
 
