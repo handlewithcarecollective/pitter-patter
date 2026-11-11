@@ -161,7 +161,6 @@ export function startDragOnPointerDown(
       }
 
       clone = startResult.clone;
-      clone.dataset["shuffleClone"] = "true";
       initialStyles = startResult.initialStyles;
 
       const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
@@ -180,6 +179,12 @@ export function startDragOnPointerDown(
   });
 
   function endDrag(domRect?: DOMRect) {
+    view.dispatch(
+      view.state.tr.setMeta(shufflePluginKey, {
+        type: "end",
+      } satisfies ShufflePluginMeta),
+    );
+
     if (!clone || !initialStyles) {
       if (startDragInContentDOM && !preserveSelection) {
         const result = view.posAtCoords({ left: clientX, top: clientY });
@@ -225,13 +230,9 @@ export function startDragOnPointerDown(
     view.root.shuffleDragging = false;
 
     const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
-    if (!gridWrapper) return;
-    const skeleton = gridWrapper.querySelector("[data-shuffle-skeleton]");
-    if (!skeleton) return;
+    const skeleton = gridWrapper?.querySelector("[data-shuffle-skeleton]");
 
     animate(skeleton, { opacity: 0 }, { duration: 0.25 });
-
-    if (!clone || !initialStyles) return endDrag();
 
     if (isAnimating(currentAnimation)) {
       currentAnimation.complete();
@@ -242,13 +243,7 @@ export function startDragOnPointerDown(
     if (before === undefined) return endDrag();
 
     const dom = view.nodeDOM(before);
-    if (!(dom instanceof HTMLElement)) return endDrag();
-
-    view.dispatch(
-      view.state.tr.setMeta(shufflePluginKey, {
-        type: "end",
-      } satisfies ShufflePluginMeta),
-    );
+    if (!(dom instanceof Element)) return endDrag();
 
     const domRect = dom.getBoundingClientRect();
 

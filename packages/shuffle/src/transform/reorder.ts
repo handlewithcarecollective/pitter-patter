@@ -20,13 +20,34 @@ export function reorder(
 
   const $containedBy = getBeforeContainedBy($from);
 
-  // `posAtCoords` is unreliable over a non-editable atom.
-  // the browser reports the nearest *editable* position,
-  // which may be in an unrelated block.
   const fromDom = view.nodeDOM(from);
   if (!(fromDom instanceof Element)) return null;
   if (contains(fromDom.getBoundingClientRect(), clientX, clientY)) {
     return null;
+  }
+
+  // If hovering over our own placeholder, swap with it
+  const placeholder = view.dom.querySelector("[data-shuffle-placeholder]");
+  if (placeholder && contains(placeholder.getBoundingClientRect(), clientX, clientY)) {
+    const placeholderPos = shufflePluginKey.getState(view.state)?.placeholderPos;
+    if (placeholderPos !== undefined) {
+      const tr = view.state.tr;
+      tr.delete(from, from + node.nodeSize);
+
+      const newPos = tr.mapping.map(placeholderPos);
+
+      tr.insert(newPos, node);
+
+      tr.setMeta(reactKeys().spec.key!, {
+        overrides: { [from]: newPos },
+      });
+      tr.setMeta(shufflePluginKey, {
+        type: "map",
+        payload: { newPos, oldRect: fromDom.getBoundingClientRect() },
+      } satisfies ShufflePluginMeta);
+      tr.setMeta("composition", shufflePluginKey.getState(view.state)?.comp);
+      return tr;
+    }
   }
 
   const posResult = view.posAtCoords({ left: clientX, top: clientY });

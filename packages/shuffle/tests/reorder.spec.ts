@@ -2,19 +2,22 @@ import { expect, test, type Page } from "@playwright/test";
 
 import {
   blocks,
+  centerX,
   dragBlockAbove,
   dragBlockBelow,
   dragBlockBy,
   dragBlockToPoint,
+  endDrag,
   findBlock,
   moveCloneTo,
   openEditor,
+  placeholderRect,
   startDragOnHandle,
   tree,
   type BlockSpec,
   type HarnessBlock,
 } from "./helpers.ts";
-import { h, img, p } from "./nodes.ts";
+import { container, h, img, p, rowWith } from "./nodes.ts";
 
 /**
  * Reordering: grab a block's drag handle, move it next to another block, let go.
@@ -158,6 +161,61 @@ test("dragging the first block to the end works", async ({ page }) => {
   await dragBlockBelow(page, T("First"), T("Fourth"));
 
   expect(await tree(page)).toEqual(names(["Second", "Third", "Fourth", "First"]));
+});
+
+test("dragged blocks can swap with their placeholders", async ({ page }) => {
+  await openEditor(page, [
+    h("Header"),
+    container(p("C1"), p("C2"), p("C3"), p("C4")),
+    rowWith(
+      { shuffleStart: 0, shuffleEnd: 13 },
+      p("L", { shuffleStart: 1, shuffleEnd: 5 }),
+      p("R", { shuffleStart: 7, shuffleEnd: 11 }),
+    ),
+    p("Tail"),
+    p("Last"),
+  ]);
+
+  const session = await startDragOnHandle(page, { type: "container" });
+  const l = await findBlock(page, T("L"));
+  await moveCloneTo(page, session, { x: centerX(l), y: l.top + l.height / 2 });
+
+  expect(await tree(page)).toEqual([
+    '"Header" 4-9',
+    "row",
+    '  "L" 1-5',
+    "  container 1-6",
+    '    "C1" 4-9',
+    '    "C2" 4-9',
+    '    "C3" 4-9',
+    '    "C4" 4-9',
+    '  "R" 7-11',
+    '"Tail" 4-9',
+    '"Last" 4-9',
+  ]);
+
+  const placeholder = await placeholderRect(page);
+  if (!placeholder) throw new Error("Joining the row left no placeholder in the page");
+
+  await moveCloneTo(page, session, {
+    x: centerX(placeholder),
+    y: placeholder.top + placeholder.height / 2,
+  });
+  await endDrag(page);
+
+  expect(await tree(page)).toEqual([
+    '"Header" 4-9',
+    "container 1-6",
+    '  "C1" 4-9',
+    '  "C2" 4-9',
+    '  "C3" 4-9',
+    '  "C4" 4-9',
+    "row",
+    '  "L" 1-5',
+    '  "R" 7-11',
+    '"Tail" 4-9',
+    '"Last" 4-9',
+  ]);
 });
 
 const topLevelBlocks = async (page: Page): Promise<HarnessBlock[]> =>

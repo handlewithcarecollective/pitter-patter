@@ -252,6 +252,15 @@ function cloneRect(page: Page): Promise<Rect | null> {
   });
 }
 
+export function placeholderRect(page: Page): Promise<Rect | null> {
+  return page.evaluate(() => {
+    const placeholder = document.querySelector("[data-shuffle-placeholder]");
+    if (!placeholder) return null;
+    const rect = placeholder.getBoundingClientRect();
+    return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+  });
+}
+
 interface Rect {
   left: number;
   top: number;
