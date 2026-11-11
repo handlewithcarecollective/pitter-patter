@@ -75,6 +75,7 @@ export interface ShufflePluginState {
   deco: DecorationSet;
   comp: string | undefined;
   activeNodePos: number | undefined;
+  state: "none" | "pending" | "dragging";
   hoverPositions: { from: number; to: number }[];
   startDragInContentDOM: boolean;
   placeholderRect: DOMRect | undefined;
@@ -140,6 +141,7 @@ export function shuffle({
           comp: undefined,
           activeNodePos: undefined,
           hoverPositions: [],
+          state: "none",
           placeholderRect: undefined,
           startDragInContentDOM,
           placeholderPos: undefined,
@@ -332,6 +334,7 @@ function reduceState(
         ...value,
         comp: randomRef(),
         activeNodePos: meta.payload.pos ?? undefined,
+        state: "pending",
         placeholderRect: undefined,
         placeholderPos: undefined,
       };
@@ -341,6 +344,7 @@ function reduceState(
         ...value,
         comp: undefined,
         activeNodePos: undefined,
+        state: "none",
         placeholderRect: undefined,
         placeholderPos: undefined,
       };
@@ -365,6 +369,7 @@ function reduceState(
       return {
         ...value,
         activeNodePos: nextActiveNodePos,
+        state: "dragging",
         placeholderRect: activeDepth !== nextActiveDepth ? meta.payload.oldRect : undefined,
         ...(meta.payload.newPos !== undefined &&
           value.activeNodePos !== undefined && {
@@ -449,7 +454,7 @@ function buildDecorations(
     });
   }
 
-  if (next.activeNodePos !== undefined) {
+  if (next.activeNodePos !== undefined && next.state === "dragging") {
     const node = newState.doc.nodeAt(next.activeNodePos);
 
     if (node) {
