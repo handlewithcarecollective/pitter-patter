@@ -71,3 +71,7 @@ img {
   border-radius: 0.25rem;
   border: #351900 solid thin;
 }
+
+.shuffle-clone {
+  background-color: var(--color-fd-background);
+}

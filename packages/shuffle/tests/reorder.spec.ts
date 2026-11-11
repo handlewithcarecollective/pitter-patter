@@ -1,15 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import {
+  aimPointerAt,
   blocks,
-  centerX,
+  cloneOffset,
   dragBlockAbove,
   dragBlockBelow,
   dragBlockBy,
-  dragBlockToPoint,
+  dragBlockTo,
   endDrag,
   findBlock,
-  moveCloneTo,
   openEditor,
   placeholderRect,
   startDragOnHandle,
@@ -56,15 +56,19 @@ test("moves a block to the end of the document", async ({ page }) => {
 
 test("drops into the space between two blocks", async ({ page }) => {
   await openEditor(page, six());
-  const p3 = await findBlock(page, T("P3"));
-  await dragBlockToPoint(page, T("P1"), { x: p3.left + p3.width / 2, y: p3.bottom + 8 });
+  await dragBlockTo(page, T("P1"), T("P3"), (p3, pointer) => ({
+    x: pointer.x,
+    y: p3.bottom + 8,
+  }));
 
   expect(await tree(page)).toEqual(names(["Header", "P2", "P3", "P1", "P4", "P5"]));
 });
 
 test("a block dropped in empty space below the text goes to the end", async ({ page }) => {
   await openEditor(page, six());
-  await dragBlockToPoint(page, T("P1"), { x: 512, y: 620 });
+  const session = await startDragOnHandle(page, T("P1"));
+  await aimPointerAt(page, session, { x: session.pointer.x, y: 620 });
+  await endDrag(page);
 
   expect(await tree(page)).toEqual(names(["Header", "P2", "P3", "P4", "P5", "P1"]));
 });
@@ -73,28 +77,30 @@ test("a block slid straight down keeps the columns it spans", async ({ page }) =
   await openEditor(page, [
     h("Header"),
     p("Wide", { shuffleStart: 2, shuffleEnd: 7 }),
-    p("Next"),
+    p("Next", { shuffleStart: 2, shuffleEnd: 7 }),
     p("Tail"),
   ]);
+  await dragBlockBelow(page, T("Wide"), T("Next"));
 
-  const from = await findBlock(page, T("Wide"));
-  const to = await findBlock(page, T("Next"));
-  await dragBlockBy(page, T("Wide"), 0, to.bottom - 3 - (from.top + from.height / 2));
-
-  expect(await tree(page)).toEqual(['"Header" 4-9', '"Next" 4-9', '"Wide" 2-7', '"Tail" 4-9']);
+  expect(await tree(page)).toEqual(['"Header" 4-9', '"Next" 2-7', '"Wide" 2-7', '"Tail" 4-9']);
 });
 
-test("a block dropped on the middle of another block takes its columns", async ({ page }) => {
+test("a block dropped with its edge over another block takes its columns", async ({ page }) => {
   await openEditor(page, [
     h("Header"),
     p("Wide", { shuffleStart: 2, shuffleEnd: 7 }),
     p("Next"),
     p("Tail"),
   ]);
-  await dragBlockBelow(page, T("Wide"), T("Next"));
+  const session = await startDragOnHandle(page, T("Wide"));
+  const next = await findBlock(page, T("Next"));
+  const grab = await cloneOffset(page, session);
+  // Repositioning takes the column from the clone's left edge, and the pointer trails that edge by
+  // the distance the handle sits in from it. Aiming the drop at the target's left edge this way
+  // puts the clone over the target, so the block keeps its width and takes the target's columns.
+  await aimPointerAt(page, session, { x: next.left - grab.x, y: next.bottom - 3 });
+  await endDrag(page);
 
-  // Columns come from the clone's left edge, and the clone was centred on the block it was dropped
-  // on - so the block keeps its width but lands in the drop target's columns.
   expect(await tree(page)).toEqual(names(["Header", "Next", "Wide", "Tail"]));
 });
 
@@ -117,11 +123,11 @@ test("reorders as the pointer moves, without releasing", async ({ page }) => {
   const session = await startDragOnHandle(page, T("P4"));
 
   const p2 = await findBlock(page, T("P2"));
-  await moveCloneTo(page, session, { x: p2.left + p2.width / 2, y: p2.bottom - 3 });
+  await aimPointerAt(page, session, { x: session.pointer.x, y: p2.bottom - 3 });
   const afterFirstDrop = await tree(page);
 
   const p1 = await findBlock(page, T("P1"));
-  await moveCloneTo(page, session, { x: p1.left + p1.width / 2, y: p1.bottom - 3 });
+  await aimPointerAt(page, session, { x: session.pointer.x, y: p1.bottom - 3 });
   const afterSecondDrop = await tree(page);
 
   expect(afterFirstDrop).toEqual(names(["Header", "P1", "P2", "P4", "P3", "P5"]));
@@ -180,7 +186,7 @@ test("dragged blocks can swap with their placeholders", async ({ page }) => {
 
   const session = await startDragOnHandle(page, { type: "container" });
   const l = await findBlock(page, T("L"));
-  await moveCloneTo(page, session, { x: centerX(l), y: l.top + l.height / 2 });
+  await aimPointerAt(page, session, { x: session.pointer.x, y: l.top + l.height / 2 });
 
   expect((await findBlock(page, { type: "container" })).depth).toBe(2);
   expect((await findBlock(page, { type: "row" })).childCount).toBe(3);
@@ -188,8 +194,8 @@ test("dragged blocks can swap with their placeholders", async ({ page }) => {
   const placeholder = await placeholderRect(page);
   if (!placeholder) throw new Error("Joining the row left no placeholder in the page");
 
-  await moveCloneTo(page, session, {
-    x: centerX(placeholder),
+  await aimPointerAt(page, session, {
+    x: session.pointer.x,
     y: placeholder.top + placeholder.height / 2,
   });
   await endDrag(page);

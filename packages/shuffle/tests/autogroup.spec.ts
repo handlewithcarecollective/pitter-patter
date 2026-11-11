@@ -34,7 +34,7 @@ test("dropping a block beside another block groups them", async ({ page }) => {
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     "row",
-    '  "Loose" 3-8',
+    '  "Loose" 5-10',
     '  "Half" 1-5',
     '"Tail" 4-9',
     '"Last" 4-9',
@@ -56,7 +56,7 @@ test("a block dropped in the spare columns of a right aligned block groups with 
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     "row",
-    '  "Loose" 5-10',
+    '  "Loose" 7-12',
     '  "Right" 8-12',
     '"Tail" 4-9',
     '"Last" 4-9',
@@ -99,8 +99,8 @@ test("a block dropped on a block that is already in a row joins that row", async
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     "row",
-    '  "Mid" 1-6',
     '  "L" 1-5',
+    '  "Mid" 4-9',
     '  "R" 7-11',
     '"Tail" 4-9',
     '"Last" 4-9',

@@ -78,7 +78,6 @@ export function startDragOnPointerDown(
   const autoScroller = new AutoScroller();
 
   let clone: HTMLElement | null = null;
-  let initialStyles: InitialStyles | null = null;
 
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
@@ -112,18 +111,14 @@ export function startDragOnPointerDown(
       return;
     }
 
-    // Drive the transforms from where the clone visually is rather than from
-    // the pointer.
     const cloneRect = clone.getBoundingClientRect();
-    const centerX = cloneRect.left + cloneRect.width / 2;
-    const centerY = cloneRect.top + cloneRect.height / 2;
 
     const tr =
       before != null
         ? (reposition(view, before, cloneRect) ??
-          autogroup(view, before, centerX, centerY) ??
-          reorder(view, before, centerX, centerY))
-        : inflate(view, clone, centerX, centerY);
+          autogroup(view, before, x, y) ??
+          reorder(view, before, x, y))
+        : inflate(view, clone, x, y);
 
     if (!tr) return;
 
@@ -148,8 +143,8 @@ export function startDragOnPointerDown(
   }
 
   const onMove = throttle(function onMove(e: PointerEvent) {
-    if (!skeletonOn || !clone || !initialStyles || !layout) {
-      const startResult = startDrag(dom!, translateCalc);
+    if (!skeletonOn || !clone || !layout) {
+      clone = startDrag(dom!, translateCalc);
 
       if (pos !== null) {
         view.dispatch(
@@ -159,9 +154,6 @@ export function startDragOnPointerDown(
           } satisfies ShufflePluginMeta),
         );
       }
-
-      clone = startResult.clone;
-      initialStyles = startResult.initialStyles;
 
       const gridWrapper = view.dom.closest("[data-shuffle-wrapper]");
       if (!gridWrapper) return;
@@ -185,7 +177,7 @@ export function startDragOnPointerDown(
       } satisfies ShufflePluginMeta),
     );
 
-    if (!clone || !initialStyles) {
+    if (!clone) {
       if (startDragInContentDOM && !preserveSelection) {
         const result = view.posAtCoords({ left: clientX, top: clientY });
         if (result) {
@@ -198,7 +190,6 @@ export function startDragOnPointerDown(
     }
 
     clone.style.transition = "transform 0.2s ease";
-    clone.style.boxShadow = initialStyles.boxShadow;
 
     const { transform, transformOrigin } = domRect
       ? translateCalc.place(domRect.left, domRect.top)
@@ -271,10 +262,6 @@ export function startDragOnPointerDown(
   return true;
 }
 
-interface InitialStyles {
-  boxShadow: string;
-}
-
 function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   const domRect = dom.getBoundingClientRect();
   const bodyRect = document.body.getBoundingClientRect();
@@ -295,7 +282,11 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
     const domStyles = getComputedStyle(domElement);
     for (let i = 0; i < domStyles.length; i++) {
       const property = domStyles.item(i);
-      cloneElement.style.setProperty(property, domStyles.getPropertyValue(property));
+      const value = domStyles.getPropertyValue(property);
+      cloneElement.style.setProperty(property, value);
+    }
+    if (cloneElement.style.background === "none") {
+      cloneElement.style.removeProperty("background");
     }
     cloneElement.style.pointerEvents = "none";
 
@@ -304,14 +295,14 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
   }
 
   clone.dataset["shuffleClone"] = "true";
+  clone.classList.add("shuffle-clone");
   clone.style.position = "absolute";
   clone.style.top = `${domRect.top - bodyRect.top}px`;
   clone.style.left = `${domRect.left - bodyRect.left}px`;
+  clone.style.removeProperty("box-shadow");
   document.body.appendChild(clone);
 
   dom.dataset["shuffleActive"] = "true";
-
-  const initialBoxShadow = dom.style.boxShadow;
 
   clone.style.transition = "transform 0.1s ease";
   const { transform, transformOrigin } = translateCalc.slide(
@@ -321,17 +312,11 @@ function startDrag(dom: HTMLElement, translateCalc: TranslateCalculator) {
 
   clone.style.transform = transform;
   clone.style.transformOrigin = transformOrigin;
-  clone.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)";
   clone.style.zIndex = "100";
 
   setTimeout(() => {
     clone.style.transition = "none";
   }, 100);
 
-  return {
-    clone,
-    initialStyles: {
-      boxShadow: initialBoxShadow,
-    } satisfies InitialStyles,
-  };
+  return clone;
 }
