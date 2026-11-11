@@ -372,6 +372,12 @@ function reduceState(
           }),
       };
     }
+    case "resize": {
+      return {
+        ...value,
+        comp: tr.getMeta("composition"),
+      };
+    }
     default: {
       const mappedPos =
         value.activeNodePos === undefined ? undefined : tr.mapping.mapResult(value.activeNodePos);
