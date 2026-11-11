@@ -33,6 +33,7 @@ export function startDragOnPointerDown(
   dom: HTMLElement & { pmViewDesc?: ViewDesc },
   clientX: number,
   clientY: number,
+  handleRect?: DOMRect,
 ) {
   const startDragInContentDOM =
     shufflePluginKey.getState(view.state)?.startDragInContentDOM ?? false;
@@ -63,6 +64,8 @@ export function startDragOnPointerDown(
 
   const startX = clientX;
   const startY = clientY;
+
+  let hasBustedHandleGuard = !handleRect;
 
   const translateCalc = new TranslateCalculator(
     originX,
@@ -113,12 +116,18 @@ export function startDragOnPointerDown(
 
     const cloneRect = clone.getBoundingClientRect();
 
+    if (!hasBustedHandleGuard && handleRect && (y < handleRect.top || y > handleRect.bottom)) {
+      hasBustedHandleGuard = true;
+    }
+
+    const effectiveY = hasBustedHandleGuard ? y : domRect.top + 1;
+
     const tr =
       before != null
         ? (reposition(view, before, cloneRect) ??
-          autogroup(view, before, x, y) ??
-          reorder(view, before, x, y))
-        : inflate(view, clone, x, y);
+          autogroup(view, before, x, effectiveY) ??
+          reorder(view, before, x, effectiveY))
+        : inflate(view, clone, x, effectiveY);
 
     if (!tr) return;
 
@@ -144,7 +153,7 @@ export function startDragOnPointerDown(
 
   const onMove = throttle(function onMove(e: PointerEvent) {
     if (!skeletonOn || !clone || !layout) {
-      clone = startDrag(dom!, translateCalc);
+      clone = startDrag(dom, translateCalc);
 
       if (pos !== null) {
         view.dispatch(

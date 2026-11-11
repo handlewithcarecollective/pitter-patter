@@ -186,6 +186,17 @@ export function shuffle({
         const activeNodePos = shufflePluginKey.getState(newState)?.activeNodePos;
         if (activeNodePos === undefined) return null;
 
+        const log = ((globalThis as any).__shuffleLog ??= []);
+        log.push({
+          activeNodePos,
+          ok: !!newState.doc.resolve(activeNodePos).nodeAfter,
+          meta: JSON.stringify(startTr.getMeta(shufflePluginKey)),
+          doc: newState.doc.toString(),
+          depth: newState.doc.resolve(activeNodePos).depth,
+          nodeAfterEnd: newState.doc.resolve(activeNodePos).parentOffset,
+          size: newState.doc.content.size,
+        });
+
         tr.setNodeAttribute(activeNodePos, "zIndex", findHighestZIndex(newState.doc) + 1);
       }
 

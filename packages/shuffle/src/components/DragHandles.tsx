@@ -153,12 +153,16 @@ export function DragHandleRenderer({
 
     const dom = view.nodeDOM(pos);
 
+    const eventTarget = event.target instanceof Element ? event.target : undefined;
+    const eventTargetRect = eventTarget?.getBoundingClientRect();
+
     startDragOnPointerDown(
       view,
       pos,
       dom as HTMLElement & { pmViewDesc?: ViewDesc },
       event.clientX,
       event.clientY,
+      eventTargetRect,
     );
   });
 

@@ -34,7 +34,7 @@ test("dropping a block beside another block groups them", async ({ page }) => {
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     "row",
-    '  "Loose" 5-10',
+    '  "Loose" 6-11',
     '  "Half" 1-5',
     '"Tail" 4-9',
     '"Last" 4-9',
@@ -56,7 +56,7 @@ test("a block dropped in the spare columns of a right aligned block groups with 
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     "row",
-    '  "Loose" 7-12',
+    '  "Loose" 2-7',
     '  "Right" 8-12',
     '"Tail" 4-9',
     '"Last" 4-9',
@@ -122,9 +122,7 @@ test("a row dropped on a block stays a row of its own", async ({ page }) => {
   expect(await tree(page)).toEqual(['"Mid" 4-9', "row", '  "L" 1-5', '  "R" 7-11', '"Tail" 4-9']);
 });
 
-// It's currently weirdly tricky to move a node into a container, need
-// to improve
-test.fail("a block dropped on the middle of a container lands after it", async ({ page }) => {
+test("a block dropped on the middle of a container lands after it", async ({ page }) => {
   await openEditor(page, [h("Header"), p("Loose"), container(p("In"), p("Other")), p("Tail")]);
   await dragBlockOnto(page, T("Loose"), { type: "container" });
 

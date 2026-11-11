@@ -5,7 +5,7 @@ import { insertPoint } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
-import { getBeforeContainedBy, isShuffleRow, supportsDrag } from "../schema.ts";
+import { getBeforeContainedBy, isShuffleRow } from "../schema.ts";
 
 export function reorder(
   view: EditorView,
@@ -171,9 +171,7 @@ export function findGap(
  *
  * Otherwise the position is a gap between block children. When the pointer is
  * over a draggable parent's own chrome, that parent is the candidate; otherwise
- * it is one of the two blocks adjacent to the gap, never the parent: prefer
- * whichever one the pointer is actually inside (per `inside`), then the block
- * after the gap, then the block before it.
+ * it is one of the two blocks adjacent to the gap.
  */
 function findCandidate($pos: ResolvedPos, inside: number): number | null {
   if ($pos.parent.inlineContent) {
@@ -182,20 +180,6 @@ function findCandidate($pos: ResolvedPos, inside: number): number | null {
       d--;
     }
     return d === 0 ? null : $pos.before(d);
-  }
-
-  // The pointer is over the parent block's own chrome rather than any child
-  // (e.g. the picture of an image block whose content is its caption), so
-  // `posAtCoords` landed at an edge of the parent's content. The parent is the
-  // block being hovered. Rows are the exception: the pointer between a row's
-  // children is targeting those children.
-  if (
-    $pos.depth > 0 &&
-    inside === $pos.before() &&
-    supportsDrag($pos.parent) &&
-    !isShuffleRow($pos.parent)
-  ) {
-    return $pos.before();
   }
 
   const { nodeBefore, nodeAfter } = $pos;
