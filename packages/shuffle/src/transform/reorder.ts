@@ -123,6 +123,7 @@ export function findGap(
 
   const candidate = doc.nodeAt(candidateStart);
   if (!candidate) return null;
+  console.log(candidate.type.name);
 
   const candidateNode = view.nodeDOM(candidateStart);
   if (!(candidateNode instanceof Element)) return null;

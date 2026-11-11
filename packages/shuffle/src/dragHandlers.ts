@@ -33,6 +33,7 @@ export function startDragOnPointerDown(
   dom: HTMLElement & { pmViewDesc?: ViewDesc },
   clientX: number,
   clientY: number,
+  handleRect?: DOMRect,
 ) {
   const startDragInContentDOM =
     shufflePluginKey.getState(view.state)?.startDragInContentDOM ?? false;
@@ -64,6 +65,8 @@ export function startDragOnPointerDown(
   const startX = clientX;
   const startY = clientY;
 
+  let hasBustedHandleGuard = !handleRect;
+
   const translateCalc = new TranslateCalculator(
     originX,
     originY,
@@ -78,6 +81,7 @@ export function startDragOnPointerDown(
   const autoScroller = new AutoScroller();
 
   let clone: HTMLElement | null = null;
+  let cloneStartTop: number | null;
 
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
@@ -113,12 +117,16 @@ export function startDragOnPointerDown(
 
     const cloneRect = clone.getBoundingClientRect();
 
+    const effectiveY = hasBustedHandleGuard || cloneStartTop === null ? y : cloneStartTop - 5;
+
     const tr =
       before != null
         ? (reposition(view, before, cloneRect) ??
-          autogroup(view, before, x, y) ??
-          reorder(view, before, x, y))
-        : inflate(view, clone, x, y);
+          autogroup(view, before, x, effectiveY) ??
+          reorder(view, before, x, effectiveY))
+        : inflate(view, clone, x, effectiveY);
+
+    console.log(tr?.getMeta(shufflePluginKey));
 
     if (!tr) return;
 
@@ -145,6 +153,7 @@ export function startDragOnPointerDown(
   const onMove = throttle(function onMove(e: PointerEvent) {
     if (!skeletonOn || !clone || !layout) {
       clone = startDrag(dom!, translateCalc);
+      cloneStartTop = clone.getBoundingClientRect().top;
 
       if (pos !== null) {
         view.dispatch(
