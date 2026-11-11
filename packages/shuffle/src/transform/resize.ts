@@ -60,25 +60,25 @@ export function resize(
 
   let transaction!: Transaction;
 
+  const newEdge = Math.max(0, closestBar + 1);
+
   if (side === "start") {
-    const newStart = Math.max(0, closestBar + 1);
     setShuffleColumns(
       pos,
-      newStart,
+      newEdge,
       shuffleEnd,
     )(view.state, (tr) => {
       transaction = tr;
     });
-    return transaction;
+  } else {
+    setShuffleColumns(
+      pos,
+      shuffleStart,
+      newEdge,
+    )(view.state, (tr) => {
+      transaction = tr;
+    });
   }
 
-  const newEnd = Math.max(0, closestBar + 1);
-  setShuffleColumns(
-    pos,
-    shuffleStart,
-    newEnd,
-  )(view.state, (tr) => {
-    transaction = tr;
-  });
   return transaction;
 }

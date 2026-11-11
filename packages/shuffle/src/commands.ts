@@ -1,6 +1,8 @@
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
+import { randomRef } from "@pitter-patter/refs";
+
 import { shufflePluginKey, ShufflePluginMeta } from "./plugin.ts";
 import { ShuffleAlignment } from "./schema.ts";
 
@@ -15,7 +17,7 @@ export function setShuffleColumns(pos: number, start: number, end: number) {
       type: "resize",
       payload: { pos, start, end },
     } satisfies ShufflePluginMeta);
-    tr.setMeta("composition", shufflePluginKey.getState(state)?.comp);
+    tr.setMeta("composition", shufflePluginKey.getState(state)?.comp ?? randomRef());
     dispatch(tr);
     return true;
   };
