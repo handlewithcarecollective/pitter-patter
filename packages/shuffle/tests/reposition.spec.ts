@@ -78,10 +78,7 @@ test("keeps its width while moving", async ({ page }) => {
   expect(await tree(page)).toEqual(['"Header" 4-9', "image 6-9", '"Tail" 4-9']);
 });
 
-// A drag by its handle holds the pointer above the block it marks, so reorder never sees the block
-// as still under the pointer and moves it out of the row next to the block above. A drag whose
-// pointer is kept at the block's own height re-orders the row's children exactly as below.
-test.fail("re-orders the children of a row by the column they start at", async ({ page }) => {
+test("re-orders the children of a row by the column they start at", async ({ page }) => {
   await openEditor(page, [
     h("Header"),
     rowWith(
@@ -94,8 +91,6 @@ test.fail("re-orders the children of a row by the column they start at", async (
   ]);
   await dragBlockToColumn(page, T("L"), 8);
 
-  // L moves right of R, so R comes first in the document: the order of a row's children is the
-  // order they are drawn in.
   expect(await tree(page)).toEqual([
     '"Header" 4-9',
     "row",
@@ -106,8 +101,7 @@ test.fail("re-orders the children of a row by the column they start at", async (
   ]);
 });
 
-// As above: the block does snap to the column, but it leaves the row to do it.
-test.fail("a block moved sideways in a row is not moved out of it", async ({ page }) => {
+test("a block moved sideways in a row is not moved out of it", async ({ page }) => {
   await openEditor(page, [
     h("Header"),
     rowWith(

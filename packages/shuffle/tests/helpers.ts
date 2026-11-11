@@ -341,13 +341,21 @@ export async function dragBlockBeside(
   source: BlockSpec,
   target: BlockSpec,
 ): Promise<void> {
-  await dragBlockTo(page, source, target, (rect) => {
-    const gap = rect.width / 6;
-    const roomOnTheRight = (rect.end ?? 12) < 12;
-    return roomOnTheRight
-      ? { x: rect.right + gap / 2, y: rect.top + rect.height / 2 }
-      : { x: rect.left - gap / 2, y: rect.top + rect.height / 2 };
+  // Grouping looks at the pointer, which has to be at the target's height; the column the source
+  // lands in comes from the clone's left edge, so that goes on the first free column beside the
+  // target - right after it when there is room, otherwise just far enough left to end before it.
+  const session = await startDragOnHandle(page, source);
+  const from = await findBlock(page, source);
+  const rect = await findBlock(page, target);
+  const width = (from.end ?? 9) - (from.start ?? 4) + 1;
+  const column =
+    (rect.end ?? 12) < 12 ? (rect.end ?? 12) + 1 : Math.max(1, (rect.start ?? 1) - width);
+  const offset = await cloneOffset(page, session);
+  await aimPointerAt(page, session, {
+    x: (await columnLeft(page, column)) - offset.x,
+    y: rect.top + rect.height / 2,
   });
+  await endDrag(page);
 }
 
 /**

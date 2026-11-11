@@ -81,7 +81,6 @@ export function startDragOnPointerDown(
   const autoScroller = new AutoScroller();
 
   let clone: HTMLElement | null = null;
-  let cloneStartTop: number | null;
 
   let layout: AutoLayout | null = null;
   let currentAnimation: Timeline | null = null;
@@ -117,7 +116,11 @@ export function startDragOnPointerDown(
 
     const cloneRect = clone.getBoundingClientRect();
 
-    const effectiveY = hasBustedHandleGuard || cloneStartTop === null ? y : cloneStartTop - 5;
+    if (!hasBustedHandleGuard && handleRect && (y < handleRect.top || y > handleRect.bottom)) {
+      hasBustedHandleGuard = true;
+    }
+
+    const effectiveY = hasBustedHandleGuard ? y : domRect.top + 1;
 
     const tr =
       before != null
@@ -125,8 +128,6 @@ export function startDragOnPointerDown(
           autogroup(view, before, x, effectiveY) ??
           reorder(view, before, x, effectiveY))
         : inflate(view, clone, x, effectiveY);
-
-    console.log(tr?.getMeta(shufflePluginKey));
 
     if (!tr) return;
 
@@ -152,8 +153,7 @@ export function startDragOnPointerDown(
 
   const onMove = throttle(function onMove(e: PointerEvent) {
     if (!skeletonOn || !clone || !layout) {
-      clone = startDrag(dom!, translateCalc);
-      cloneStartTop = clone.getBoundingClientRect().top;
+      clone = startDrag(dom, translateCalc);
 
       if (pos !== null) {
         view.dispatch(

@@ -1,6 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-import { dragBlockBelow, dragBlockBy, openEditor, tree, type BlockSpec } from "./helpers.ts";
+import {
+  dragBlockBelow,
+  dragBlockBy,
+  dragBlockTo,
+  openEditor,
+  tree,
+  type BlockSpec,
+} from "./helpers.ts";
 import { container, h, p, rowWith } from "./nodes.ts";
 
 /**
@@ -112,7 +119,12 @@ test("a block taken out of a container leaves the container behind", async ({ pa
 
 test("a block dropped on a container's bottom edge goes inside it", async ({ page }) => {
   await openEditor(page, [h("Header"), container(p("A"), p("B")), p("Loose"), p("Tail")]);
-  await dragBlockBelow(page, T("Loose"), { type: "container" });
+  // Aimed well inside the bottom edge: the handle Loose is dragged by overlaps the bottom few px of
+  // the container above it, and a pointer still over the handle is treated as not having moved.
+  await dragBlockTo(page, T("Loose"), { type: "container" }, (rect, pointer) => ({
+    x: pointer.x,
+    y: rect.bottom - 10,
+  }));
 
   const lines = await tree(page);
   const containerIndex = lines.indexOf("container 4-9");

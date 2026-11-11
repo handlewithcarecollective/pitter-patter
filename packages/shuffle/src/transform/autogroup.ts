@@ -22,7 +22,7 @@ export function autogroup(
   if (node.type.spec.pitterPatter?.shuffle?.containedBy) return null;
 
   const adjacentElements = findAdjacentElements(clientY, view.dom.getBoundingClientRect()).filter(
-    (el) => !el.dataset["shuffleActive"] && el !== view.dom,
+    (el) => !el.closest("[data-shuffle-active]") && el !== view.dom,
   );
 
   const adjacentPmDoms = adjacentElements

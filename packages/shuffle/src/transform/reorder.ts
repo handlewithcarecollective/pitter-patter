@@ -5,7 +5,7 @@ import { insertPoint } from "prosemirror-transform";
 import { EditorView } from "prosemirror-view";
 
 import { shufflePluginKey, ShufflePluginMeta } from "../plugin.ts";
-import { getBeforeContainedBy, isShuffleRow, } from "../schema.ts";
+import { getBeforeContainedBy, isShuffleRow } from "../schema.ts";
 
 export function reorder(
   view: EditorView,
@@ -123,7 +123,6 @@ export function findGap(
 
   const candidate = doc.nodeAt(candidateStart);
   if (!candidate) return null;
-  console.log(candidate.type.name);
 
   const candidateNode = view.nodeDOM(candidateStart);
   if (!(candidateNode instanceof Element)) return null;
