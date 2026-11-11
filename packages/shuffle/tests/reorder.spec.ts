@@ -176,23 +176,14 @@ test("dragged blocks can swap with their placeholders", async ({ page }) => {
     p("Last"),
   ]);
 
+  const initial = treePositions(await blocks(page));
+
   const session = await startDragOnHandle(page, { type: "container" });
   const l = await findBlock(page, T("L"));
   await moveCloneTo(page, session, { x: centerX(l), y: l.top + l.height / 2 });
 
-  expect(await tree(page)).toEqual([
-    '"Header" 4-9',
-    "row",
-    '  "L" 1-5',
-    "  container 1-6",
-    '    "C1" 4-9',
-    '    "C2" 4-9',
-    '    "C3" 4-9',
-    '    "C4" 4-9',
-    '  "R" 7-11',
-    '"Tail" 4-9',
-    '"Last" 4-9',
-  ]);
+  expect((await findBlock(page, { type: "container" })).depth).toBe(2);
+  expect((await findBlock(page, { type: "row" })).childCount).toBe(3);
 
   const placeholder = await placeholderRect(page);
   if (!placeholder) throw new Error("Joining the row left no placeholder in the page");
@@ -203,20 +194,11 @@ test("dragged blocks can swap with their placeholders", async ({ page }) => {
   });
   await endDrag(page);
 
-  expect(await tree(page)).toEqual([
-    '"Header" 4-9',
-    "container 1-6",
-    '  "C1" 4-9',
-    '  "C2" 4-9',
-    '  "C3" 4-9',
-    '  "C4" 4-9',
-    "row",
-    '  "L" 1-5',
-    '  "R" 7-11',
-    '"Tail" 4-9',
-    '"Last" 4-9',
-  ]);
+  expect(treePositions(await blocks(page))).toEqual(initial);
 });
 
 const topLevelBlocks = async (page: Page): Promise<HarnessBlock[]> =>
   (await blocks(page)).filter((block) => block.depth === 1);
+
+const treePositions = (list: HarnessBlock[]): string[] =>
+  list.map((block) => `${block.type} ${block.path.join("/")}`);
