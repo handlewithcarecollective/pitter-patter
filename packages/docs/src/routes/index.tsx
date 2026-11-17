@@ -24,15 +24,23 @@ function Home() {
           </h1>
           <p className="text-left">An open source collaborative rich editing toolkit.</p>
           <p className="text-left">Built with React and ProseMirror.</p>
-          <Link
-            to="/docs/$"
-            params={{
-              _splat: "introduction/getting-started",
-            }}
-            className="px-3 py-2 rounded-lg bg-fd-primary text-fd-primary-foreground font-medium text-sm"
-          >
-            Get started
-          </Link>
+          <div className="flex gap-2 md:gap-4">
+            <Link
+              to="/demo"
+              className="px-3 py-2 rounded-lg bg-fd-primary text-fd-primary-foreground font-medium text-sm"
+            >
+              Demo
+            </Link>
+            <Link
+              to="/docs/$"
+              params={{
+                _splat: "introduction/getting-started",
+              }}
+              className="px-3 py-2 rounded-lg bg-fd-primary text-fd-primary-foreground font-medium text-sm"
+            >
+              Get started
+            </Link>
+          </div>
         </div>
       </div>
     </HomeLayout>
