@@ -5,6 +5,8 @@ description: ""
 
 [What is Pitter Patter?](/docs/introduction/what-is-pitter-patter)
 
+Check out the [demo](/demo) here to see the collab and shuffle packages in action!
+
 ---
 
 ## Rich text editing
