@@ -3,6 +3,22 @@
   box-sizing: border-box;
 }
 
+/* anime.js applies position: absolute to every node _except_ nodes that have
+text node siblings. That means an inline node with text siblings keeps its
+non-animated position (usually static), but its _children_ get position: absolute.
+So then the inline node's children get their animation coords (top, left)
+applied, they position themselves relative to their grandparent, rather
+than their parent.
+
+To work around this, we apply position: relative to every animated node
+with the lowest specificity (0,0,0). anime.js's manual position: absolute
+application beats this, so it's a no-op for everything _other_ than
+the inline case described above. In that case, the only effect it has
+is to prevent children from being positioned relative to their grandparents. */
+:where(.is-animated) :where(*) {
+  position: relative;
+}
+
 .shuffle-wrapper {
   position: relative;
   align-content: start;
