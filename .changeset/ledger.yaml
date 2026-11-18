@@ -36,6 +36,12 @@
   intents:
     - afraid-hairs-begin
     - wicked-owls-bet
+"@pitter-patter/shuffle@0.3.11":
+  dir: packages/shuffle
+  intents:
+    - angry-swans-unite
+    - fair-wombats-unite
+    - honest-pots-do
 "@pitter-patter/shuffle@0.3.7":
   dir: packages/shuffle
   intents:
