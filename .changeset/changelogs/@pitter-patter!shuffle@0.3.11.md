@@ -8,5 +8,5 @@
   shuffle clone; track the mouse pointer rather than the center of the drag clone when calculating
   transforms.
 
-- When a drag starts on a drag handle, don't report a y-axis move until the drag has moved outside the
-  original handle rect
+- When a drag starts on a drag handle, don't report a y-axis move until the drag has moved outside
+  the original handle rect
