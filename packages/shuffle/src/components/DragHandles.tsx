@@ -134,12 +134,9 @@ interface DragHandleRendererProps {
   handleComponent?: ComponentType<DragHandleProps> | undefined;
 }
 
-export function DragHandleRenderer({
-  pos,
-  left,
-  top,
-  handleComponent: Handle,
-}: DragHandleRendererProps) {
+export function DragHandleRenderer({ pos, left, top, handleComponent }: DragHandleRendererProps) {
+  const Handle = handleComponent ?? DragHandle;
+
   const node = useEditorStateSelector((state) => state.doc.nodeAt(pos));
 
   const initialZIndex = useEditorStateSelector((state) => state.doc.resolve(pos).depth + 10_000);
@@ -168,27 +165,11 @@ export function DragHandleRenderer({
 
   if (!node) return;
 
-  if (Handle) {
-    return (
-      <Handle
-        style={{ top, left, zIndex }}
-        node={node}
-        onPointerDown={handlePointerDown}
-        onMouseEnter={() => {
-          setHovered(true);
-        }}
-        onMouseLeave={() => {
-          setHovered(false);
-        }}
-      />
-    );
-  }
-
   return (
-    <DragHandle
+    <Handle
       style={{ top, left, zIndex }}
-      onPointerDown={handlePointerDown}
       node={node}
+      onPointerDown={handlePointerDown}
       onMouseEnter={() => {
         setHovered(true);
       }}
@@ -202,16 +183,20 @@ export function DragHandleRenderer({
 export function DragHandle(props: DragHandleProps) {
   const { style, node, onPointerDown, onMouseEnter, onMouseLeave } = props;
   return (
-    <button
-      type="button"
-      className="shuffle-drag-handle"
-      style={style}
-      draggable="false"
-      onPointerDown={onPointerDown}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      {sentenceCase(node.type.name)}
-    </button>
+    // zero-size div wrapper gives the button an anchor so we can set `bottom` instead of setting `top` with
+    // `translateY(-100%)`, which can cause a 1-pixel dead zone between the node and the handle on Firefox
+    <div style={{ position: "absolute", ...style }}>
+      <button
+        type="button"
+        className="shuffle-drag-handle"
+        style={{ bottom: 0 }}
+        draggable="false"
+        onPointerDown={onPointerDown}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        {sentenceCase(node.type.name)}
+      </button>
+    </div>
   );
 }

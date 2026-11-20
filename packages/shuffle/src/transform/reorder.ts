@@ -170,7 +170,7 @@ export function findGap(
  * ancestor when the position sits inside an inline node with content).
  *
  * Otherwise the position is a gap between block children. When the pointer is
- * over a draggable parent's own chrome, that parent is the candidate; otherwise
+ * over a draggable parent's own clone, that parent is the candidate; otherwise
  * it is one of the two blocks adjacent to the gap.
  */
 function findCandidate($pos: ResolvedPos, inside: number): number | null {
